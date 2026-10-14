@@ -1,0 +1,20 @@
+{
+  "name": "dev-kit",
+  "interface": {
+    "displayName": "dev-kit"
+  },
+  "plugins": [
+    {
+      "name": "dk",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

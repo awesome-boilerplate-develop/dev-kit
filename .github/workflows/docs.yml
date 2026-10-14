@@ -1,0 +1,23 @@
+name: docs
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # check_i18n.py compares each translation with its source commit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: References between controllers and parts
+        run: python3 scripts/check_parts.py .
+      - name: Manifest versions in sync
+        run: python3 scripts/bump_version.py --check
+      - name: Translations (stale translations are warnings)
+        run: python3 scripts/check_i18n.py

@@ -1,0 +1,15 @@
+# .dev-kit/config.yml — written by dk:init, read by every dk controller
+base_branch: main
+commands:
+  check: ""   # one command that runs everything below that exists, e.g. "make check"
+  test: ""
+  lint: ""
+  build: ""
+tracker: none        # none | github  (not used by controllers yet)
+graph:
+  codegraph: false   # true when the repo has a .codegraph/ index (rule G1)
+  crg: false         # true when code-review-graph has built .code-review-graph/ (rule G1)
+standards:
+  kit: [review/finding-quality]   # ids under dev-kit/standards/
+  team: ""                        # path to the team standards folder, or ""
+  disable: []                     # ids (file or file#item) to switch off

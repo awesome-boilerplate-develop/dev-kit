@@ -1,0 +1,13 @@
+{
+  "source": "en",
+  "readme": {
+    "vi": "README.vi.md",
+    "zh-CN": "README.zh-CN.md",
+    "ja": "README.ja.md"
+  },
+  "docs": {
+    "vi": ["README.md", "01-overview.md", "02-architecture.md", "03-skills.md", "04-rules.md", "05-setup-and-usage.md", "06-evidence.md", "07-maintenance.md", "glossary.md"],
+    "zh-CN": ["README.md", "01-overview.md", "03-skills.md", "05-setup-and-usage.md", "glossary.md"],
+    "ja": ["README.md", "01-overview.md", "03-skills.md", "05-setup-and-usage.md", "glossary.md"]
+  }
+}

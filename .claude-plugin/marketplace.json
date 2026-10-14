@@ -1,0 +1,13 @@
+{
+  "name": "dev-kit",
+  "owner": {
+    "name": "awesome-boilerplate-develop"
+  },
+  "plugins": [
+    {
+      "name": "dk",
+      "source": "./",
+      "description": "4 kanban-card controllers + init, merged from Superpowers, Matt Pocock's skills and agent-skills"
+    }
+  ]
+}
