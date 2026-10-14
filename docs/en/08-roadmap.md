@@ -10,13 +10,13 @@
 | 4 | Dogfood for 1–2 weeks, record in `templates/dogfood-log.md` | Measures what the lab cannot: whether anyone reads the reports, whether review catches real bugs, whether the workflow gets in the way |
 | 5 | Fix based on the log, re-measure in the lab before releasing a new version | Keeps the "evidence first" principle |
 
-## 8.2 Not in 0.7.0
+## 8.2 Features: built and not built
 
 | Feature | Status | Notes |
 |---|---|---|
 | Tracker (GitHub Issues…) | Not built | Specs are currently local files in `.dev-kit/specs/` |
-| Hosts other than Claude Code (omp, Codex) | Not tried ❓ | Skill invocation syntax and subagent spawning differ |
-| `CONSTRAINTS.md` read automatically by pre-pr-check | Partial | pre-pr-check looks for signs of lowered standards in the diff, but does not yet compare against the numeric thresholds in `CONSTRAINTS.md` |
+| Hosts other than Claude Code | Done (0.8.12) | Codex, Copilot CLI, Antigravity, OpenCode, omp load the kit; review quality measured only once on Codex ([05](05-setup-and-usage.md), [06](06-evidence.md)) |
+| `CONSTRAINTS.md` read automatically by pre-pr-check | Done (1.1.0) | pre-pr-check step 1 checks the diff against `.dev-kit/CONSTRAINTS.md` (or the project's own) when it exists; not measured |
 
 ## 8.3 Rules waiting for evidence
 
@@ -30,6 +30,24 @@
 
 1. **Main host:** Claude Code or omp? This decides how codegraph is wired in and how subagents are spawned.
 2. **Specs:** keep them as local files or push them to a tracker?
-3. **`.dev-kit/`:** which parts to commit (config, specs) and which to ignore (reports)?
+3. ~~**`.dev-kit/`:** which parts to commit and which to ignore?~~ Decided in 1.1.0: dev-kit is personal and nothing in `.dev-kit/` is committed. A shared team mode is an idea for later (8.5).
 4. **Artifacts:** write them in Vietnamese, or in the language of the card?
 5. **Cost:** do bugs need to come down below 1.5× baseline (currently 1.8×)? That would mean dropping review or the report for small bugs.
+
+## 8.5 Ideas for later
+
+### Team mode (not built)
+
+1.1.0 made dev-kit strictly personal (rule O1). A team that wants to share its setup could later opt in to a **team mode**, chosen once in `dk:init` (for example `mode: personal | team` in `config.yml`, default `personal`).
+
+What team mode could change:
+- **Committed:** `.dev-kit/config.yml` (commands, base branch), `.dev-kit/standards/` (project rules, reviewed in PRs like code), `.dev-kit/specs/`, and possibly `baseline.md`. `.dev-kit/.gitignore` would then list only the personal parts (`reports/`, `plans/`, `sdd/`, `init-report.md`) instead of `*`.
+- **Project knowledge:** `domain-modeling` and `constraint-driven-development` could write to the project's own `GLOSSARY.md`, `docs/adr/` and `CONSTRAINTS.md` at the root, as upstream does.
+- **Worktrees:** the committed parts arrive with every worktree; only the personal parts would still need copying.
+- **Onboarding:** a teammate's `dk:init` would read the committed config and standards instead of detecting everything again.
+
+Open questions before building it:
+- Who owns the shared standards, and how a personal override (project > team > kit) works when the project layer is committed.
+- Whether a red `baseline.md` should be shared: it goes stale as tests are fixed.
+- How to measure the gain: for example, the in-house controls rule (CHANGELOG 0.8.7) applied by several people from one committed file versus each person keeping a copy.
+- Whether `standards.team` (a shared folder outside the repo) already covers enough of this, making team mode unnecessary.
