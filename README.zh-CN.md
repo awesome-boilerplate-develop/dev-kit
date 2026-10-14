@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.0.0 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.1.0 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | 简体中文 | [日本語](README.ja.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](README.md)。
@@ -63,18 +63,18 @@ omp plugin install dk@dev-kit
 
 ### OpenCode
 
-OpenCode 从文件夹加载 skill，因此需要克隆仓库并链接这些 skill：
+OpenCode 从文件夹加载 skill，因此需要克隆仓库并链接到你的用户 skill 文件夹：
 
 ```bash
-git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/.dev-kit
+git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/dev-kit
 mkdir -p ~/.config/opencode/skills
-for s in ~/.dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
+for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 ```
 
 然后在 `~/.config/opencode/opencode.json` 中让 OpenCode 读取 kit 目录：
 
 ```json
-{ "permission": { "external_directory": { "~/.dev-kit/**": "allow" } } }
+{ "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
 ### 其他 CLI
@@ -86,7 +86,7 @@ for s in ~/.dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 
 ## 快速开始
 
-1. 用 agent 打开你的仓库，让它 **使用 `dk:init`**。它会检查你的工具、检测测试和构建命令、在安装任何东西之前先询问，并把当前的测试 baseline 记录在 `.dev-kit/` 中。
+1. 用 agent 打开你的仓库，让它 **使用 `dk:init`**。它会给出一份带默认值的计划（测试和构建命令、graph 索引），在你回复 “ok” 之后创建 `.dev-kit/` 并记录当前的测试 baseline。
 2. 按名称把卡片交给它：
 
    ```text
@@ -101,7 +101,8 @@ for s in ~/.dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 - **有证据的 rule。** [`rules/RULES.md`](rules/RULES.md) 列出每条 rule、它是否开启，以及背后的 lab 结果。只有当一条 rule 在至少 5 个它没见过的任务上起到了帮助，才会被打开。
 - **按风险决定 review 深度。** `dk:pre-pr-check` 会根据 diff 的大小和类型，选择 self-review、一个 reviewer 或四个 reviewer（标准、spec、安全、测试）。
 - **机器检查的报告。** [`scripts/check_report.py`](scripts/check_report.py) 会拒绝一份报告，直到其中的 “certain” finding 位于被修改的代码中、不是泛泛的“缺少测试”之类的评语，并且只引用存在的 rule。
-- **分层的标准。** kit、团队和项目三层标准（`.dev-kit/standards/`）；每个 reviewer 只会收到与其角色相关的主题。
+- **个人使用，从不推送。** dev-kit 写入的所有内容（配置、specs、plans、reports、你的项目标准）都放在 `.dev-kit/` 中，它会在 git 中自我忽略；dev-kit 从不修改 `.gitignore`、`CLAUDE.md`、`AGENTS.md` 或任何其他被跟踪的文件。
+- **分层的标准。** kit 标准、你以任意方式共享的团队文件夹（`standards.team`），以及位于 `.dev-kit/standards/` 的你自己的项目标准；每个 reviewer 只会收到与其角色相关的主题。
 - **可选的 graph 工具。** 有了 [codegraph](https://github.com/colbymchenry/codegraph) 和 code-review-graph 索引，controller 会用它们来查找代码、衡量 blast radius，并在 review 之前运行 `detect-changes`。
 
 ## 证据

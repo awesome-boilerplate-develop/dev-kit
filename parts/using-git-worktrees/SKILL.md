@@ -83,7 +83,7 @@ Follow this priority order. Explicit user preference always beats observed files
 git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/dev/null
 ```
 
-**If NOT ignored:** Add to .gitignore, commit the change, then proceed.
+**If NOT ignored:** add the directory to `.git/info/exclude` (a local file git never pushes), then proceed. Do not edit or commit `.gitignore`: dev-kit is personal and never changes tracked files (rule O1).
 
 **Why critical:** Prevents accidentally committing worktree contents to repository.
 
@@ -101,7 +101,19 @@ cd "$path"
 
 ## Step 2: Project Setup
 
-Auto-detect and run appropriate setup:
+**Bring dev-kit's local files along (dev-kit).** `.dev-kit/` is ignored, so a new worktree (native tool or git fallback) starts without it. From the worktree, copy everything except reports and the SDD workspace from the main checkout, so the worktree has the config, baseline, standards, specs and plans:
+
+```bash
+main=$(cd "$(git rev-parse --git-common-dir)/.." && pwd -P)
+if [ -d "$main/.dev-kit" ] && [ ! -e .dev-kit ]; then
+  mkdir .dev-kit
+  (cd "$main/.dev-kit" && tar --exclude ./reports --exclude ./sdd -cf - .) | tar -xf - -C .dev-kit
+fi
+```
+
+Graph indexes (`.codegraph/`, `.code-review-graph/`) are not copied; rule G1 is off in the worktree unless you build them there.
+
+Then auto-detect and run appropriate setup:
 
 ```bash
 # Node.js
@@ -151,7 +163,8 @@ Ready to implement <feature-name>
 | `worktrees/` exists | Use it (verify ignored) |
 | Both exist | Use `.worktrees/` |
 | Neither exists | Check instruction file, then default `.worktrees/` |
-| Directory not ignored | Add to .gitignore + commit |
+| Directory not ignored | Add to `.git/info/exclude` (never commit `.gitignore`) |
+| `.dev-kit/` exists in the main checkout | Copy it into the worktree, minus `reports/` and `sdd/` |
 | Permission error on create | Sandbox fallback, work in place |
 | Tests fail during baseline | Report failures + ask |
 | No package.json/Cargo.toml | Skip dependency install |

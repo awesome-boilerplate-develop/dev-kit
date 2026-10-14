@@ -92,7 +92,7 @@ Stop at four. A twelve-question intake produces a config nobody understands and 
 
 ### Step 3: Write CONSTRAINTS.md
 
-One file at the repo root. Any agent on any harness can read it, and a change to it shows up in review where it belongs.
+Upstream puts one file at the repo root so every agent and reviewer sees it. **Under dev-kit it goes to `.dev-kit/CONSTRAINTS.md`** (rule O1: dev-kit is personal and never adds tracked files). If the repo already has a root `CONSTRAINTS.md`, read and follow that one instead; propose changes to the user rather than editing it.
 
 ```markdown
 # Constraints
@@ -137,7 +137,7 @@ number and no command in this column is an aspiration, not a constraint.
 | W1 | `no-explicit-any` | `src/legacy/**` | Rewrite tracked in ENG-441 | @addy | 2026-11-01 |
 ```
 
-Then **ask the user** whether to add one line to `AGENTS.md` and/or `CLAUDE.md`: `Read CONSTRAINTS.md before writing code. Do not weaken it to make a change pass.` Never edit those files without a yes (dev-kit rule).
+Do not add a line to `AGENTS.md` or `CLAUDE.md`: those files are tracked and shared (rule O1). dev-kit controllers read `.dev-kit/CONSTRAINTS.md` themselves (`dk:pre-pr-check` step 1).
 
 ### Step 4: Install what each dimension needs
 
@@ -205,7 +205,7 @@ Someone will point out that if the agent writes the code and the checks, the che
 
 Agents don't craft clever loopholes. They hit a red check and take the cheapest road to green. Watch for these five moves in the diff, at review time:
 
-1. **The threshold moved.** A budget lowered, a severity dropped, a check removed from the fast stage. Compare `CONSTRAINTS.md` against its state at the branch point.
+1. **The threshold moved.** A budget lowered, a severity dropped, a check removed from the fast stage. Compare `CONSTRAINTS.md` against its state at the branch point. (dev-kit: `.dev-kit/CONSTRAINTS.md` is not in git, so there is no branch-point copy; treat any edit that loosens it during a task as this move, and never edit it to make a change pass.)
 2. **A test got easier.** `.skip` added, a test file deleted, assertions pulled out of tests that stayed.
 3. **A checker got silenced.** New `@ts-ignore` or `eslint-disable`. Four suppressions deserve special attention because they switch off a check you're relying on: `istanbul ignore` drops code from coverage instead of testing it, `Stryker disable` hides a surviving mutant, `nosemgrep` and `gitleaks:allow` do it for security findings.
 4. **Work is unfinished.** A stub that throws, an empty `catch` turning a failure into silence, a `TODO` standing where the implementation should be.

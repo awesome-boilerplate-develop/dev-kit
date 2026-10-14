@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.0.0 review=human -->
+<!-- i18n: source=README.md source_commit=v1.1.0 review=human -->
 [English](README.md) | Tiếng Việt | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([README.md](README.md)) là bản chuẩn.
@@ -63,18 +63,18 @@ omp plugin install dk@dev-kit
 
 ### OpenCode
 
-OpenCode nạp skill từ các thư mục, nên hãy clone repo rồi liên kết các skill:
+OpenCode nạp skill từ các thư mục, nên hãy clone repo rồi liên kết các skill vào thư mục skill của user:
 
 ```bash
-git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/.dev-kit
+git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/dev-kit
 mkdir -p ~/.config/opencode/skills
-for s in ~/.dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
+for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 ```
 
 Sau đó cho OpenCode đọc thư mục kit, trong `~/.config/opencode/opencode.json`:
 
 ```json
-{ "permission": { "external_directory": { "~/.dev-kit/**": "allow" } } }
+{ "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
 ### Các CLI khác
@@ -86,7 +86,7 @@ Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý 
 
 ## Bắt đầu nhanh
 
-1. Mở repo của bạn bằng agent và nhờ nó **dùng `dk:init`**. Nó kiểm tra công cụ, phát hiện lệnh test và build, hỏi trước khi cài bất cứ thứ gì, và ghi lại test baseline hiện tại trong `.dev-kit/`.
+1. Mở repo của bạn bằng agent và nhờ nó **dùng `dk:init`**. Nó đưa ra một kế hoạch với các giá trị mặc định (lệnh test và build, index graph), và sau khi bạn trả lời "ok" thì tạo `.dev-kit/` và ghi lại test baseline hiện tại.
 2. Giao thẻ cho nó theo tên:
 
    ```text
@@ -101,7 +101,8 @@ Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý 
 - **Rule có bằng chứng.** [`rules/RULES.md`](rules/RULES.md) liệt kê từng rule, trạng thái bật/tắt và kết quả lab đứng sau nó. Một rule chỉ được bật nếu nó giúp ích trên ít nhất 5 tác vụ chưa từng thấy.
 - **Độ sâu review theo rủi ro.** `dk:pre-pr-check` chọn self-review, một reviewer hoặc bốn (standards, spec, security, tests) tùy theo kích thước và loại của diff.
 - **Báo cáo được máy kiểm tra.** [`scripts/check_report.py`](scripts/check_report.py) từ chối một báo cáo cho đến khi finding "certain" nằm trong code đã đổi, không phải nhận xét chung chung kiểu thiếu test, và chỉ trích dẫn những rule có thật.
-- **Tiêu chuẩn theo lớp.** Tiêu chuẩn của kit, team và project (`.dev-kit/standards/`); mỗi reviewer chỉ nhận các chủ đề thuộc vai trò của mình.
+- **Của riêng bạn, không bao giờ push.** Mọi thứ dev-kit ghi (config, spec, plan, báo cáo, tiêu chuẩn project của bạn) nằm trong `.dev-kit/`, thư mục này tự bị git bỏ qua; dev-kit không bao giờ sửa `.gitignore`, `CLAUDE.md`, `AGENTS.md` hay bất kỳ file nào đang được git theo dõi.
+- **Tiêu chuẩn theo lớp.** Tiêu chuẩn của kit, một thư mục team mà bạn chia sẻ theo cách nào cũng được (`standards.team`), và tiêu chuẩn project của riêng bạn trong `.dev-kit/standards/`; mỗi reviewer chỉ nhận các chủ đề thuộc vai trò của mình.
 - **Công cụ graph (tùy chọn).** Với các index của [codegraph](https://github.com/colbymchenry/codegraph) và code-review-graph, controller tìm code, đo blast radius và chạy `detect-changes` trước khi review.
 
 ## Evidence

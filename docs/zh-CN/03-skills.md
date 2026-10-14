@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.0.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.1.0 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -24,29 +24,30 @@
 **使用场景：** 在一台机器或一个仓库上首次使用 dev-kit；或者想重新检查设置时。
 
 **原则：**
-- 先打印计划，等你批准，再动手。
+- 打印一份填好默认值的计划，等你批准（一次回答），再动手。只有在缺少工具或 baseline 是红的时候，才会另外询问。
 - 重新运行只会检查并补全缺失的部分；不会覆盖已有文件。
 - 安装任何东西或修改仓库之外的任何内容，都要先询问。
 - 它不包含任何 controller 逻辑。
+- `.dev-kit/` 是个人的：它创建的任何内容都不会被提交，也从不修改 `.gitignore` 等被跟踪的文件。
 
 **步骤：**
 1. **机器：** 检查 `git`、`gh`、`make`、`codegraph`、`code-review-graph`（含版本）；列出已启用的 plugin，并提醒你按名称调用 `dk:<controller>`。
    - **检查 graph 工具**：使用 `scripts/install-graph-tools.sh --check`。
    - **如果缺失：** 在计划中说明并询问一次。如果你同意，运行 `scripts/install-graph-tools.sh --install`（固定版本；已有的工具不会动）。如果你拒绝，则继续，并在报告中写 “G1 off”。
    - **绝不运行** `codegraph install` 或 `code-review-graph install`：这两个命令会注册 MCP、hook 和指令文件。
-2. **检测命令：** 从 `Makefile`、`package.json`、`pyproject.toml` 中检测。请你确认，然后写入 `.dev-kit/config.yml`。
-3. **创建 `.dev-kit/`**（specs、plans、reports）。询问哪些部分要提交。
-4. **可选：** 用 `constraint-driven-development` part 创建 `CONSTRAINTS.md`（会询问你的质量标准；有默认阈值）。
+2. **检测命令：** 从 `Makefile`、`package.json`、`pyproject.toml` 中检测。在计划中展示它们，然后写入 `.dev-kit/config.yml`。
+3. **创建 `.dev-kit/`**（specs、plans、reports），并放入内容为 `*` 的 `.gitignore`，让 git 忽略整个文件夹。无需决定提交什么。
+4. **可选**（默认不创建；在计划中询问）：用 `constraint-driven-development` part 创建 `.dev-kit/CONSTRAINTS.md`（会询问你的质量标准；有默认阈值）。
 5. **Graph 索引，默认开启**（属于你批准的计划的一部分）：
    - 运行 `codegraph init` 和 `code-review-graph build`；
-   - 对于大型仓库，先报告磁盘占用并询问：每约 3,000 个文件大致占用 150 MB 和 600 MB；
-   - 把 `.codegraph/` 和 `.code-review-graph/` 加入 `.gitignore`，并在 `config.yml` 中写入 `graph.*`。
+   - 对于大型仓库，计划中会显示磁盘占用：每约 3,000 个文件大致占用 150 MB 和 600 MB；
+   - 不要改动仓库的 `.gitignore`：如果某个索引文件夹仍出现在 `git status` 中（codegraph 会保留它自己的、可见的 `.gitignore`），就把它加入 `.git/info/exclude`（仅对你本地的克隆有效）；并在 `config.yml` 中写入 `graph.*`。
 6. **Baseline：** 运行一次测试和构建。
    - **绿：** 记录到报告中。
    - **红：** 报告失败数量和主要的失败分组，然后请你选择：**停止**（先修复）或**接受为已知 baseline**。如果你接受，就写入 `.dev-kit/baseline.md`（按 `templates/baseline.md`），逐个按名称列出失败的测试。此后 controller 只有在此列表**之外**的测试失败时，才把一次运行算作失败（rule B1）。
-7. **写入 `.dev-kit/init-report.md`。**
+7. **写入 `.dev-kit/init-report.md`**，并检查 `git status` 与运行 `dk:init` 之前相比没有变化。
 
-**输出：** `config.yml`、`.dev-kit/` 目录、init 报告，以及可选的 `CONSTRAINTS.md` 和 graph 索引。
+**输出：** `config.yml`、`.dev-kit/` 目录、init 报告，以及可选的 `.dev-kit/CONSTRAINTS.md` 和 graph 索引。无需提交任何内容。
 
 ⚠️ `dk:init` **从未在 lab 中运行过**。它是最先要试的东西（[08](../en/08-roadmap.md)，英文）。
 

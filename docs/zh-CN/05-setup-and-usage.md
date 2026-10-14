@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.0.0 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.1.0 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | 简体中文 | [日本語](../ja/05-setup-and-usage.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[05-setup-and-usage.md](../en/05-setup-and-usage.md)。
@@ -53,9 +53,8 @@ dev-kit 的 rule 和 lab 证据都是在 Claude 上测量的。对于表中的 C
 |---|---|---|
 | `claude --plugin-dir /path/to/dev-kit` | 仅该 session | 加载本地 checkout；不改动任何配置；适合在修改 kit 时使用 |
 | `claude plugin install dk@dev-kit` | 默认为用户（所有项目） | 安装结果显示 `scope: user`（2026-10-14）；仅项目的选项未验证 ❓ |
-| 在仓库的 `.claude/settings.json` 中启用 | 仅该仓库 | 适合只有部分仓库使用 dev-kit 的情况 |
 
-建议：如果你在很多仓库中使用，就为用户安装，但只在真正使用它的仓库里运行 `dk:init`。
+建议：为你的用户安装，并且只在你使用它的仓库里运行 `dk:init`。不要在仓库共享的 `.claude/settings.json` 中启用 dev-kit：它是个人 kit（rule O1）。
 
 ## 5.4 与其他 plugin 一起使用（Superpowers、code-review……）
 
@@ -102,7 +101,7 @@ lab 测量了 17 个 SWE Django 任务（Haiku）：有索引和没有索引都�
 Use skill dk:init for this repo.
 ```
 
-agent 会打印一份计划，请你确认检查命令，然后创建 `.dev-kit/` 并运行 baseline。如果 baseline 是红的，它会停下来：先把它变绿，因为每个 controller 都依赖一个绿色的起点。
+agent 会打印一份带默认值的计划（检查命令、graph 索引、不创建 `CONSTRAINTS.md`），并等待你的批准；回复 “ok” 或说明要改什么。然后它创建 `.dev-kit/`（被 git 忽略，无需提交）并运行 baseline。如果 baseline 是红的，它会询问是停止，还是把当前的失败接受为已知。
 
 ## 5.8 日常使用
 

@@ -1,5 +1,12 @@
 # dev-kit changelog
 
+## 1.1.0 (2026-10-14): `.dev-kit/` is personal, `dk:init` asks once
+- **Nothing dev-kit writes is committed (rule O1).** `dk:init` creates `.dev-kit/.gitignore` containing `*`, so the whole folder stays out of git. It no longer asks what to commit and never edits the repo's `.gitignore`; index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to `.git/info/exclude`.
+- **`dk:init` prints one plan with defaults** (commands, graph indexes, no `CONSTRAINTS.md`) and needs one approval; it asks separately only for a missing tool or a red baseline. It ends by checking that `git status` is unchanged.
+- **Parts no longer write tracked files:** `domain-modeling` writes new terms and ADRs to `.dev-kit/GLOSSARY.md` and `.dev-kit/adr/`, `constraint-driven-development` writes `.dev-kit/CONSTRAINTS.md` and never edits `CLAUDE.md`/`AGENTS.md`; the project's own files are read and changes to them are proposed. `dk:pre-pr-check` step 1 checks the diff against `CONSTRAINTS.md` when one exists.
+- **Worktrees:** `using-git-worktrees` ignores the worktree folder in `.git/info/exclude` instead of committing `.gitignore`, and copies `.dev-kit/` (minus `reports/`, `sdd/`) into the new worktree so config, baseline, standards, specs and plans are there.
+- **Verified (Claude Code, Sonnet 5.5, a throwaway repo):** `dk:init` left `git status` unchanged and the repo's `.gitignore` untouched (a first run exposed the codegraph case, fixed above); the worktree part produced a worktree with the copied `.dev-kit/` and a clean `git status` in both checkouts.
+
 ## 1.0.0 (2026-10-14): first public release
 - **Skills:** `dk:init` plus 4 controllers (`dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`), 16 parts copied from Superpowers, mattpocock/skills and agent-skills (`UPSTREAM.md`), 2 review agents.
 - **Rules with evidence** (`rules/RULES.md`), layered standards (kit, team, project), optional graph tools, and a machine check of `pre-pr-check` reports (`scripts/check_report.py`).

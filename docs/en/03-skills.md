@@ -21,9 +21,10 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 **Use when:** using dev-kit for the first time on a machine or a repo; or when you want to re-check the setup.
 
 **Principles:**
-- Print the plan first, wait for your approval, then act.
+- Print one plan with the defaults filled in, wait for your approval (one answer), then act. It asks separately only when a tool is missing or the baseline is red.
 - A re-run only checks and fills in what is missing; it does not overwrite existing files.
 - Installing anything or changing anything outside the repo requires asking first.
+- `.dev-kit/` is personal: nothing it creates is committed, and it never edits a tracked file such as `.gitignore`.
 - It contains no controller logic.
 
 **Steps:**
@@ -31,19 +32,19 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
    - **Check the graph tools** with `scripts/install-graph-tools.sh --check`.
    - **If missing:** say so in the plan and ask once. If you agree, run `scripts/install-graph-tools.sh --install` (pinned versions; tools already present are left alone). If you decline, continue and write "G1 off" in the report.
    - **Never run** `codegraph install` or `code-review-graph install`: those two commands register MCP, hooks and instruction files.
-2. **Detect commands:** from `Makefile`, `package.json`, `pyproject.toml`. Ask you to confirm, then write `.dev-kit/config.yml`.
-3. **Create `.dev-kit/`** (specs, plans, reports). Ask which parts will be committed.
-4. **Optional:** create `CONSTRAINTS.md` with the `constraint-driven-development` part (asks you for quality standards; there are default thresholds).
+2. **Detect commands:** from `Makefile`, `package.json`, `pyproject.toml`. Show them in the plan, then write `.dev-kit/config.yml`.
+3. **Create `.dev-kit/`** (specs, plans, reports) with a `.gitignore` containing `*`, so git ignores the whole folder. Nothing to decide about committing.
+4. **Optional** (default no; ask for it in the plan): create `.dev-kit/CONSTRAINTS.md` with the `constraint-driven-development` part (asks you for quality standards; there are default thresholds).
 5. **Graph indexes, on by default** (part of the plan you approve):
    - run `codegraph init` and `code-review-graph build`;
-   - for a large repo, report the disk size first and ask: roughly 150 MB and 600 MB per ~3,000 files;
-   - add `.codegraph/` and `.code-review-graph/` to `.gitignore`, and write `graph.*` in `config.yml`.
+   - for a large repo, the plan shows the disk size: roughly 150 MB and 600 MB per ~3,000 files;
+   - do not touch the repo's `.gitignore`: if an index folder still shows in `git status` (codegraph keeps its own `.gitignore` visible), add it to `.git/info/exclude`, which is local to your clone; write `graph.*` in `config.yml`.
 6. **Baseline:** run tests and build once.
    - **Green:** record it in the report.
    - **Red:** report the count and the main failure groups, then ask you to choose: **stop** (fix first) or **accept as a known baseline**. If you accept, write `.dev-kit/baseline.md` (per `templates/baseline.md`) listing each failing test by name. From then on controllers count a run as failed only when a test **outside** this list fails (rule B1).
-7. **Write `.dev-kit/init-report.md`.**
+7. **Write `.dev-kit/init-report.md`**, and check that `git status` is unchanged from before `dk:init`.
 
-**Outputs:** `config.yml`, the `.dev-kit/` directory, the init report, optionally `CONSTRAINTS.md` and the graph indexes.
+**Outputs:** `config.yml`, the `.dev-kit/` directory, the init report, optionally `.dev-kit/CONSTRAINTS.md` and the graph indexes. Nothing to commit.
 
 ⚠️ `dk:init` **has never been run in the lab**. It is the first thing to try ([08](08-roadmap.md)).
 

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.0.0 review=human -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.1.0 review=human -->
 [English](../en/05-setup-and-usage.md) | Tiếng Việt | [简体中文](../zh-CN/05-setup-and-usage.md) | [日本語](../ja/05-setup-and-usage.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/05-setup-and-usage.md](../en/05-setup-and-usage.md)) là bản chuẩn.
@@ -53,9 +53,8 @@ Các rule và bằng chứng lab của dev-kit được đo trên Claude. Với 
 |---|---|---|
 | `claude --plugin-dir /path/to/dev-kit` | Chỉ session đó | Nạp một bản checkout cục bộ; không đụng cấu hình; hợp khi đang sửa kit |
 | `claude plugin install dk@dev-kit` | User (mọi project) theo mặc định | Lần cài báo `scope: user` (2026-10-14); tùy chọn chỉ cho project chưa được kiểm chứng ❓ |
-| Bật trong `.claude/settings.json` của repo | Chỉ repo đó | Hợp khi chỉ một số repo dùng dev-kit |
 
-Gợi ý: cài cho user nếu bạn dùng ở nhiều repo, nhưng chỉ chạy `dk:init` ở những repo thật sự dùng.
+Gợi ý: cài cho user của bạn, và chỉ chạy `dk:init` ở những repo bạn thực sự dùng. Đừng bật dev-kit trong `.claude/settings.json` dùng chung của một repo: đây là bộ công cụ cá nhân (rule O1).
 
 ## 5.4 Dùng cùng các plugin khác (Superpowers, code-review…)
 
@@ -102,7 +101,7 @@ Lab đã đo 17 tác vụ SWE Django (Haiku): có và không có index đều gi
 Use skill dk:init for this repo.
 ```
 
-Agent in một kế hoạch, nhờ bạn xác nhận các lệnh kiểm tra, rồi tạo `.dev-kit/` và chạy baseline. Nếu baseline đỏ thì nó dừng: hãy làm cho nó xanh trước, vì mọi controller đều dựa vào một điểm xuất phát xanh.
+Agent in một kế hoạch với các giá trị mặc định (lệnh kiểm tra, index graph, không có `CONSTRAINTS.md`) và chờ bạn duyệt; hãy trả lời "ok" hoặc nói bạn muốn đổi gì. Sau đó nó tạo `.dev-kit/` (được git bỏ qua, không có gì để commit) và chạy baseline. Nếu baseline đỏ thì nó hỏi nên dừng hay chấp nhận các lỗi hiện tại là đã biết.
 
 ## 5.8 Dùng hằng ngày
 

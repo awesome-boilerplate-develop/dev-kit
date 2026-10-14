@@ -2,7 +2,7 @@
 
 Checked on opencode 1.18.35.
 
-- **Install:** OpenCode plugins are JS modules; skills come from skill folders ([skills](https://opencode.ai/docs/skills/)): `.opencode/skills/`, `.agents/skills/`, `.claude/skills/` in the project, or `~/.config/opencode/skills/`, `~/.agents/skills/`, `~/.claude/skills/`. Link each folder under `<dev-kit>/skills/` there, keeping its name (`ln -s <dev-kit>/skills/pre-pr-check ~/.config/opencode/skills/pre-pr-check`).
+- **Install:** OpenCode plugins are JS modules; skills come from skill folders ([skills](https://opencode.ai/docs/skills/)): `.opencode/skills/`, `.agents/skills/`, `.claude/skills/` in the project, or `~/.config/opencode/skills/`, `~/.agents/skills/`, `~/.claude/skills/`. Use a user folder, not a project one: links inside the project would show up in git, and dev-kit is personal (rule O1). Link each folder under `<dev-kit>/skills/` there, keeping its name (`ln -s <dev-kit>/skills/pre-pr-check ~/.config/opencode/skills/pre-pr-check`).
 - **Allow the kit folder.** Reads outside the project need `external_directory`, which defaults to `ask`; non-interactive `opencode run` rejected them in a probe. Add to `opencode.json` ([permissions](https://opencode.ai/docs/permissions/)):
 
   ```json

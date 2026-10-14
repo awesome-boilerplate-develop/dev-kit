@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.0.0 review=human -->
+<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.1.0 review=human -->
 [English](../en/02-architecture.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/02-architecture.md).
@@ -77,30 +77,29 @@ flowchart LR
 | `subagent-driven-development` | Superpowers | việc lớn |
 | `requesting-code-review` | Superpowers | SDD cần file `code-reviewer.md` trong này |
 | `finishing-a-development-branch` | Superpowers | việc lớn (merge lại nhánh, dọn worktree) |
-| `constraint-driven-development` | agent-skills | init (tạo `CONSTRAINTS.md`, tùy chọn) |
+| `constraint-driven-development` | agent-skills | init (tạo `.dev-kit/CONSTRAINTS.md`, tùy chọn) |
 
 Các agent persona `dk:security-auditor` và `dk:test-engineer` (agent-skills) chỉ được dùng khi pre-pr-check chọn mức 4 reviewer.
 
 ## 2.4 Artifact: `.dev-kit/`
+
+`.dev-kit/` thuộc về bạn, không thuộc về team: `dk:init` đặt bên trong nó một `.gitignore` chứa `*`, nên không thứ gì trong đó bị commit hay push, và dev-kit không bao giờ sửa file đang được git theo dõi (rule O1).
 
 | Đường dẫn | Ai ghi | Nội dung |
 |---|---|---|
 | `.dev-kit/config.yml` | `dk:init` | Lệnh test/lint/build, nhánh gốc, tracker, công cụ đồ thị |
 | `.dev-kit/init-report.md` | `dk:init` | Đã có gì, đã tạo gì, còn thiếu gì, lệnh đã chạy và kết quả |
 | `.dev-kit/baseline.md` | `dk:init` (khi baseline đỏ và bạn chấp nhận) | Danh sách test đang fail từ trước; controller so với danh sách này (rule B1) |
+| `.dev-kit/standards/` | bạn | Tiêu chuẩn project của bạn (rule T1); tiêu chuẩn team có thể nằm trong một thư mục chia sẻ đặt qua `standards.team` |
 | `.dev-kit/specs/<feature>.md` | story-runner | Theo `templates/spec.md`: mục tiêu, quy tắc, giao diện, tiêu chí chấp nhận, ngoài phạm vi, **Decisions** |
 | `.dev-kit/plans/` | story-runner/code-refactor (việc lớn) | Plan theo `writing-plans` |
 | `.dev-kit/reports/<name>.md` | mọi controller | Báo cáo theo `templates/report.md`: đổi gì, vì sao, test, lệnh đã chạy, bảng review, câu hỏi mở |
-| `.dev-kit/sdd/<plan>/` | subagent-driven development (việc lớn) | Ledger, brief từng task, gói review. Tự có `.gitignore` |
+| `.dev-kit/sdd/<plan>/` | subagent-driven development (việc lớn) | Ledger, brief từng task, gói review |
 | `.dev-kit/reports/pr-body.md` | pre-pr-check | Nội dung PR: Summary / Evidence / Merge Danger |
+| `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | part `domain-modeling` | Thuật ngữ và quyết định mới; `GLOSSARY.md` và `docs/adr/` của chính project được đọc, và mọi thay đổi với chúng được đề xuất cho bạn |
+| `.dev-kit/CONSTRAINTS.md` | part `constraint-driven-development` (tùy chọn) | Chuẩn chất lượng của bạn; `pre-pr-check` đối chiếu diff với nó. Nếu có `CONSTRAINTS.md` của project ở gốc repo thì đọc file đó thay vào |
 
-**Ngoại lệ có chủ đích** (rule O1): những file sau là tài liệu của dự án, không phải của dev-kit, nên nằm ở gốc repo.
-- `GLOSSARY.md` và `docs/adr/`: do part `domain-modeling` ghi.
-- `CONSTRAINTS.md`: do part `constraint-driven-development` ghi.
-
-dev-kit không sửa `CLAUDE.md`/`AGENTS.md` khi chưa hỏi.
-
-Commit phần nào của `.dev-kit/` là quyết định của từng repo: `dk:init` sẽ hỏi.
+**Worktrees:** một git worktree mới chỉ chứa các file được git theo dõi, nên part `using-git-worktrees` chép `.dev-kit/` (trừ `reports/` và `sdd/`) vào đó, và bỏ qua thư mục worktree thông qua `.git/info/exclude`.
 
 ## 2.5 Cấu hình: `.dev-kit/config.yml`
 

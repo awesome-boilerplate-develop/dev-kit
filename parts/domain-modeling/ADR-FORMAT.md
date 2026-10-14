@@ -2,7 +2,7 @@
 
 ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
 
-Create the `docs/adr/` directory lazily: only when the first ADR is needed.
+**dev-kit (rule O1):** read the project's `docs/adr/`, but write new ADRs to `.dev-kit/adr/` (created lazily, numbered after the highest number in both folders). Propose moving an ADR into `docs/adr/` to the user; never do it yourself.
 
 ## Template
 

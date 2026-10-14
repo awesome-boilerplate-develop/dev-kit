@@ -39,6 +39,8 @@ If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The m
 
 Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
+**Where dev-kit writes (rule O1).** dev-kit is personal and never edits tracked files. Read the project's own `GLOSSARY.md`, `GLOSSARY-MAP.md` and `docs/adr/` wherever they are, as above. Write new terms to `.dev-kit/GLOSSARY.md` and new ADRs to `.dev-kit/adr/` instead; when a resolved term or decision belongs in the project's own files, propose the exact change to the user rather than making it. Read the paths below with that substitution.
+
 ## During the session
 
 ### Challenge against the glossary

@@ -80,14 +80,16 @@ Source file: [`rules/RULES.md`](../../rules/RULES.md). This document explains wh
 
 Merging their results was confusing. Since 0.6.0, the reviewer prompts and agent personas have been changed to share one scale.
 
-### O1: One output home
+### O1: One personal output home
 
-> Everything dev-kit writes goes under `.dev-kit/`, filled from `templates/`. Exceptions, on purpose: `GLOSSARY.md`, `docs/adr/`, `CONSTRAINTS.md` (the project's own documents). Never edit `CLAUDE.md`/`AGENTS.md` without asking.
+> dev-kit belongs to one developer and nothing it writes is committed. Everything goes under `.dev-kit/` (including the glossary, ADRs and `CONSTRAINTS.md` that parts produce), filled from `templates/`; `.dev-kit/.gitignore` (`*`) keeps the folder out of git. Never edit a tracked file for dev-kit's own bookkeeping: no `.gitignore`, `CLAUDE.md` or `AGENTS.md` changes; ignore local paths in `.git/info/exclude`. The project's own `GLOSSARY.md`, `docs/adr/` or `CONSTRAINTS.md` are read; changes to them are proposed, not made.
 
 **Why:** an audit on 2026-10-13 found 3 deviations.
 - The SDD ledger was written to `.superpowers/sdd/`.
 - `code-review` did not look for specs in `.dev-kit/specs/`.
 - `constraint-driven-development` edited `CLAUDE.md` on its own.
+
+In 1.1.0 the kit became strictly personal: `dk:init` used to add the index folders to `.gitignore` and ask what to commit, `using-git-worktrees` committed a `.gitignore` change, and `domain-modeling` / `constraint-driven-development` created files at the repo root. All of these would reach the team's repository.
 
 ### B1: Known-failure baseline
 

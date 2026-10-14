@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.0.0 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.1.0 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -24,9 +24,10 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 **Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; hoặc khi bạn muốn kiểm tra lại phần thiết lập.
 
 **Nguyên tắc:**
-- In kế hoạch trước, chờ bạn duyệt, rồi mới làm.
+- In một kế hoạch với các giá trị mặc định đã điền sẵn, chờ bạn duyệt (một câu trả lời), rồi mới làm. Nó chỉ hỏi riêng khi thiếu một công cụ hoặc khi baseline đỏ.
 - Chạy lại chỉ kiểm tra và bổ sung phần còn thiếu; không ghi đè file đã có.
 - Cài bất cứ thứ gì hoặc đổi bất cứ thứ gì ngoài repo đều phải hỏi trước.
+- `.dev-kit/` là của riêng bạn: không thứ gì nó tạo ra bị commit, và nó không bao giờ sửa file đang được git theo dõi như `.gitignore`.
 - Nó không chứa logic của controller.
 
 **Các bước:**
@@ -34,19 +35,19 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
    - **Kiểm tra các công cụ graph** bằng `scripts/install-graph-tools.sh --check`.
    - **Nếu thiếu:** nói rõ trong kế hoạch và hỏi một lần. Nếu bạn đồng ý, chạy `scripts/install-graph-tools.sh --install` (version được ghim; công cụ đã có thì để nguyên). Nếu bạn từ chối, tiếp tục và ghi "G1 off" trong báo cáo.
    - **Không bao giờ chạy** `codegraph install` hay `code-review-graph install`: hai lệnh đó đăng ký MCP, hook và các file hướng dẫn.
-2. **Phát hiện lệnh:** từ `Makefile`, `package.json`, `pyproject.toml`. Nhờ bạn xác nhận, rồi ghi `.dev-kit/config.yml`.
-3. **Tạo `.dev-kit/`** (specs, plans, reports). Hỏi phần nào sẽ được commit.
-4. **Tùy chọn:** tạo `CONSTRAINTS.md` bằng part `constraint-driven-development` (hỏi bạn về tiêu chuẩn chất lượng; có ngưỡng mặc định).
+2. **Phát hiện lệnh:** từ `Makefile`, `package.json`, `pyproject.toml`. Hiển thị chúng trong kế hoạch, rồi ghi `.dev-kit/config.yml`.
+3. **Tạo `.dev-kit/`** (specs, plans, reports) cùng một `.gitignore` chứa `*`, để git bỏ qua cả thư mục. Không có gì phải quyết định về việc commit.
+4. **Tùy chọn** (mặc định là không; hỏi trong kế hoạch): tạo `.dev-kit/CONSTRAINTS.md` bằng part `constraint-driven-development` (hỏi bạn về tiêu chuẩn chất lượng; có ngưỡng mặc định).
 5. **Index graph, mặc định bật** (nằm trong kế hoạch bạn duyệt):
    - chạy `codegraph init` và `code-review-graph build`;
-   - với repo lớn, báo dung lượng đĩa trước và hỏi: khoảng 150 MB và 600 MB cho mỗi ~3,000 file;
-   - thêm `.codegraph/` và `.code-review-graph/` vào `.gitignore`, và ghi `graph.*` trong `config.yml`.
+   - với repo lớn, kế hoạch cho thấy dung lượng đĩa: khoảng 150 MB và 600 MB cho mỗi ~3,000 file;
+   - không đụng vào `.gitignore` của repo: nếu một thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện), thêm nó vào `.git/info/exclude`, file chỉ có hiệu lực trong bản clone của bạn; ghi `graph.*` trong `config.yml`.
 6. **Baseline:** chạy test và build một lần.
    - **Xanh:** ghi vào báo cáo.
    - **Đỏ:** báo số lượng và các nhóm lỗi chính, rồi nhờ bạn chọn: **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**. Nếu chấp nhận, ghi `.dev-kit/baseline.md` (theo `templates/baseline.md`) liệt kê từng test đang lỗi theo tên. Từ đó controller chỉ coi một lần chạy là thất bại khi có test **ngoài** danh sách này lỗi (rule B1).
-7. **Ghi `.dev-kit/init-report.md`.**
+7. **Ghi `.dev-kit/init-report.md`**, và kiểm tra `git status` không đổi so với trước khi chạy `dk:init`.
 
-**Đầu ra:** `config.yml`, thư mục `.dev-kit/`, báo cáo init, và tùy chọn `CONSTRAINTS.md` cùng các index graph.
+**Đầu ra:** `config.yml`, thư mục `.dev-kit/`, báo cáo init, và tùy chọn `.dev-kit/CONSTRAINTS.md` cùng các index graph. Không có gì để commit.
 
 ⚠️ `dk:init` **chưa từng được chạy trong lab**. Đây là thứ nên thử đầu tiên ([08](../en/08-roadmap.md)).
 

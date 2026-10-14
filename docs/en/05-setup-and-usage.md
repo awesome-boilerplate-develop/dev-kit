@@ -50,9 +50,8 @@ dev-kit's rules and lab evidence were measured on Claude. On the CLIs in the tab
 |---|---|---|
 | `claude --plugin-dir /path/to/dev-kit` | That session only | Loads a local checkout; touches no configuration; useful while changing the kit |
 | `claude plugin install dk@dev-kit` | User (all projects) by default | The install reported `scope: user` (2026-10-14); a project-only option is not verified ❓ |
-| Enable in the repo's `.claude/settings.json` | That repo only | Good when only some repos use dev-kit |
 
-Suggestion: install for the user if you use it in many repos, but run `dk:init` only in repos that really use it.
+Suggestion: install for your user, and run `dk:init` only in repos where you use it. Do not enable dev-kit in a repo's shared `.claude/settings.json`: it is a personal kit (rule O1).
 
 ## 5.4 Using it with other plugins (Superpowers, code-review…)
 
@@ -99,7 +98,7 @@ The lab measured 17 SWE Django tasks (Haiku): with and without an index both sol
 Use skill dk:init for this repo.
 ```
 
-The agent prints a plan, asks you to confirm the check commands, then creates `.dev-kit/` and runs the baseline. If the baseline is red it stops: make it green first, because every controller relies on a green starting point.
+The agent prints one plan with defaults (check commands, graph indexes, no `CONSTRAINTS.md`) and waits for your approval; reply "ok" or say what to change. It then creates `.dev-kit/` (ignored by git, nothing to commit) and runs the baseline. If the baseline is red it asks whether to stop or accept the current failures as known.
 
 ## 5.8 Daily use
 

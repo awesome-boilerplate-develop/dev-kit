@@ -74,30 +74,29 @@ flowchart LR
 | `subagent-driven-development` | Superpowers | large work |
 | `requesting-code-review` | Superpowers | SDD needs the `code-reviewer.md` file in it |
 | `finishing-a-development-branch` | Superpowers | large work (merge the branch back, clean up the worktree) |
-| `constraint-driven-development` | agent-skills | init (creates `CONSTRAINTS.md`, optional) |
+| `constraint-driven-development` | agent-skills | init (creates `.dev-kit/CONSTRAINTS.md`, optional) |
 
 The persona agents `dk:security-auditor` and `dk:test-engineer` (agent-skills) are used only when pre-pr-check picks the 4-reviewer level.
 
 ## 2.4 Artifacts: `.dev-kit/`
+
+`.dev-kit/` belongs to you, not to the team: `dk:init` puts a `.gitignore` containing `*` inside it, so nothing in it is ever committed or pushed, and dev-kit never edits a tracked file (rule O1).
 
 | Path | Written by | Content |
 |---|---|---|
 | `.dev-kit/config.yml` | `dk:init` | Test/lint/build commands, base branch, tracker, graph tools |
 | `.dev-kit/init-report.md` | `dk:init` | What exists, what was created, what is missing, commands run and their results |
 | `.dev-kit/baseline.md` | `dk:init` (when the baseline is red and you accept it) | List of tests that already fail; controllers compare against this list (rule B1) |
+| `.dev-kit/standards/` | you | Your project standards (rule T1); team standards can live in a shared folder set in `standards.team` |
 | `.dev-kit/specs/<feature>.md` | story-runner | Per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, **Decisions** |
 | `.dev-kit/plans/` | story-runner/code-refactor (large work) | Plan per `writing-plans` |
 | `.dev-kit/reports/<name>.md` | every controller | Report per `templates/report.md`: what changed, why, tests, commands run, review table, open questions |
-| `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets. Has its own `.gitignore` |
+| `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets |
 | `.dev-kit/reports/pr-body.md` | pre-pr-check | PR body: Summary / Evidence / Merge Danger |
+| `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | the `domain-modeling` part | New terms and decisions; the project's own `GLOSSARY.md` and `docs/adr/` are read, and changes to them are proposed to you |
+| `.dev-kit/CONSTRAINTS.md` | the `constraint-driven-development` part (optional) | Your quality bar; `pre-pr-check` checks the diff against it. A project `CONSTRAINTS.md` at the root is read instead |
 
-**Deliberate exceptions** (rule O1): these files are project documents, not dev-kit's, so they live at the repo root.
-- `GLOSSARY.md` and `docs/adr/`: written by the `domain-modeling` part.
-- `CONSTRAINTS.md`: written by the `constraint-driven-development` part.
-
-dev-kit does not edit `CLAUDE.md`/`AGENTS.md` without asking.
-
-Which parts of `.dev-kit/` to commit is each repo's decision: `dk:init` asks.
+**Worktrees:** a new git worktree only contains tracked files, so the `using-git-worktrees` part copies `.dev-kit/` (without `reports/` and `sdd/`) into it, and ignores the worktree folder through `.git/info/exclude`.
 
 ## 2.5 Configuration: `.dev-kit/config.yml`
 

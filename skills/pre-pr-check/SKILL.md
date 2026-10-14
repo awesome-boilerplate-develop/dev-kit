@@ -21,7 +21,7 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 
 **Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
 
-1. Run the check command now; keep the output as Evidence. Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.
+1. Run the check command now; keep the output as Evidence. Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds. If `.dev-kit/CONSTRAINTS.md` (or the project's own `CONSTRAINTS.md`) exists, also check the diff against its floor and numbered rules; a change that breaks one is a blocker.
 2. **Graph first.** Check `test -d "$(git rev-parse --show-toplevel)/.code-review-graph"`; do not infer it from other listings. If it exists (rule G1): playbook §1, then §7 `detect-changes --brief --base main`. Keep the summary (risk score, test gaps, untested functions); it is a required input for every reviewer. The command errors → write "detect-changes failed: <error>" in Review setup. No index → write "no .code-review-graph/ index". `check_report.py` rejects "no index" when the directory exists.
 3. **Review depth (rule C2), from numbers.** Run `git diff --shortstat main...HEAD` and list the touched files; pick the depth from those numbers and C2's triggers, not from impression. **Never lower the depth to save cost**; if you think a lower depth is enough, ask the user.
    - *Self-review*: Read part `code-review` and apply both axes yourself (its self-review mode: no sub-agents).

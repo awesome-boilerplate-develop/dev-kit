@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.0.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.1.0 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -24,9 +24,10 @@
 **使う場面:** マシンまたはリポジトリで初めて dev-kit を使うとき。またはセットアップを再確認したいとき。
 
 **原則:**
-- まず計画を表示し、あなたの承認を待ってから実行する。
+- 既定値を入れた計画を 1 つ表示し、あなたの承認（1 回の返答）を待ってから実行する。別に確認するのは、ツールが足りないときと baseline が red のときだけ。
 - 再実行では、足りないものを確認して補うだけで、既存のファイルは上書きしない。
 - 何かをインストールしたり、リポジトリの外を変更したりするときは、事前に確認する。
+- `.dev-kit/` は個人用: 作成したものは一切コミットされず、`.gitignore` のような追跡されているファイルも編集しない。
 - controller のロジックは含まない。
 
 **ステップ:**
@@ -34,19 +35,19 @@
    - **グラフツールの確認**は `scripts/install-graph-tools.sh --check` で行う。
    - **足りない場合:** 計画にそのことを書き、一度だけ確認する。同意すれば `scripts/install-graph-tools.sh --install` を実行する（バージョン固定。すでにあるツールはそのまま）。断られた場合は続行し、レポートに「G1 off」と書く。
    - **決して実行しない:** `codegraph install` と `code-review-graph install`。この 2 つのコマンドは MCP、hook、指示ファイルを登録します。
-2. **コマンドの検出:** `Makefile`、`package.json`、`pyproject.toml` から検出する。あなたに確認してから `.dev-kit/config.yml` を書く。
-3. **`.dev-kit/` を作成**（specs、plans、reports）。どの部分をコミットするか確認する。
-4. **任意:** `constraint-driven-development` part で `CONSTRAINTS.md` を作成する（品質基準を尋ねる。既定のしきい値もある）。
+2. **コマンドの検出:** `Makefile`、`package.json`、`pyproject.toml` から検出する。計画に示したうえで `.dev-kit/config.yml` を書く。
+3. **`.dev-kit/` を作成**（specs、plans、reports）。`*` を含む `.gitignore` を置き、git がフォルダ全体を無視するようにする。コミットについて決めることはない。
+4. **任意**（既定は no。計画の中で尋ねる）: `constraint-driven-development` part で `.dev-kit/CONSTRAINTS.md` を作成する（品質基準を尋ねる。既定のしきい値もある）。
 5. **グラフのインデックス。既定で on**（承認する計画の一部）:
    - `codegraph init` と `code-review-graph build` を実行する。
-   - 大きなリポジトリでは、先にディスクサイズを報告して確認する: 約 3,000 ファイルあたり、およそ 150 MB と 600 MB。
-   - `.codegraph/` と `.code-review-graph/` を `.gitignore` に追加し、`config.yml` に `graph.*` を書く。
+   - 大きなリポジトリでは、計画にディスクサイズを示す: 約 3,000 ファイルあたり、およそ 150 MB と 600 MB。
+   - リポジトリの `.gitignore` には触れない: インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、clone ローカルの `.git/info/exclude` に追加する。`config.yml` に `graph.*` を書く。
 6. **Baseline:** テストとビルドを一度実行する。
    - **Green:** レポートに記録する。
    - **Red:** 件数と主な失敗グループを報告し、あなたに選んでもらう: **停止**（先に直す）か、**既知の baseline として受け入れる**か。受け入れる場合は、失敗しているテストを名前で列挙した `.dev-kit/baseline.md`（`templates/baseline.md` に沿う）を書く。以後 controller は、このリストの**外**のテストが失敗したときだけ、その実行を失敗とみなす（rule B1）。
-7. **`.dev-kit/init-report.md` を書く。**
+7. **`.dev-kit/init-report.md` を書き**、`git status` が `dk:init` の前と変わっていないことを確認する。
 
-**出力:** `config.yml`、`.dev-kit/` ディレクトリ、init のレポート。任意で `CONSTRAINTS.md` とグラフのインデックス。
+**出力:** `config.yml`、`.dev-kit/` ディレクトリ、init のレポート。任意で `.dev-kit/CONSTRAINTS.md` とグラフのインデックス。コミットするものはありません。
 
 ⚠️ `dk:init` は **lab で一度も実行されていません**。最初に試すべきものです（[08](../en/08-roadmap.md)、英語）。
 

@@ -55,6 +55,6 @@ The skill infers which structure applies:
 
 - If `GLOSSARY-MAP.md` exists, read it to find contexts
 - If only a root `GLOSSARY.md` exists, single context
-- If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved
+- If neither exists, create `.dev-kit/GLOSSARY.md` lazily when the first term is resolved (dev-kit, rule O1: never create the project's root file)
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.

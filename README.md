@@ -60,18 +60,18 @@ omp plugin install dk@dev-kit
 
 ### OpenCode
 
-OpenCode loads skills from folders, so clone the repo and link the skills:
+OpenCode loads skills from folders, so clone the repo and link the skills into your user skill folder:
 
 ```bash
-git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/.dev-kit
+git clone https://github.com/awesome-boilerplate-develop/dev-kit ~/dev-kit
 mkdir -p ~/.config/opencode/skills
-for s in ~/.dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
+for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 ```
 
 Then let OpenCode read the kit folder, in `~/.config/opencode/opencode.json`:
 
 ```json
-{ "permission": { "external_directory": { "~/.dev-kit/**": "allow" } } }
+{ "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
 ### Other CLIs
@@ -83,7 +83,7 @@ Per-CLI details (where the install lives, the subagent tool, known caveats): [`h
 
 ## Quick start
 
-1. Open your repo with the agent and ask it to **use `dk:init`**. It checks your tools, detects the test and build commands, asks before installing anything, and records the current test baseline in `.dev-kit/`.
+1. Open your repo with the agent and ask it to **use `dk:init`**. It shows one plan with defaults (test and build commands, graph indexes), and after your "ok" creates `.dev-kit/` and records the current test baseline.
 2. Hand it a card by name:
 
    ```text
@@ -98,7 +98,8 @@ Per-CLI details (where the install lives, the subagent tool, known caveats): [`h
 - **Rules with evidence.** [`rules/RULES.md`](rules/RULES.md) lists every rule, whether it is on, and the lab result behind it. A rule is turned on only if it helped on at least five tasks it had not seen.
 - **Review depth by risk.** `dk:pre-pr-check` picks self-review, one reviewer or four (standards, spec, security, tests) from the size and kind of the diff.
 - **Machine-checked reports.** [`scripts/check_report.py`](scripts/check_report.py) rejects a report until a "certain" finding sits in the changed code, is not a generic missing-test remark, and cites only rules that exist.
-- **Layered standards.** Kit, team and project standards (`.dev-kit/standards/`); each reviewer gets only the topics of its role.
+- **Personal, never pushed.** Everything dev-kit writes (config, specs, plans, reports, your project standards) lives in `.dev-kit/`, which ignores itself in git; dev-kit never edits `.gitignore`, `CLAUDE.md`, `AGENTS.md` or any other tracked file.
+- **Layered standards.** Kit standards, a team folder you share however you like (`standards.team`), and your own project standards in `.dev-kit/standards/`; each reviewer gets only the topics of its role.
 - **Optional graph tools.** With [codegraph](https://github.com/colbymchenry/codegraph) and code-review-graph indexes, controllers locate code, measure blast radius and run `detect-changes` before review.
 
 ## Evidence

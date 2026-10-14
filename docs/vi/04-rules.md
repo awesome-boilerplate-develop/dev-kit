@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/04-rules.md source_commit=v1.0.0 review=human -->
+<!-- i18n: source=docs/en/04-rules.md source_commit=v1.1.0 review=human -->
 [English](../en/04-rules.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/04-rules.md).
@@ -83,14 +83,16 @@ File gốc: [`rules/RULES.md`](../../rules/RULES.md). Tài liệu này giải th
 
 Gộp kết quả của chúng rất lẫn lộn. Từ 0.6.0, các prompt reviewer và agent persona đã được sửa để dùng chung một thang.
 
-### O1: One output home
+### O1: One personal output home
 
-> Everything dev-kit writes goes under `.dev-kit/`, filled from `templates/`. Exceptions, on purpose: `GLOSSARY.md`, `docs/adr/`, `CONSTRAINTS.md` (the project's own documents). Never edit `CLAUDE.md`/`AGENTS.md` without asking.
+> dev-kit belongs to one developer and nothing it writes is committed. Everything goes under `.dev-kit/` (including the glossary, ADRs and `CONSTRAINTS.md` that parts produce), filled from `templates/`; `.dev-kit/.gitignore` (`*`) keeps the folder out of git. Never edit a tracked file for dev-kit's own bookkeeping: no `.gitignore`, `CLAUDE.md` or `AGENTS.md` changes; ignore local paths in `.git/info/exclude`. The project's own `GLOSSARY.md`, `docs/adr/` or `CONSTRAINTS.md` are read; changes to them are proposed, not made.
 
 **Vì sao:** lần rà soát ngày 2026-10-13 tìm ra 3 chỗ lệch.
 - Ledger SDD được ghi ra `.superpowers/sdd/`.
 - `code-review` không tìm spec trong `.dev-kit/specs/`.
 - `constraint-driven-development` tự sửa `CLAUDE.md`.
+
+Trong 1.1.0, kit trở nên hoàn toàn của riêng một người dùng: trước đó `dk:init` thêm các thư mục index vào `.gitignore` và hỏi nên commit gì, `using-git-worktrees` commit một thay đổi `.gitignore`, còn `domain-modeling` / `constraint-driven-development` tạo file ở gốc repo. Tất cả những thứ đó sẽ đi vào repository của team.
 
 ### B1: Known-failure baseline
 

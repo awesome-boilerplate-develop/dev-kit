@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.0.0 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.1.0 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)
@@ -53,9 +53,8 @@ dev-kit の rule と lab の根拠は Claude で測定したものです。表�
 |---|---|---|
 | `claude --plugin-dir /path/to/dev-kit` | そのセッションのみ | ローカルのチェックアウトを読み込みます。設定には触れません。kit を変更している間に便利です |
 | `claude plugin install dk@dev-kit` | 既定ではユーザー（全プロジェクト） | インストール結果は `scope: user` と報告されました（2026-10-14）。プロジェクト限定のオプションは未検証です ❓ |
-| リポジトリの `.claude/settings.json` で有効にする | そのリポジトリのみ | 一部のリポジトリだけで dev-kit を使う場合に向いています |
 
-おすすめ: 多くのリポジトリで使うならユーザー向けにインストールし、`dk:init` は本当に使うリポジトリでだけ実行してください。
+おすすめ: ユーザー向けにインストールし、`dk:init` は実際に使うリポジトリでだけ実行してください。リポジトリで共有される `.claude/settings.json` では dev-kit を有効にしないでください。これは個人用の kit です（rule O1）。
 
 ## 5.4 他の plugin（Superpowers、code-review…）との併用
 
@@ -102,7 +101,7 @@ lab では SWE の Django タスク 17 件（Haiku）を測定しました。イ
 Use skill dk:init for this repo.
 ```
 
-エージェントは計画を表示し、チェックコマンドの確認を求めたあと、`.dev-kit/` を作成して baseline を実行します。baseline が red の場合は停止します。先に green にしてください。どの controller も green の出発点を前提にしているためです。
+エージェントは既定値を入れた計画（チェックコマンド、グラフのインデックス、`CONSTRAINTS.md` なし）を 1 つ表示し、あなたの承認を待ちます。「ok」と返すか、変更したい点を伝えてください。そのあと `.dev-kit/`（git に無視され、コミットするものはありません）を作成して baseline を実行します。baseline が red の場合は、停止するか、現在の失敗を既知のものとして受け入れるかを尋ねます。
 
 ## 5.8 日常の使い方
 
