@@ -18,35 +18,38 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 
 ## 3.1 `dk:init`
 
-**Use when:** using dev-kit for the first time on a machine or a repo; or when you want to re-check the setup.
+**Use when:** using dev-kit for the first time on a machine or a repo; to re-check the setup; or to re-run one part: `dk:init index` (for example in a new worktree), `dk:init baseline`, `dk:init standards [topic]`.
 
 **Principles:**
-- Print one plan with the defaults filled in, wait for your approval (one answer), then act. It asks separately only when a tool is missing or the baseline is red.
+- **Probe first, then ask one question at a time, in a fixed order.** Each question shows what the agent found, a default and short options; it waits for your answer before the next one. "default" and "skip" always work. It never asks what the code already answers.
 - A re-run only checks and fills in what is missing; it does not overwrite existing files.
 - Installing anything or changing anything outside the repo requires asking first.
 - `.dev-kit/` is personal: nothing it creates is committed, and it never edits a tracked file such as `.gitignore`.
 - It contains no controller logic.
 
-**Steps:**
-1. **Machine:** check `git`, `gh`, `make`, `codegraph`, `code-review-graph` (with versions); list the enabled plugins and remind you to call `dk:<controller>` by name.
-   - **Check the graph tools** with `scripts/install-graph-tools.sh --check`.
-   - **If missing:** say so in the plan and ask once. If you agree, run `scripts/install-graph-tools.sh --install` (pinned versions; tools already present are left alone). If you decline, continue and write "G1 off" in the report.
-   - **Never run** `codegraph install` or `code-review-graph install`: those two commands register MCP, hooks and instruction files.
-2. **Detect commands:** from `Makefile`, `package.json`, `pyproject.toml`. Show them in the plan, then write `.dev-kit/config.yml`.
-3. **Create `.dev-kit/`** (specs, plans, reports) with a `.gitignore` containing `*`, so git ignores the whole folder. Nothing to decide about committing.
-4. **Optional** (default no; ask for it in the plan): create `.dev-kit/CONSTRAINTS.md` with the `constraint-driven-development` part (asks you for quality standards; there are default thresholds).
-5. **Graph indexes, on by default** (part of the plan you approve):
-   - run `codegraph init` and `code-review-graph build`;
-   - for a large repo, the plan shows the disk size: roughly 150 MB and 600 MB per ~3,000 files;
-   - do not touch the repo's `.gitignore`: if an index folder still shows in `git status` (codegraph keeps its own `.gitignore` visible), add it to `.git/info/exclude`, which is local to your clone; write `graph.*` in `config.yml`.
-6. **Baseline:** run tests and build once.
-   - **Green:** record it in the report.
-   - **Red:** report the count and the main failure groups, then ask you to choose: **stop** (fix first) or **accept as a known baseline**. If you accept, write `.dev-kit/baseline.md` (per `templates/baseline.md`) listing each failing test by name. From then on controllers count a run as failed only when a test **outside** this list fails (rule B1).
-7. **Write `.dev-kit/init-report.md`**, and check that `git status` is unchanged from before `dk:init`.
+**Steps and questions, in order:**
+1. **Graph tools:** checked with `scripts/install-graph-tools.sh --check`. *Question only if one is missing:* install it? If you decline, it continues with "G1 off". It never runs `codegraph install` or `code-review-graph install` (they register MCP, hooks and instruction files).
+2. **Personal settings:** reads `~/.dev-kit/config.yml` if an earlier repo saved a team standards folder there.
+3. **Probe, no questions:** commands, base branch, stack, what the linters already enforce, files already tracked under `.dev-kit/`, the project's own `GLOSSARY.md`, `docs/adr/`, `CONSTRAINTS.md`.
+4. *Question:* **commands and base branch** (confirm or correct). Then it creates `.dev-kit/` with a `.gitignore` containing `*` and writes `config.yml`.
+5. *Question:* **graph indexes** (default yes; the expected size for a large repo, roughly 150 MB and 600 MB per ~3,000 files). Index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to `.git/info/exclude`.
+6. **Baseline:** runs tests and build once. *Question only if red:* **stop** (fix first) or **accept as a known baseline**, written to `.dev-kit/baseline.md`; from then on a run fails only when a test **outside** that list fails (rule B1).
+7. **Standards by topic** (below).
+8. *Question:* **`CONSTRAINTS.md`** (optional, default no) → `.dev-kit/CONSTRAINTS.md`. Skipped when the project has its own.
+9. **Report** `.dev-kit/init-report.md`, and a check that `git status` is unchanged.
 
-**Outputs:** `config.yml`, the `.dev-kit/` directory, the init report, optionally `.dev-kit/CONSTRAINTS.md` and the graph indexes. Nothing to commit.
+**Standards by topic** (design: [09](09-init-and-standards.md), section 9.6). Rules are written only for what the agent cannot know or has been seen to get wrong; never naming or style.
+- **Probe first:** what the linter covers; in-house libraries (internal packages, how many files use them against framework controls, what recent files use, their component list); central services and permission sources, found with the graph.
+- **Topic by topic, in order:** architecture, coding, testing, security, ui, api, data, ops, process; topics with nothing to offer are skipped. One question per topic (two at most) combining:
+  1. the **kit checklist** for that topic (`standards/<topic>/`): `validated` files pre-ticked, `experimental` files not; single items can be switched off;
+  2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team;
+  3. the option **"add another convention for this topic"**.
+- At most 12 standards questions, then **one open question**: "other conventions the agent should know?"
+- The agent drafts the rules in the standard format, **reads them back for your confirmation**, then writes project rules to `.dev-kit/standards/<topic>/` and team rules to the team folder (asked once, remembered in `~/.dev-kit/config.yml`).
 
-⚠️ `dk:init` **has never been run in the lab**. It is the first thing to try ([08](08-roadmap.md)).
+**Kit standards** (all `experimental` until measured on new bugs): `review/finding-quality` (always on), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
+
+**Outputs:** `config.yml`, the `.dev-kit/` directory, the standards you chose, the init report, optionally `.dev-kit/CONSTRAINTS.md` and the graph indexes. Nothing to commit.
 
 ---
 

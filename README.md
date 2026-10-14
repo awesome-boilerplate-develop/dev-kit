@@ -83,7 +83,7 @@ Per-CLI details (where the install lives, the subagent tool, known caveats): [`h
 
 ## Quick start
 
-1. Open your repo with the agent and ask it to **use `dk:init`**. It shows one plan with defaults (test and build commands, graph indexes), and after your "ok" creates `.dev-kit/` and records the current test baseline.
+1. Open your repo with the agent and ask it to **use `dk:init`**. It probes the repo, then asks a few questions one at a time (commands, graph indexes, a standards checklist by topic with rules it suggests from your code), creates `.dev-kit/` and records the current test baseline.
 2. Hand it a card by name:
 
    ```text

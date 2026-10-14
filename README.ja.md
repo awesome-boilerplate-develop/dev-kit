@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.1.0 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.2.0 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [README.md](README.md)
@@ -86,7 +86,7 @@ CLI ごとの詳細（インストール先、subagent ツール、既知の注�
 
 ## クイックスタート
 
-1. エージェントでリポジトリを開き、**`dk:init` を使う**よう頼みます。既定値を入れた計画を 1 つ表示し（テストとビルドのコマンド、グラフのインデックス）、あなたの「ok」のあとに `.dev-kit/` を作成して、現在のテストの baseline を記録します。
+1. エージェントでリポジトリを開き、**`dk:init` を使う**よう頼みます。まずリポジトリを調べ、そのあと少数の質問を 1 つずつ行い（コマンド、グラフのインデックス、トピックごとの standards チェックリストとコードから提案される rule）、`.dev-kit/` を作成して、現在のテストの baseline を記録します。
 2. カードを名前で渡します:
 
    ```text

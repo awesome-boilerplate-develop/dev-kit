@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.1.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.0 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -21,35 +21,38 @@
 
 ## 3.1 `dk:init`
 
-**使う場面:** マシンまたはリポジトリで初めて dev-kit を使うとき。またはセットアップを再確認したいとき。
+**使う場面:** マシンまたはリポジトリで初めて dev-kit を使うとき。セットアップを再確認するとき。または 1 つの部分だけやり直すとき: `dk:init index`（例えば新しい worktree で）、`dk:init baseline`、`dk:init standards [topic]`。
 
 **原則:**
-- 既定値を入れた計画を 1 つ表示し、あなたの承認（1 回の返答）を待ってから実行する。別に確認するのは、ツールが足りないときと baseline が red のときだけ。
+- **まず調査し、そのあと質問を 1 つずつ、決まった順番で行う。** 各質問には、エージェントが見つけたもの、既定値、短い選択肢が示され、あなたの答えを待ってから次へ進む。「default」と「skip」は常に使える。コードがすでに答えているものは決して尋ねない。
 - 再実行では、足りないものを確認して補うだけで、既存のファイルは上書きしない。
 - 何かをインストールしたり、リポジトリの外を変更したりするときは、事前に確認する。
 - `.dev-kit/` は個人用: 作成したものは一切コミットされず、`.gitignore` のような追跡されているファイルも編集しない。
 - controller のロジックは含まない。
 
-**ステップ:**
-1. **マシン:** `git`、`gh`、`make`、`codegraph`、`code-review-graph` を（バージョンとともに）確認する。有効な plugin を一覧し、`dk:<controller>` を名前で呼び出すよう案内する。
-   - **グラフツールの確認**は `scripts/install-graph-tools.sh --check` で行う。
-   - **足りない場合:** 計画にそのことを書き、一度だけ確認する。同意すれば `scripts/install-graph-tools.sh --install` を実行する（バージョン固定。すでにあるツールはそのまま）。断られた場合は続行し、レポートに「G1 off」と書く。
-   - **決して実行しない:** `codegraph install` と `code-review-graph install`。この 2 つのコマンドは MCP、hook、指示ファイルを登録します。
-2. **コマンドの検出:** `Makefile`、`package.json`、`pyproject.toml` から検出する。計画に示したうえで `.dev-kit/config.yml` を書く。
-3. **`.dev-kit/` を作成**（specs、plans、reports）。`*` を含む `.gitignore` を置き、git がフォルダ全体を無視するようにする。コミットについて決めることはない。
-4. **任意**（既定は no。計画の中で尋ねる）: `constraint-driven-development` part で `.dev-kit/CONSTRAINTS.md` を作成する（品質基準を尋ねる。既定のしきい値もある）。
-5. **グラフのインデックス。既定で on**（承認する計画の一部）:
-   - `codegraph init` と `code-review-graph build` を実行する。
-   - 大きなリポジトリでは、計画にディスクサイズを示す: 約 3,000 ファイルあたり、およそ 150 MB と 600 MB。
-   - リポジトリの `.gitignore` には触れない: インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、clone ローカルの `.git/info/exclude` に追加する。`config.yml` に `graph.*` を書く。
-6. **Baseline:** テストとビルドを一度実行する。
-   - **Green:** レポートに記録する。
-   - **Red:** 件数と主な失敗グループを報告し、あなたに選んでもらう: **停止**（先に直す）か、**既知の baseline として受け入れる**か。受け入れる場合は、失敗しているテストを名前で列挙した `.dev-kit/baseline.md`（`templates/baseline.md` に沿う）を書く。以後 controller は、このリストの**外**のテストが失敗したときだけ、その実行を失敗とみなす（rule B1）。
-7. **`.dev-kit/init-report.md` を書き**、`git status` が `dk:init` の前と変わっていないことを確認する。
+**ステップと質問（順番どおり）:**
+1. **グラフツール:** `scripts/install-graph-tools.sh --check` で確認する。*質問は、足りないものがあるときだけ:* インストールするか。断られた場合は「G1 off」で続行する。`codegraph install` と `code-review-graph install` は決して実行しない（MCP、hook、指示ファイルを登録するため）。
+2. **個人設定:** 以前のリポジトリでチームの standards フォルダが保存されていれば、`~/.dev-kit/config.yml` から読み込む。
+3. **調査のみ、質問なし:** コマンド、ベースブランチ、スタック、linter がすでに強制しているもの、すでに `.dev-kit/` の下で追跡されているファイル、プロジェクト自身の `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
+4. *質問:* **コマンドとベースブランチ**（確認または修正）。そのあと `*` を含む `.gitignore` を置いた `.dev-kit/` を作成し、`config.yml` を書く。
+5. *質問:* **グラフのインデックス**（既定は yes。大きなリポジトリで想定されるサイズ: 約 3,000 ファイルあたり、およそ 150 MB と 600 MB）。インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、`.git/info/exclude` に追加する。
+6. **Baseline:** テストとビルドを一度実行する。*質問は red のときだけ:* **停止**（先に直す）か、**既知の baseline として受け入れる**か。受け入れた場合は `.dev-kit/baseline.md` に書かれ、以後は、そのリストの**外**のテストが失敗したときだけ実行が失敗となる（rule B1）。
+7. **トピックごとの standards**（下記）。
+8. *質問:* **`CONSTRAINTS.md`**（任意、既定は no）→ `.dev-kit/CONSTRAINTS.md`。プロジェクトに独自のものがある場合はスキップする。
+9. **レポート** `.dev-kit/init-report.md`。そして `git status` が変わっていないことの確認。
 
-**出力:** `config.yml`、`.dev-kit/` ディレクトリ、init のレポート。任意で `.dev-kit/CONSTRAINTS.md` とグラフのインデックス。コミットするものはありません。
+**トピックごとの standards**（設計: [09](../en/09-init-and-standards.md)、英語、セクション 9.6）。rule を書くのは、エージェントが知り得ないこと、または誤りやすいことが確認されたことだけで、命名やスタイルは対象外。
+- **まず調査:** linter がカバーしている範囲、社内ライブラリ（社内パッケージ、フレームワークのコントロールに対して何ファイルが使っているか、最近のファイルが何を使っているか、そのコンポーネント一覧）、グラフで見つけた中央サービスと権限の取得元。
+- **トピックごとに順番に:** `architecture`、`coding`、`testing`、`security`、`ui`、`api`、`data`、`ops`、`process`。提案できるものがないトピックはスキップする。トピックごとに質問は 1 つ（多くても 2 つ）で、次をまとめて示す:
+  1. そのトピックの **kit のチェックリスト**（`standards/<topic>/`）: `validated` のファイルは最初からチェック済み、`experimental` のファイルはチェックなし。個々の項目はオフにできる。
+  2. 調査から得た根拠つきの、**プロジェクトまたはチームの rule の提案**（例: 「68 ファイルが `<ui-…>` を使い、4 ファイルが `mat-input` を使っています。新しいコードでは社内コントロールを使うべきですか?」）。それぞれにスコープ（プロジェクトかチームか）を付ける。
+  3. 「このトピックに別の規約を追加する」という選択肢。
+- standards の質問は最大 12 個、そのあと**自由質問 1 つ**: 「エージェントが知っておくべきその他の規約はありますか?」
+- エージェントは rule を標準のフォーマットで起草し、**あなたの確認のために読み返し**、そのあとプロジェクトの rule を `.dev-kit/standards/<topic>/` に、チームの rule をチームのフォルダ（一度だけ尋ね、`~/.dev-kit/config.yml` に記憶する）に書く。
 
-⚠️ `dk:init` は **lab で一度も実行されていません**。最初に試すべきものです（[08](../en/08-roadmap.md)、英語）。
+**Kit の standards**（新しいバグで測定するまですべて `experimental`）: `review/finding-quality`（常にオン）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
+
+**出力:** `config.yml`、`.dev-kit/` ディレクトリ、あなたが選んだ standards、init のレポート。任意で `.dev-kit/CONSTRAINTS.md` とグラフのインデックス。コミットするものはありません。
 
 ---
 

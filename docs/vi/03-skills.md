@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.1.0 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.0 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -21,35 +21,38 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 
 ## 3.1 `dk:init`
 
-**Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; hoặc khi bạn muốn kiểm tra lại phần thiết lập.
+**Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; để kiểm tra lại phần thiết lập; hoặc để chạy lại một phần: `dk:init index` (ví dụ trong một worktree mới), `dk:init baseline`, `dk:init standards [topic]`.
 
 **Nguyên tắc:**
-- In một kế hoạch với các giá trị mặc định đã điền sẵn, chờ bạn duyệt (một câu trả lời), rồi mới làm. Nó chỉ hỏi riêng khi thiếu một công cụ hoặc khi baseline đỏ.
+- **Probe trước, rồi hỏi từng câu một, theo thứ tự cố định.** Mỗi câu hỏi cho thấy những gì agent tìm thấy, một giá trị mặc định và vài lựa chọn ngắn; nó chờ câu trả lời của bạn rồi mới sang câu tiếp theo. "default" và "skip" luôn dùng được. Nó không bao giờ hỏi điều mà code đã trả lời.
 - Chạy lại chỉ kiểm tra và bổ sung phần còn thiếu; không ghi đè file đã có.
 - Cài bất cứ thứ gì hoặc đổi bất cứ thứ gì ngoài repo đều phải hỏi trước.
 - `.dev-kit/` là của riêng bạn: không thứ gì nó tạo ra bị commit, và nó không bao giờ sửa file đang được git theo dõi như `.gitignore`.
 - Nó không chứa logic của controller.
 
-**Các bước:**
-1. **Máy:** kiểm tra `git`, `gh`, `make`, `codegraph`, `code-review-graph` (kèm version); liệt kê các plugin đang bật và nhắc bạn gọi `dk:<controller>` theo tên.
-   - **Kiểm tra các công cụ graph** bằng `scripts/install-graph-tools.sh --check`.
-   - **Nếu thiếu:** nói rõ trong kế hoạch và hỏi một lần. Nếu bạn đồng ý, chạy `scripts/install-graph-tools.sh --install` (version được ghim; công cụ đã có thì để nguyên). Nếu bạn từ chối, tiếp tục và ghi "G1 off" trong báo cáo.
-   - **Không bao giờ chạy** `codegraph install` hay `code-review-graph install`: hai lệnh đó đăng ký MCP, hook và các file hướng dẫn.
-2. **Phát hiện lệnh:** từ `Makefile`, `package.json`, `pyproject.toml`. Hiển thị chúng trong kế hoạch, rồi ghi `.dev-kit/config.yml`.
-3. **Tạo `.dev-kit/`** (specs, plans, reports) cùng một `.gitignore` chứa `*`, để git bỏ qua cả thư mục. Không có gì phải quyết định về việc commit.
-4. **Tùy chọn** (mặc định là không; hỏi trong kế hoạch): tạo `.dev-kit/CONSTRAINTS.md` bằng part `constraint-driven-development` (hỏi bạn về tiêu chuẩn chất lượng; có ngưỡng mặc định).
-5. **Index graph, mặc định bật** (nằm trong kế hoạch bạn duyệt):
-   - chạy `codegraph init` và `code-review-graph build`;
-   - với repo lớn, kế hoạch cho thấy dung lượng đĩa: khoảng 150 MB và 600 MB cho mỗi ~3,000 file;
-   - không đụng vào `.gitignore` của repo: nếu một thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện), thêm nó vào `.git/info/exclude`, file chỉ có hiệu lực trong bản clone của bạn; ghi `graph.*` trong `config.yml`.
-6. **Baseline:** chạy test và build một lần.
-   - **Xanh:** ghi vào báo cáo.
-   - **Đỏ:** báo số lượng và các nhóm lỗi chính, rồi nhờ bạn chọn: **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**. Nếu chấp nhận, ghi `.dev-kit/baseline.md` (theo `templates/baseline.md`) liệt kê từng test đang lỗi theo tên. Từ đó controller chỉ coi một lần chạy là thất bại khi có test **ngoài** danh sách này lỗi (rule B1).
-7. **Ghi `.dev-kit/init-report.md`**, và kiểm tra `git status` không đổi so với trước khi chạy `dk:init`.
+**Các bước và câu hỏi, theo thứ tự:**
+1. **Công cụ graph:** kiểm tra bằng `scripts/install-graph-tools.sh --check`. *Chỉ hỏi nếu thiếu một công cụ:* có cài không? Nếu bạn từ chối, nó tiếp tục với "G1 off". Nó không bao giờ chạy `codegraph install` hay `code-review-graph install` (hai lệnh đó đăng ký MCP, hook và các file hướng dẫn).
+2. **Thiết lập cá nhân:** đọc `~/.dev-kit/config.yml` nếu một repo trước đó đã lưu ở đó thư mục tiêu chuẩn của team.
+3. **Probe, không hỏi:** lệnh, base branch, stack, những gì linter đã ép buộc, các file đã được theo dõi trong `.dev-kit/`, `GLOSSARY.md` của chính dự án, `docs/adr/`, `CONSTRAINTS.md`.
+4. *Câu hỏi:* **lệnh và base branch** (xác nhận hoặc sửa). Sau đó nó tạo `.dev-kit/` cùng một `.gitignore` chứa `*` và ghi `config.yml`.
+5. *Câu hỏi:* **index graph** (mặc định có; dung lượng dự kiến với repo lớn, khoảng 150 MB và 600 MB cho mỗi ~3,000 file). Các thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện) được đưa vào `.git/info/exclude`.
+6. **Baseline:** chạy test và build một lần. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1).
+7. **Tiêu chuẩn theo topic** (bên dưới).
+8. *Câu hỏi:* **`CONSTRAINTS.md`** (tùy chọn, mặc định là không) → `.dev-kit/CONSTRAINTS.md`. Bỏ qua khi dự án đã có file riêng.
+9. **Báo cáo** `.dev-kit/init-report.md`, và kiểm tra `git status` không đổi.
 
-**Đầu ra:** `config.yml`, thư mục `.dev-kit/`, báo cáo init, và tùy chọn `.dev-kit/CONSTRAINTS.md` cùng các index graph. Không có gì để commit.
+**Tiêu chuẩn theo topic** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
+- **Probe trước:** linter bao phủ những gì; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng); các service trung tâm và nguồn permission, tìm bằng graph.
+- **Lần lượt từng topic, theo thứ tự:** `architecture`, `coding`, `testing`, `security`, `ui`, `api`, `data`, `ops`, `process`; topic không có gì để đề xuất thì bỏ qua. Mỗi topic một câu hỏi (tối đa hai) gộp:
+  1. **checklist của kit** cho topic đó (`standards/<topic>/`): file `validated` được tick sẵn, file `experimental` thì không; từng mục có thể tắt riêng;
+  2. **rule đề xuất cho dự án hoặc team kèm bằng chứng** từ probe (ví dụ "68 file dùng `<ui-…>`, 4 file dùng `mat-input`: code mới có nên dùng control nội bộ không?"), mỗi rule kèm phạm vi: dự án hoặc team;
+  3. lựa chọn **"thêm một quy ước khác cho topic này"**.
+- Tối đa 12 câu hỏi về tiêu chuẩn, rồi **một câu hỏi mở**: "còn quy ước nào khác agent nên biết không?"
+- Agent soạn các rule theo định dạng tiêu chuẩn, **đọc lại cho bạn xác nhận**, rồi ghi rule của dự án vào `.dev-kit/standards/<topic>/` và rule của team vào thư mục team (hỏi một lần, được nhớ trong `~/.dev-kit/config.yml`).
 
-⚠️ `dk:init` **chưa từng được chạy trong lab**. Đây là thứ nên thử đầu tiên ([08](../en/08-roadmap.md)).
+**Tiêu chuẩn của kit** (tất cả là `experimental` cho đến khi đo trên các bug mới): `review/finding-quality` (luôn bật), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
+
+**Đầu ra:** `config.yml`, thư mục `.dev-kit/`, các tiêu chuẩn bạn đã chọn, báo cáo init, và tùy chọn `.dev-kit/CONSTRAINTS.md` cùng các index graph. Không có gì để commit.
 
 ---
 

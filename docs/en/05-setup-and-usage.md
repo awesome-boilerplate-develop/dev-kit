@@ -98,7 +98,7 @@ The lab measured 17 SWE Django tasks (Haiku): with and without an index both sol
 Use skill dk:init for this repo.
 ```
 
-The agent prints one plan with defaults (check commands, graph indexes, no `CONSTRAINTS.md`) and waits for your approval; reply "ok" or say what to change. It then creates `.dev-kit/` (ignored by git, nothing to commit) and runs the baseline. If the baseline is red it asks whether to stop or accept the current failures as known.
+The agent probes the repo first, then asks one question at a time, in order: commands and base branch, graph indexes, the baseline (only if it is red), the standards checklist topic by topic with rules it suggests from the code, one open question about other conventions, and the optional `CONSTRAINTS.md`. Each question shows its evidence and a default; reply "default", "skip" or your answer. It creates `.dev-kit/` (ignored by git, nothing to commit). To redo one part later: `dk:init index`, `dk:init baseline`, `dk:init standards [topic]`.
 
 ## 5.8 Daily use
 

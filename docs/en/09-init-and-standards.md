@@ -1,6 +1,6 @@
 # 9. Design for 0.9.0: merged `dk:init`, standards by topic, finding quality, enforced compliance
 
-> Status: **design draft, awaiting approval** (draft 2, 2026-10-13). Nothing in this document has been built yet.
+> Status: **approved and built** (draft 2, 2026-10-13). Built in 0.8.4–0.8.11 (9.5, 9.7), 0.8.7 (standards framework, sample team rule) and 1.2.0 (merged `dk:init` with questions asked one at a time, kit standards set). Not yet measured: the kit standards on new bugs and the init questions on 2–3 real repos (9.8). Since 1.1.0, `.dev-kit/` is personal and never committed (rule O1), so the project tier lives in an ignored folder; a shared team mode is an idea in [08](08-roadmap.md).
 > Background: the `pre-pr-check` backtest on 8 real bugs caught 1/8 and partly caught 3/8; the agent skipped `detect-changes` in 4 of 6 runs and once lowered the review level on its own (see [06](06-evidence.md)).
 
 ## 9.1 Goals
@@ -208,9 +208,9 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
 
 ## 9.10 Order of work after approval
 
-1. Enforced compliance (9.7) and the finding-quality gate (9.5). Measure on the 6 PRs.
-2. The 3-tier standards framework, file format, and the 9.4 table in the controller.
-3. Initial kit set: the 5 files in 9.3, each approved by the kit owner.
-4. Merged `dk:init` with per-topic questions (9.2, 9.6).
-5. A sample team rule for a team's own controls, measured on one UI card in a worktree.
-6. Update docs 01–08.
+1. ✅ Enforced compliance (9.7) and the finding-quality gate (9.5), measured on the 6 PRs (0.8.4–0.8.11).
+2. ✅ The 3-tier standards framework, file format, and the 9.4 table in the controller (0.8.7).
+3. ✅ Initial kit set: the 5 files in 9.3 (1.2.0, all `experimental`; the kit owner still has to approve each one).
+4. ✅ Merged `dk:init` with per-topic questions, asked one at a time (1.2.0).
+5. ✅ A sample team rule for a team's own controls, measured on one UI card in a worktree (0.8.7).
+6. Update docs 01–08: done along the way.

@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.1.0 review=human -->
+<!-- i18n: source=README.md source_commit=v1.2.0 review=human -->
 [English](README.md) | Tiếng Việt | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([README.md](README.md)) là bản chuẩn.
@@ -86,7 +86,7 @@ Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý 
 
 ## Bắt đầu nhanh
 
-1. Mở repo của bạn bằng agent và nhờ nó **dùng `dk:init`**. Nó đưa ra một kế hoạch với các giá trị mặc định (lệnh test và build, index graph), và sau khi bạn trả lời "ok" thì tạo `.dev-kit/` và ghi lại test baseline hiện tại.
+1. Mở repo của bạn bằng agent và nhờ nó **dùng `dk:init`**. Nó probe repo, rồi hỏi vài câu từng câu một (lệnh, index graph, một checklist tiêu chuẩn theo topic kèm các rule nó đề xuất từ code của bạn), tạo `.dev-kit/` và ghi lại test baseline hiện tại.
 2. Giao thẻ cho nó theo tên:
 
    ```text

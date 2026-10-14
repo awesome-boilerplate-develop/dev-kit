@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.1.0 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.2.0 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | 简体中文 | [日本語](README.ja.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](README.md)。
@@ -86,7 +86,7 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 
 ## 快速开始
 
-1. 用 agent 打开你的仓库，让它 **使用 `dk:init`**。它会给出一份带默认值的计划（测试和构建命令、graph 索引），在你回复 “ok” 之后创建 `.dev-kit/` 并记录当前的测试 baseline。
+1. 用 agent 打开你的仓库，让它 **使用 `dk:init`**。它会先探查仓库，然后一次问一个问题（命令、graph 索引、按 topic 的 standards 清单，以及它根据你的代码建议的 rule），创建 `.dev-kit/` 并记录当前的测试 baseline。
 2. 按名称把卡片交给它：
 
    ```text
