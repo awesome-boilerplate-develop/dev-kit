@@ -1,5 +1,12 @@
 # dev-kit changelog
 
+## 1.2.2 (2026-10-15)
+- **`dk:init` defaults are explicit:** "default" enables `validated` kit files only, never ticks an `experimental` one, and keeps no suggested rule; a rule is written only when the user keeps it by name.
+- **Evidence in suggestions:** every count comes from a command the agent ran; a direction such as "X replaces Y" without usage evidence is asked as a question.
+- **Tests that cannot run** (restore, authentication, missing service) are not a red baseline: the agent asks whether to stop or continue with `baseline: not-measured` (new key in `templates/config.yml`: `green`, `known-failures`, `not-measured`).
+- **Kit standards reviewed against the docs 09 criteria** (the kit owner delegated the review on 2026-10-15): each file now cites the backtest bugs behind its items, and `ui/forms-and-actions` U3 is reviewed only for async views or write actions the diff adds (less noise). All four stay `experimental` until measured on new bugs.
+- **Measured:** `dk:init` on 3 real repos (two Angular micro-frontends, one .NET API): 8–10 questions (3–4 on standards), `git status` unchanged; 6 of 7 checked claims right; the deviations above were found there and fixed (docs 06).
+
 ## 1.2.1 (2026-10-14)
 - **The `CONSTRAINTS.md` question explains itself:** what the file is (a pass bar as numbers with the command that checks each, a floor, exceptions), how it differs from the standards just chosen, what `dk:pre-pr-check` already flags without it, what it would add for this repo (from the probe), its cost (up to 4 more questions, maybe a tool to install) and that its benefit is unmeasured. Docs 03 gets a "`CONSTRAINTS.md` versus standards" table.
 - **In-house library rules ask the design's follow-ups** (docs 09, 9.6): whether the old version is still allowed in new code and which framework controls stay allowed, in the same topic question.

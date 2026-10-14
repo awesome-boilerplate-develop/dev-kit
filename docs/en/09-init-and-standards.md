@@ -198,7 +198,7 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
 | Finding quality | The same 6 PRs: you mark each finding correct or false | Correct rate in the "certain" tier ≥ 70%; no already-caught bug lost |
 | Kit rules | **New** bugs, not used to draft the rules | More caught than with the rules off; noise rises only slightly |
 | Team rule (a team's own control set) | One UI card, done with and without the team rule; count the places that use a framework control instead of the team control | Fewer wrong uses |
-| Questions at init | 2–3 real repos | Guessed answers are mostly right; ≤ 12 questions |
+| Questions at init | 2–3 real repos | Guessed answers are mostly right; ≤ 12 questions. **Measured on 3 repos (1.2.0–1.2.2): ≤ 12 met; 6 of 7 checked claims right (agent-checked); see [06](06-evidence.md)** |
 
 ## 9.9 Open questions
 

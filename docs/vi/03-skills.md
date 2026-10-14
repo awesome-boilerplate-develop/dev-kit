@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.1 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.2 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -36,7 +36,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 3. **Probe, không hỏi:** lệnh, base branch, stack, những gì linter đã ép buộc, các file đã được theo dõi trong `.dev-kit/`, `GLOSSARY.md` của chính dự án, `docs/adr/`, `CONSTRAINTS.md`.
 4. *Câu hỏi:* **lệnh và base branch** (xác nhận hoặc sửa). Sau đó nó tạo `.dev-kit/` cùng một `.gitignore` chứa `*` và ghi `config.yml`.
 5. *Câu hỏi:* **index graph** (mặc định có; dung lượng dự kiến với repo lớn, khoảng 150 MB và 600 MB cho mỗi ~3,000 file). Các thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện) được đưa vào `.git/info/exclude`.
-6. **Baseline:** chạy test và build một lần. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1).
+6. **Baseline:** chạy test và build một lần. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1). Nếu test **không chạy được** (package restore, xác thực, thiếu một service), nó nói rõ và hỏi dừng hay tiếp tục với baseline được đánh dấu `not-measured` trong `config.yml`; chạy lại `dk:init baseline` khi môi trường đã hoạt động.
 7. **Tiêu chuẩn theo topic** (bên dưới).
 8. *Câu hỏi:* **`CONSTRAINTS.md`** (tùy chọn, mặc định là không) → `.dev-kit/CONSTRAINTS.md`. Bỏ qua khi dự án đã có file riêng. Câu hỏi giải thích file này bổ sung gì cho repo của bạn (bên dưới).
 9. **Báo cáo** `.dev-kit/init-report.md`, và kiểm tra `git status` không đổi.
@@ -47,6 +47,8 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
   1. **checklist của kit** cho topic đó (`standards/<topic>/`): file `validated` được tick sẵn, file `experimental` thì không; từng mục có thể tắt riêng;
   2. **rule đề xuất cho dự án hoặc team kèm bằng chứng** từ probe (ví dụ "68 file dùng `<ui-…>`, 4 file dùng `mat-input`: code mới có nên dùng control nội bộ không?"), mỗi rule kèm phạm vi: dự án hoặc team; với thư viện nội bộ, nó còn hỏi phiên bản cũ có còn được phép không và những control của framework nào vẫn được phép;
   3. lựa chọn **"thêm một quy ước khác cho topic này"**.
+
+  Trả lời "default" chỉ bật các file kit `validated` và không giữ rule đề xuất nào; agent có thể khuyến nghị một file `experimental` hoặc một rule, nhưng bạn tick hoặc giữ nó theo tên. Mọi con số trong một đề xuất đến từ một lệnh agent đã chạy; một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì được hỏi dưới dạng câu hỏi.
 - Tối đa 12 câu hỏi về tiêu chuẩn, rồi **một câu hỏi mở**: "còn quy ước nào khác agent nên biết không?"
 - Agent soạn các rule theo định dạng tiêu chuẩn, **đọc lại cho bạn xác nhận**, rồi ghi rule của dự án vào `.dev-kit/standards/<topic>/` và rule của team vào thư mục team (hỏi một lần, được nhớ trong `~/.dev-kit/config.yml`).
 

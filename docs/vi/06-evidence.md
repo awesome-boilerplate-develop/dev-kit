@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.2.1 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.2.2 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -193,6 +193,25 @@ Ticket "dialog form" (input, select, textarea, toggle, button), `dk:story-runner
 - **pi tạm dừng (0.8.13):** nạp được nhưng không có subagent, nên các vai review chạy trong phiên chính; cách chạy này chưa được đo, nên chưa hỗ trợ.
 
 **Rule trên các CLI khác:** các rule và bằng chứng ở trên được đo trên Claude. Trên Codex mới có 1 lần backtest; cần chạy lặp trước khi coi một rule là có ích trên CLI đó.
+
+### Câu hỏi của `dk:init` trên 3 repo thật (dev-kit 1.2.0–1.2.2)
+
+Git worktree mới của ba repository private, Claude Code với Sonnet 5.5, mỗi lượt một câu trả lời với `--resume`; mọi câu hỏi đều trả lời "default" (đã đọc lại để xác nhận). Đối chiếu với docs 09 §9.8: tối đa 12 câu hỏi, các câu trả lời đoán phần lớn đúng.
+
+| Repo | Câu hỏi (tiêu chuẩn) | Probe đã đề xuất gì | Chi phí (USD) |
+|---|---|---|---|
+| A: Angular micro-frontend, ~840 file `.ts` | 9 (4) | Thư viện component nội bộ: 110 file dùng v2, 7 file dùng v1, 36 template dùng control của framework; một rule dự án được soạn và đọc lại | 0.33 |
+| B: Angular micro-frontend, ~390 file `.ts` | 10 (4) | Bộ control riêng của repo (18 control trong một thư mục, 11 template dùng chúng, còn 77 form field của framework); một rule dự án được soạn và đọc lại | 0.40 |
+| C: .NET API, ~290 file `.cs` | 8 (3) | Không có rule dự án; topic `ui` bị bỏ qua (không có UI). Test không chạy được: package restore lỗi trên một feed private | 0.23 |
+
+- **≤ 12 câu hỏi:** đạt (3–4 câu hỏi về tiêu chuẩn, tổng 8–10 câu). `git status` không đổi ở cả ba repo.
+- **Câu trả lời đoán** (agent tự kiểm với code, không phải người xác nhận): đề xuất cho repo B đưa ra 7 nhận định, 6 đúng; nhận định sai nói rằng control mới thay control cũ, trong khi code dùng control cũ nhiều hơn (16 so với 10 và 11 so với 0). Các con số của repo A khớp với những lần đếm thủ công trước đó trên repo ấy.
+- **Sai lệch, đã sửa ở 1.2.2:**
+  - "default" đã tick các file kit `experimental` ở B và C (A để tắt), dù skill nói chúng bắt đầu ở trạng thái không tick → "default" giờ không bao giờ tick file `experimental` và không giữ rule đề xuất nào.
+  - Một hướng migration được nêu mà không có bằng chứng sử dụng → mọi con số phải đến từ một lệnh agent đã chạy, và một hướng không có bằng chứng thì được hỏi dưới dạng câu hỏi.
+  - Test không chạy được chưa có đường xử lý xác định; agent tự ứng biến "not measured" → giờ là một nhánh xác định (`baseline: not-measured` trong `config.yml`).
+  - Khi không có rule nào được soạn, bước đọc lại bị gộp vào câu hỏi mở ở C → giờ được phép.
+- **Sau khi sửa (repo B, chỉ các câu hỏi theo topic):** câu hỏi `coding` nêu "experimental, nên mặc định là tắt", và những ý chưa được chứng minh (`: any` trong 124 file, kiểu unsubscribe) được hỏi dưới dạng câu hỏi. Lần chạy thứ hai còn đề xuất các rule `architecture` mà lần đầu đã bỏ qua: những gì probe tìm thấy thay đổi giữa các lần chạy.
 
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 

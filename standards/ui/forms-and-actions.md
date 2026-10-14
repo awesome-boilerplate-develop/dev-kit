@@ -4,7 +4,7 @@ topic: ui
 scope: kit
 status: experimental
 applies_to: ["**/*.html", "**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.component.ts"]
-references: WCAG 2.2 AA (1.3.1 Info and Relationships, 2.1.1 Keyboard, 3.3.1 Error Identification)
+references: WCAG 2.2 AA (1.3.1 Info and Relationships, 2.1.1 Keyboard, 3.3.1 Error Identification); dev-kit backtest (U1 two range errors on one condition and a message made impossible by `maxlength`, U2 double submit, U4 sort icon not reset after adding a record)
 ---
 ## Implement
 - U1 Each validation message has its own condition, and each can actually appear (no message that an input mask or `maxlength` makes impossible). Why: shared or impossible conditions show the wrong message or none.
@@ -13,7 +13,7 @@ references: WCAG 2.2 AA (1.3.1 Info and Relationships, 2.1.1 Keyboard, 3.3.1 Err
 - U4 After a write that changes a list, reset the dependent view state (sort, paging, selection) the same way everywhere. Why: stale sort or paging shows the wrong rows.
 - U5 Form fields have labels, errors are linked to their field and announced, actions work with the keyboard. Why: WCAG 2.2 AA.
 ## Review
-- U2, U3 on the diff → major. U1, U4 → major when the user sees wrong information, minor otherwise. U5 → major on a new screen, minor otherwise.
+- U2 on the diff → major. U3 only for an async view or write action the diff adds → major. U1, U4 → major when the user sees wrong information, minor otherwise. U5 → major on a new screen, minor otherwise.
 ## Do not flag
 - Visual style, spacing and colors unless they break U5.
 ## Severity

@@ -4,7 +4,7 @@ topic: testing
 scope: kit
 status: experimental
 applies_to: ["**/*"]
-references: Beck, Test-Driven Development by Example; Google Testing Blog (test behavior, not implementation)
+references: Beck, Test-Driven Development by Example; Google Testing Blog (test behavior, not implementation); dev-kit backtest (T2 a filter test passing on an empty list, a toast test not checking the message)
 ---
 ## Implement
 - T1 A bug fix comes with a test that fails before the fix and passes after, at the level where the bug was seen. Why: it proves the fix and keeps the bug from coming back.

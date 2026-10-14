@@ -4,7 +4,7 @@ topic: coding
 scope: kit
 status: experimental
 applies_to: ["**/*"]
-references: Google Engineering Practices (code review); Fowler, Refactoring (code smells)
+references: Google Engineering Practices (code review); Fowler, Refactoring (code smells); dev-kit backtest on 8 real bugs (C2 in-flight lock released early, C3 record dropped on a missing code, C4 `&&` where a sibling used `||`, C5 UI sort names sent to the API, C1 list call with no error path)
 ---
 ## Implement
 - C1 When a call can fail (I/O, HTTP, parsing), handle the error or pass it on; never swallow it (empty `catch`, a `catch` that logs and continues as if it succeeded). Why: silent failures hide lost or wrong data.

@@ -5,6 +5,7 @@ commands:
   test: ""
   lint: ""
   build: ""
+baseline: green     # green | known-failures (see baseline.md) | not-measured (tests could not run; rerun dk:init baseline)
 tracker: none        # none | github  (not used by controllers yet)
 graph:
   codegraph: false   # true when the repo has a .codegraph/ index (rule G1)

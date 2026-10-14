@@ -4,7 +4,7 @@ topic: security
 scope: kit
 status: experimental
 applies_to: ["**/*"]
-references: OWASP Top 10:2025 (A01 Broken Access Control and others); OWASP ASVS 5.0
+references: OWASP Top 10:2025 (A01 Broken Access Control and others); OWASP ASVS 5.0; dev-kit backtest (S2 permission flags hard-coded to `true`, S6 raw server text shown in a toast)
 ---
 ## Implement
 - S1 When a handler reads or writes a record by id, check that the caller may access that record, not only that they are signed in. Why: object-level access is the most common access-control flaw (IDOR).

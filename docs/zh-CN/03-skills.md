@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.1 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.2 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -36,7 +36,7 @@
 3. **探查，不提问：** 命令、基础分支、技术栈、linter 已经强制执行的内容、`.dev-kit/` 下已被跟踪的文件、项目自己的 `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
 4. *提问：* **命令和基础分支**（确认或更正）。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
 5. *提问：* **graph 索引**（默认是；大型仓库的预期占用，每约 3,000 个文件大致 150 MB 和 600 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入 `.git/info/exclude`。
-6. **Baseline：** 运行一次测试和构建。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。
+6. **Baseline：** 运行一次测试和构建。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。如果测试**无法运行**（package restore、认证、缺少服务），它会说明这一点，并询问是停止，还是继续并在 `config.yml` 中将 baseline 标记为 `not-measured`；环境可用后重新运行 `dk:init baseline`。
 7. **按 topic 的 standards**（见下）。
 8. *提问：* **`CONSTRAINTS.md`**（可选，默认否）→ `.dev-kit/CONSTRAINTS.md`。如果项目自带，则跳过。该问题会说明这个文件能为你的仓库增加什么（见下文）。
 9. **报告** `.dev-kit/init-report.md`，并检查 `git status` 没有变化。
@@ -47,6 +47,8 @@
   1. 该 topic 的 **kit 清单**（`standards/<topic>/`）：`validated` 文件预先勾选，`experimental` 文件不勾选；单个条目可以关闭；
   2. 根据探查结果给出的**带依据的项目或团队 rule 建议**（例如 “68 个文件使用 `<ui-…>`，4 个使用 `mat-input`：新代码应该使用 in-house 控件吗？”），每条都标明范围：项目或团队；对于 in-house 库，还会询问旧版本是否仍允许使用，以及哪些框架控件仍然允许使用；
   3. 选项 **“为该 topic 添加另一个约定”**。
+
+  回答 “default” 只会启用 `validated` kit 文件，并且不保留任何建议的 rule；agent 可以推荐一个 `experimental` 文件或一条 rule，但需要你按名称勾选或保留。建议中的每个计数都来自 agent 运行过的命令；像 “X 取代 Y” 这样没有使用证据的说法，会作为问题来问。
 - 最多 12 个 standards 问题，然后是**一个开放问题**：“agent 还应该知道其他约定吗？”
 - agent 按标准格式起草 rule，**读给你确认**，然后把项目 rule 写入 `.dev-kit/standards/<topic>/`，把团队 rule 写入团队文件夹（只问一次，记在 `~/.dev-kit/config.yml` 中）。
 

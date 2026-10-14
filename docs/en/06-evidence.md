@@ -191,6 +191,26 @@ Card "dialog form" (input, select, textarea, toggle, button), `dk:story-runner`,
 
 **Rules on other CLIs:** the rules and evidence above were measured on Claude. On Codex there is only 1 backtest run; repeat runs are needed before treating a rule as useful on that CLI.
 
+### `dk:init` questions on 3 real repos (dev-kit 1.2.0–1.2.2)
+
+Fresh git worktrees of three private repositories, Claude Code with Sonnet 5.5, one answer per turn with `--resume`; every question answered "default" (the read-back confirmed). Checked against docs 09 §9.8: at most 12 questions, guessed answers mostly right.
+
+| Repo | Questions (standards) | What the probe suggested | Cost (USD) |
+|---|---|---|---|
+| A: Angular micro-frontend, ~840 `.ts` files | 9 (4) | In-house component library: 110 files on v2, 7 on v1, 36 templates with framework controls; a project rule drafted and read back | 0.33 |
+| B: Angular micro-frontend, ~390 `.ts` files | 10 (4) | The repo's own control set (18 controls under one folder, 11 templates using them, 77 framework form fields left); a project rule drafted and read back | 0.40 |
+| C: .NET API, ~290 `.cs` files | 8 (3) | No project rule; the `ui` topic skipped (no UI). Tests could not run: package restore failed on a private feed | 0.23 |
+
+- **≤ 12 questions:** met (3–4 standards questions, 8–10 in total). `git status` was unchanged in all three.
+- **Guessed answers** (checked by the agent against the code, not confirmed by a human): repo B's suggestion made 7 claims, 6 correct; the wrong one stated that newer controls replace older ones, while the code used the older ones more (16 vs 10 and 11 vs 0). Repo A's counts match earlier manual counts on that repo.
+- **Deviations, fixed in 1.2.2:**
+  - "default" ticked `experimental` kit files in B and C (A kept them off), although the skill said they start unticked → "default" now never ticks an `experimental` file and keeps no suggested rule.
+  - A migration direction was stated without usage evidence → every count must come from a command the agent ran, and a direction without evidence is asked as a question.
+  - Tests that cannot run had no defined path; the agent improvised "not measured" → now a defined branch (`baseline: not-measured` in `config.yml`).
+  - With no drafted rules, the read-back joined the open question in C → now allowed.
+- **After the fix (repo B, topic questions only):** the `coding` question stated "experimental, so the default is off", and unproven ideas (`: any` in 124 files, unsubscribe style) were asked as questions. A second run also proposed `architecture` rules that the first run had skipped: what the probe finds varies between runs.
+
+
 ## 6.4 Findings that went into the design
 
 | Finding | Change in dev-kit |

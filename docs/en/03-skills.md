@@ -33,7 +33,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 3. **Probe, no questions:** commands, base branch, stack, what the linters already enforce, files already tracked under `.dev-kit/`, the project's own `GLOSSARY.md`, `docs/adr/`, `CONSTRAINTS.md`.
 4. *Question:* **commands and base branch** (confirm or correct). Then it creates `.dev-kit/` with a `.gitignore` containing `*` and writes `config.yml`.
 5. *Question:* **graph indexes** (default yes; the expected size for a large repo, roughly 150 MB and 600 MB per ~3,000 files). Index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to `.git/info/exclude`.
-6. **Baseline:** runs tests and build once. *Question only if red:* **stop** (fix first) or **accept as a known baseline**, written to `.dev-kit/baseline.md`; from then on a run fails only when a test **outside** that list fails (rule B1).
+6. **Baseline:** runs tests and build once. *Question only if red:* **stop** (fix first) or **accept as a known baseline**, written to `.dev-kit/baseline.md`; from then on a run fails only when a test **outside** that list fails (rule B1). If the tests **could not run** (package restore, authentication, a missing service), it says so and asks whether to stop or continue with the baseline marked `not-measured` in `config.yml`; rerun `dk:init baseline` once the environment works.
 7. **Standards by topic** (below).
 8. *Question:* **`CONSTRAINTS.md`** (optional, default no) → `.dev-kit/CONSTRAINTS.md`. Skipped when the project has its own. The question explains what the file adds for your repo (below).
 9. **Report** `.dev-kit/init-report.md`, and a check that `git status` is unchanged.
@@ -44,6 +44,8 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
   1. the **kit checklist** for that topic (`standards/<topic>/`): `validated` files pre-ticked, `experimental` files not; single items can be switched off;
   2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team; for an in-house library it also asks whether the old version is still allowed and which framework controls stay allowed;
   3. the option **"add another convention for this topic"**.
+
+  Answering "default" enables `validated` kit files only and keeps no suggested rule; the agent may recommend an `experimental` file or a rule, but you tick or keep it by name. Every count in a suggestion comes from a command the agent ran; a claim like "X replaces Y" without usage evidence is asked as a question.
 - At most 12 standards questions, then **one open question**: "other conventions the agent should know?"
 - The agent drafts the rules in the standard format, **reads them back for your confirmation**, then writes project rules to `.dev-kit/standards/<topic>/` and team rules to the team folder (asked once, remembered in `~/.dev-kit/config.yml`).
 
