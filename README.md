@@ -76,8 +76,7 @@ Then let OpenCode read the kit folder, in `~/.config/opencode/opencode.json`:
 
 ### Other CLIs
 
-- **Cursor:** a manifest is included but not verified yet.
-- **Not supported:** Gemini CLI (Google moved free-tier users to Antigravity), pi (no subagent tool in pi core).
+- **Not supported:** Gemini CLI (Google moved free-tier users to Antigravity), pi (no subagent tool in pi core), Cursor (never verified; dropped).
 
 Per-CLI details (where the install lives, the subagent tool, known caveats): [`harness/`](harness/README.md).
 

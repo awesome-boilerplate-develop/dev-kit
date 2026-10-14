@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.2.2 review=human -->
+<!-- i18n: source=README.md source_commit=v1.2.3 review=human -->
 [English](README.md) | Tiếng Việt | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([README.md](README.md)) là bản chuẩn.
@@ -79,8 +79,7 @@ Sau đó cho OpenCode đọc thư mục kit, trong `~/.config/opencode/opencode.
 
 ### Các CLI khác
 
-- **Cursor:** đã có manifest nhưng chưa được kiểm chứng.
-- **Không hỗ trợ:** Gemini CLI (Google đã chuyển người dùng gói miễn phí sang Antigravity), pi (lõi pi không có công cụ subagent).
+- **Không hỗ trợ:** Gemini CLI (Google đã chuyển người dùng gói miễn phí sang Antigravity), pi (lõi pi không có công cụ subagent), Cursor (chưa từng kiểm chứng; đã bỏ).
 
 Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý đã biết): [`harness/`](harness/README.md).
 

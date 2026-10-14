@@ -11,14 +11,13 @@ dev-kit/
 │   └── marketplace.json    # for installing via /plugin marketplace
 ├── .codex-plugin/plugin.json        # Codex manifest ("skills": "./skills/")
 ├── .agents/plugins/marketplace.json # marketplace "dev-kit" for codex plugin marketplace add
-├── .cursor-plugin/plugin.json       # Cursor manifest (not verified)
 ├── .antigravity-plugin/plugin.json  # Antigravity (agy) manifest
 ├── .version-bump.json      # manifests that must share one version (scripts/bump_version.py)
 ├── skills/                 # 5 registered skills: init + 4 controllers
 │   ├── init/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
 ├── parts/                  # 16 sub-skills copied from upstream: NOT registered as skills
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
-├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, Cursor, omp)
+├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
 ├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
 ├── scripts/                # check_parts.py, check_report.py, bump_version.py, install-graph-tools.sh

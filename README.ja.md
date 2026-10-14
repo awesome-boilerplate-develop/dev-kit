@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.2.2 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.2.3 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [README.md](README.md)
@@ -79,8 +79,7 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 
 ### その他の CLI
 
-- **Cursor:** manifest は含まれていますが、まだ検証していません。
-- **非対応:** Gemini CLI（Google は無料枠のユーザーを Antigravity に移行しました）、pi（pi のコアに subagent ツールがありません）。
+- **非対応:** Gemini CLI（Google は無料枠のユーザーを Antigravity に移行しました）、pi（pi のコアに subagent ツールがありません）、Cursor（一度も検証できなかったため削除しました）。
 
 CLI ごとの詳細（インストール先、subagent ツール、既知の注意点）: [`harness/`](harness/README.md)。
 

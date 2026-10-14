@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.2.2 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.2.3 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -170,7 +170,7 @@ Ticket "dialog form" (input, select, textarea, toggle, button), `dk:story-runner
 | Antigravity 1.3.5 | không | có (bản copy cả cây) | có | `invoke_subagent` |
 | Copilot CLI 1.0.89 | không | có | có khi đã cài; với `--plugin-dir` phải thêm `--add-dir` | `task` |
 | OpenCode 1.18.35 | không | đường dẫn symlink | có, sau khi resolve symlink và cho phép `external_directory` | `task` (`general`) |
-| Cursor | – | – | – | chưa chạy được: cần `cursor-agent login` |
+| Cursor | – | – | – | chưa chạy được: cần `cursor-agent login` (bỏ hỗ trợ từ 1.2.3) |
 | omp 18.10.4 | không | có | có | `task` |
 | pi 1.0.2 | không | có | có | không có (pi lõi); tạm dừng hỗ trợ từ 0.8.13 |
 

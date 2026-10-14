@@ -6,7 +6,7 @@ dev-kit (plugin name `dk`) is a skill set that helps agents work kanban cards: s
 
 These docs exist in English, Vietnamese (tiers 1–2), Simplified Chinese and Japanese (tier 1). English is authoritative; translations may lag behind.
 
-> Documentation version: dev-kit **1.2.2** (2026-10-15). 1.0.0 was the first public release; earlier version numbers in these docs (0.x) are private lab iterations. The numbers come from the dev-kit lab (private) (mostly Haiku 5.5, partly Sonnet 5.5, Claude Code 2.1.296) and from backtests on a private Angular repository at work (Sonnet 5.5; one run on Codex). Anything not yet measured is marked ❓.
+> Documentation version: dev-kit **1.2.3** (2026-10-15). 1.0.0 was the first public release; earlier version numbers in these docs (0.x) are private lab iterations. The numbers come from the dev-kit lab (private) (mostly Haiku 5.5, partly Sonnet 5.5, Claude Code 2.1.296) and from backtests on a private Angular repository at work (Sonnet 5.5; one run on Codex). Anything not yet measured is marked ❓.
 
 ## Reading order
 

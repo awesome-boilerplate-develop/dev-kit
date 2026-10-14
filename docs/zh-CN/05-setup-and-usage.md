@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.2 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.3 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | 简体中文 | [日本語](../ja/05-setup-and-usage.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[05-setup-and-usage.md](../en/05-setup-and-usage.md)。
@@ -9,7 +9,7 @@
 
 | 项目 | 说明 |
 |---|---|
-| Agent CLI | Claude Code 是参考 CLI（lab 使用 2.1.296）。Codex、Copilot CLI、Antigravity（`agy`）、OpenCode 和 omp 可以加载该 kit（5.2 节）；Cursor 未验证 ❓ |
+| Agent CLI | Claude Code 是参考 CLI（lab 使用 2.1.296）。Codex、Copilot CLI、Antigravity（`agy`）、OpenCode 和 omp 可以加载该 kit（5.2 节） |
 | `git` | 必需 |
 | 仓库的检查命令 | `make check`、`npm test`、…… `dk:init` 会检测并记录它 |
 | `gh` | 可选；dev-kit 自己从不开 PR |
@@ -39,10 +39,10 @@ claude plugin install dk@dev-kit
 | Antigravity 1.3.5 | `agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit` | `agy` 同时注册 `agents/` 和 `rules/*.md`（[antigravity.md](../../harness/antigravity.md)） |
 | omp 18.10.4 | `omp plugin marketplace add awesome-boilerplate-develop/dev-kit` 然后 `omp plugin install dk@dev-kit` | omp 读取 Claude Code plugin；两个 review agent 以具名的 task agent 出现（[omp.md](../../harness/omp.md)） |
 | OpenCode 1.18.35 | 克隆该仓库，把每个 `skills/<name>` 目录链接到 `~/.config/opencode/skills/` | 通过 `permission.external_directory` 允许读取 kit 目录（[opencode.md](../../harness/opencode.md)） |
-| Cursor | – | 未验证：Cursor 需要 `cursor-agent login` ❓（[cursor.md](../../harness/cursor.md)） |
 
 不支持：
 - **Gemini CLI：** 自 2026-06-18 起，Google 已把免费层和 Google One 用户迁移到 Antigravity CLI。
+- **Cursor（自 1.2.3 起移除）：** 从未验证，因为 `cursor-agent` 需要登录。
 - **pi（暂时搁置）：** pi 1.0.2 可以安装并加载该 kit，但 pi 核心没有 subagent 工具，所以每个 review 角色都得在主 session 中运行；这种模式尚未测量。
 
 dev-kit 的 rule 和 lab 证据都是在 Claude 上测量的。对于表中的 CLI，已验证能加载该 kit；review 质量只在 Codex 上做过一次 backtest，其他 CLI 均未测量（[06](../en/06-evidence.md)，英文）。

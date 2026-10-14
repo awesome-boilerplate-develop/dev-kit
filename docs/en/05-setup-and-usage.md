@@ -6,7 +6,7 @@ English | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-C
 
 | Item | Notes |
 |---|---|
-| Agent CLI | Claude Code is the reference CLI (the lab used 2.1.296). Codex, Copilot CLI, Antigravity (`agy`), OpenCode and omp can load the kit (section 5.2); Cursor is not verified ❓ |
+| Agent CLI | Claude Code is the reference CLI (the lab used 2.1.296). Codex, Copilot CLI, Antigravity (`agy`), OpenCode and omp can load the kit (section 5.2) |
 | `git` | Required |
 | The repo's check command | `make check`, `npm test`, … `dk:init` detects and records it |
 | `gh` | Optional; dev-kit never opens a PR itself |
@@ -36,10 +36,10 @@ Check that it loaded: in a session, ask the agent to list the skills that start 
 | Antigravity 1.3.5 | `agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit` | `agy` registers both `agents/` and `rules/*.md` ([antigravity.md](../../harness/antigravity.md)) |
 | omp 18.10.4 | `omp plugin marketplace add awesome-boilerplate-develop/dev-kit` then `omp plugin install dk@dev-kit` | omp reads Claude Code plugins; the two review agents appear as named task agents ([omp.md](../../harness/omp.md)) |
 | OpenCode 1.18.35 | clone the repo, link each `skills/<name>` directory into `~/.config/opencode/skills/` | Allow reading the kit directory with `permission.external_directory` ([opencode.md](../../harness/opencode.md)) |
-| Cursor | – | Not verified: Cursor needs `cursor-agent login` ❓ ([cursor.md](../../harness/cursor.md)) |
 
 Not supported:
 - **Gemini CLI:** since 2026-06-18 Google has moved free-tier and Google One users to the Antigravity CLI.
+- **Cursor (dropped in 1.2.3):** never verified, because `cursor-agent` needs a login.
 - **pi (set aside for now):** pi 1.0.2 installs and loads the kit, but core pi has no subagent tool, so every review role would have to run in the main session; that mode has not been measured.
 
 dev-kit's rules and lab evidence were measured on Claude. On the CLIs in the table, loading the kit has been verified; review quality has had only one backtest, on Codex, and the other CLIs are unmeasured ([06](06-evidence.md)).

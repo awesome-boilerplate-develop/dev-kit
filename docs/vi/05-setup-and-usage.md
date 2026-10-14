@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.2 review=human -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.3 review=human -->
 [English](../en/05-setup-and-usage.md) | Tiếng Việt | [简体中文](../zh-CN/05-setup-and-usage.md) | [日本語](../ja/05-setup-and-usage.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/05-setup-and-usage.md](../en/05-setup-and-usage.md)) là bản chuẩn.
@@ -9,7 +9,7 @@
 
 | Mục | Ghi chú |
 |---|---|
-| Agent CLI | Claude Code là CLI tham chiếu (lab dùng 2.1.296). Codex, Copilot CLI, Antigravity (`agy`), OpenCode và omp có thể nạp kit (mục 5.2); Cursor chưa kiểm chứng ❓ |
+| Agent CLI | Claude Code là CLI tham chiếu (lab dùng 2.1.296). Codex, Copilot CLI, Antigravity (`agy`), OpenCode và omp có thể nạp kit (mục 5.2) |
 | `git` | Bắt buộc |
 | Lệnh kiểm tra của repo | `make check`, `npm test`, … `dk:init` phát hiện và ghi lại |
 | `gh` | Tùy chọn; dev-kit không bao giờ tự mở PR |
@@ -39,10 +39,10 @@ Kiểm tra đã nạp chưa: trong một session, nhờ agent liệt kê các sk
 | Antigravity 1.3.5 | `agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit` | `agy` đăng ký cả `agents/` lẫn `rules/*.md` ([antigravity.md](../../harness/antigravity.md)) |
 | omp 18.10.4 | `omp plugin marketplace add awesome-boilerplate-develop/dev-kit` rồi `omp plugin install dk@dev-kit` | omp đọc plugin của Claude Code; hai agent review xuất hiện dưới dạng named task agent ([omp.md](../../harness/omp.md)) |
 | OpenCode 1.18.35 | clone repo, liên kết từng thư mục `skills/<name>` vào `~/.config/opencode/skills/` | Cho phép đọc thư mục kit bằng `permission.external_directory` ([opencode.md](../../harness/opencode.md)) |
-| Cursor | – | Chưa kiểm chứng: Cursor cần `cursor-agent login` ❓ ([cursor.md](../../harness/cursor.md)) |
 
 Không hỗ trợ:
 - **Gemini CLI:** từ 2026-06-18 Google đã chuyển người dùng gói miễn phí và Google One sang Antigravity CLI.
+- **Cursor (bỏ từ 1.2.3):** chưa từng kiểm chứng được, vì `cursor-agent` cần đăng nhập.
 - **pi (tạm gác):** pi 1.0.2 cài và nạp được kit, nhưng lõi pi không có công cụ subagent, nên mọi vai trò review sẽ phải chạy trong session chính; chế độ đó chưa được đo.
 
 Các rule và bằng chứng lab của dev-kit được đo trên Claude. Với các CLI trong bảng, việc nạp kit đã được kiểm chứng; chất lượng review mới có một backtest, trên Codex, còn các CLI khác chưa đo ([06](06-evidence.md)).

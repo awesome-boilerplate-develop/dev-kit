@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.2 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.2.3 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)
@@ -9,7 +9,7 @@
 
 | 項目 | 備考 |
 |---|---|
-| エージェント CLI | Claude Code がリファレンス CLI です（lab では 2.1.296 を使用）。Codex、Copilot CLI、Antigravity (`agy`)、OpenCode、omp も kit を読み込めます（5.2 節）。Cursor は未検証です ❓ |
+| エージェント CLI | Claude Code がリファレンス CLI です（lab では 2.1.296 を使用）。Codex、Copilot CLI、Antigravity (`agy`)、OpenCode、omp も kit を読み込めます（5.2 節）。 |
 | `git` | 必須 |
 | リポジトリのチェックコマンド | `make check`、`npm test` など。`dk:init` が検出して記録します |
 | `gh` | 任意。dev-kit 自身が PR を開くことはありません |
@@ -39,10 +39,10 @@ claude plugin install dk@dev-kit
 | Antigravity 1.3.5 | `agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit` | `agy` は `agents/` と `rules/*.md` の両方を登録します（[antigravity.md](../../harness/antigravity.md)） |
 | omp 18.10.4 | `omp plugin marketplace add awesome-boilerplate-develop/dev-kit` のあと `omp plugin install dk@dev-kit` | omp は Claude Code plugin を読み込みます。2 つのレビューエージェントは名前付きの task エージェントとして現れます（[omp.md](../../harness/omp.md)） |
 | OpenCode 1.18.35 | リポジトリを clone し、各 `skills/<name>` ディレクトリを `~/.config/opencode/skills/` にリンクする | `permission.external_directory` で kit ディレクトリの読み取りを許可してください（[opencode.md](../../harness/opencode.md)） |
-| Cursor | – | 未検証です: Cursor には `cursor-agent login` が必要です ❓（[cursor.md](../../harness/cursor.md)） |
 
 非対応:
 - **Gemini CLI:** 2026-06-18 以降、Google は無料枠と Google One のユーザーを Antigravity CLI に移行しました。
+- **Cursor（1.2.3 で削除）:** `cursor-agent` にログインが必要なため、一度も検証できませんでした。
 - **pi（現時点では見送り）:** pi 1.0.2 は kit をインストールして読み込みますが、pi のコアには subagent ツールがないため、すべてのレビューの役割をメインセッションで実行することになります。このモードは測定していません。
 
 dev-kit の rule と lab の根拠は Claude で測定したものです。表の CLI では、kit が読み込まれることは確認済みです。レビュー品質は Codex での 1 回の backtest だけで、他の CLI は未測定です（[06](../en/06-evidence.md)、英語）。

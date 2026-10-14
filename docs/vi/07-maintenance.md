@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.2.2 review=human -->
+<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.2.3 review=human -->
 [English](../en/07-maintenance.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/07-maintenance.md).
@@ -51,7 +51,7 @@ Link nằm trong code fence (ví dụ minh họa) được bỏ qua.
 | Đổi luồng controller, bật/tắt rule, thêm part | minor (1.x.0) |
 | Đổi tên skill, đổi chỗ để artifact, đổi schema config | major (x.0.0); mô tả cách chuyển đổi trong CHANGELOG |
 
-Version nằm ở nhiều manifest (Claude Code, Codex, Cursor, Antigravity), được liệt kê trong `.version-bump.json`. Luôn đổi bằng `python3 scripts/bump_version.py <x.y.z>`; `--check` báo lỗi khi các manifest lệch nhau. Codex, Copilot và `agy` cài một bản copy, nên sau khi sửa kit bạn phải cài lại; Codex lưu bản copy theo thư mục từng version (`~/.codex/plugins/cache/dev-kit/dk/<version>/`), nên bắt buộc phải nâng version.
+Version nằm ở nhiều manifest (Claude Code, Codex, Antigravity), được liệt kê trong `.version-bump.json`. Luôn đổi bằng `python3 scripts/bump_version.py <x.y.z>`; `--check` báo lỗi khi các manifest lệch nhau. Codex, Copilot và `agy` cài một bản copy, nên sau khi sửa kit bạn phải cài lại; Codex lưu bản copy theo thư mục từng version (`~/.codex/plugins/cache/dev-kit/dk/<version>/`), nên bắt buộc phải nâng version.
 
 ## 7.6 Giấy phép
 
@@ -64,6 +64,6 @@ Làm theo Superpowers v7.0.0: một bộ `skills/`, mỗi CLI một manifest, kh
 - **Thêm một CLI mới:** thêm manifest (nếu CLI có định dạng plugin), thêm một dòng vào `.version-bump.json`, viết `harness/<cli>.md`, và thêm tên CLI vào đoạn Harness của 5 controller.
 - **Kiểm sau khi đổi controller hoặc khi CLI ra bản lớn:** cài kit, rồi bảo agent nạp `pre-pr-check` và chỉ làm theo đoạn Harness, và trả về thư mục kit, dòng đầu của `rules/RULES.md`, file ghi chú đã đọc, và tên công cụ subagent. Đạt khi cả bốn đều đúng.
 - **Ba điều không được làm,** rút ra từ ADR 0002 của mattpocock/skills và một lần thử ngày 2026-10-14:
-  - đưa `parts/` vào trong `skills/`: Codex và Cursor dò skill đệ quy, nên part sẽ thành skill và tốn context lúc mở phiên;
+  - đưa `parts/` vào trong `skills/`: Codex dò skill đệ quy, nên part sẽ thành skill và tốn context lúc mở phiên;
   - gom file bằng symlink trong plugin: Codex bỏ symlink khi cài;
   - khai nguồn marketplace của Codex kiểu `"url": "./"`: Codex coi đó là repo git và `git clone` thất bại; hãy dùng `"source": "local", "path": "./"`.

@@ -9,13 +9,13 @@ dev-kit skills are written for Claude Code (the reference harness). Each control
 | GitHub Copilot CLI | [copilot.md](copilot.md) | `.claude-plugin/` (read as a legacy manifest) | yes |
 | Antigravity (`agy`) | [antigravity.md](antigravity.md) | `.antigravity-plugin/` | yes |
 | OpenCode | [opencode.md](opencode.md) | skill folders, no manifest | yes |
-| Cursor | [cursor.md](cursor.md) | `.cursor-plugin/` | no (needs `cursor-agent login`) |
 | omp | [omp.md](omp.md) | `.claude-plugin/` (omp reads Claude Code plugins) | yes |
 
 "Verified" = a probe skill laid out like dev-kit was loaded on that harness and the agent read a file two levels above its `SKILL.md` and spawned one subagent, then dev-kit itself was installed and the agent resolved the kit folder and its harness notes (2026-10-14; versions in each file).
 
 Not supported:
 - **Gemini CLI:** Google moved unpaid and Google One users to Antigravity CLI on 2026-06-18.
+- **Cursor (dropped in 1.2.3):** never verified, because `cursor-agent` needs a login; the manifest and notes were removed.
 - **pi (dropped for now):** pi 1.0.2 installed the kit and loaded the skills, but pi core has no subagent tool, so every review role would run in the main session; that path has not been measured.
 
 ## Shared vocabulary

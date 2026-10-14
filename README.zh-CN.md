@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.2.2 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.2.3 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | 简体中文 | [日本語](README.ja.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](README.md)。
@@ -79,8 +79,7 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 
 ### 其他 CLI
 
-- **Cursor：** 已包含 manifest，但尚未验证。
-- **不支持：** Gemini CLI（Google 已把免费层用户迁移到 Antigravity）、pi（pi 核心没有 subagent 工具）。
+- **不支持：** Gemini CLI（Google 已把免费层用户迁移到 Antigravity）、pi（pi 核心没有 subagent 工具）、Cursor（从未验证，已移除）。
 
 各 CLI 的详情（安装位置、subagent 工具、已知注意事项）：[`harness/`](harness/README.md)。
 

@@ -167,7 +167,7 @@ Card "dialog form" (input, select, textarea, toggle, button), `dk:story-runner`,
 | Antigravity 1.3.5 | no | yes (whole-tree copy) | yes | `invoke_subagent` |
 | Copilot CLI 1.0.89 | no | yes | yes when installed; with `--plugin-dir` you must add `--add-dir` | `task` |
 | OpenCode 1.18.35 | no | symlink path | yes, after resolving the symlink and allowing `external_directory` | `task` (`general`) |
-| Cursor | – | – | – | could not run: needs `cursor-agent login` |
+| Cursor | – | – | – | could not run: needs `cursor-agent login` (support dropped in 1.2.3) |
 | omp 18.10.4 | no | yes | yes | `task` |
 | pi 1.0.2 | no | yes | yes | none (core pi); support paused from 0.8.13 |
 

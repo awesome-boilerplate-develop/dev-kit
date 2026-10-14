@@ -48,7 +48,7 @@ Links inside code fences (illustrative examples) are ignored.
 | Changing the controller flow, enabling/disabling a rule, adding a part | minor (1.x.0) |
 | Renaming a skill, moving the artifact location, changing the config schema | major (x.0.0); describe the migration in the CHANGELOG |
 
-The version lives in several manifests (Claude Code, Codex, Cursor, Antigravity), listed in `.version-bump.json`. Always change it with `python3 scripts/bump_version.py <x.y.z>`; `--check` fails when the manifests disagree. Codex, Copilot and `agy` install a copy, so after changing the kit you must reinstall; Codex stores the copy in a per-version folder (`~/.codex/plugins/cache/dev-kit/dk/<version>/`), so the version must be bumped.
+The version lives in several manifests (Claude Code, Codex, Antigravity), listed in `.version-bump.json`. Always change it with `python3 scripts/bump_version.py <x.y.z>`; `--check` fails when the manifests disagree. Codex, Copilot and `agy` install a copy, so after changing the kit you must reinstall; Codex stores the copy in a per-version folder (`~/.codex/plugins/cache/dev-kit/dk/<version>/`), so the version must be bumped.
 
 ## 7.6 License
 
@@ -61,6 +61,6 @@ Follow Superpowers v7.0.0: one `skills/` set, one manifest per CLI, differences 
 - **Adding a new CLI:** add a manifest (if the CLI has a plugin format), add a line to `.version-bump.json`, write `harness/<cli>.md`, and add the CLI name to the Harness section of the 5 controllers.
 - **Checking after changing a controller or when a CLI has a major release:** install the kit, then ask the agent to load `pre-pr-check` and follow only the Harness section, and to return the kit directory, the first line of `rules/RULES.md`, the note file it read, and the name of the subagent tool. It passes when all four are correct.
 - **Three things not to do,** taken from ADR 0002 of mattpocock/skills and a trial on 2026-10-14:
-  - putting `parts/` inside `skills/`: Codex and Cursor scan skills recursively, so parts would become skills and cost context at session start;
+  - putting `parts/` inside `skills/`: Codex scans skills recursively, so parts would become skills and cost context at session start;
   - gathering files with symlinks inside the plugin: Codex drops symlinks on install;
   - declaring the Codex marketplace source as `"url": "./"`: Codex treats it as a git repo and `git clone` fails; use `"source": "local", "path": "./"`.

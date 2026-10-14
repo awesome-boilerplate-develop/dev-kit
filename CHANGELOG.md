@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.2.3 (2026-10-15)
+- **Cursor support dropped:** removed `.cursor-plugin/plugin.json` and `harness/cursor.md`, dropped `cursor` from the Harness section of the 5 controllers and from `.version-bump.json`, and listed Cursor under "Not supported" in the READMEs, `harness/README.md` and docs 05.
+- **Why:** it was never verified: `cursor-agent` needs a login that the test machine did not have. The probe results in docs 06 stay as history.
+
 ## 1.2.2 (2026-10-15)
 - **`dk:init` defaults are explicit:** "default" enables `validated` kit files only, never ticks an `experimental` one, and keeps no suggested rule; a rule is written only when the user keeps it by name.
 - **Evidence in suggestions:** every count comes from a command the agent ran; a direction such as "X replaces Y" without usage evidence is asked as a question.
