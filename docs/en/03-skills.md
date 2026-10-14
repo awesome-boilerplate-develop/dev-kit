@@ -35,19 +35,30 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 5. *Question:* **graph indexes** (default yes; the expected size for a large repo, roughly 150 MB and 600 MB per ~3,000 files). Index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to `.git/info/exclude`.
 6. **Baseline:** runs tests and build once. *Question only if red:* **stop** (fix first) or **accept as a known baseline**, written to `.dev-kit/baseline.md`; from then on a run fails only when a test **outside** that list fails (rule B1).
 7. **Standards by topic** (below).
-8. *Question:* **`CONSTRAINTS.md`** (optional, default no) → `.dev-kit/CONSTRAINTS.md`. Skipped when the project has its own.
+8. *Question:* **`CONSTRAINTS.md`** (optional, default no) → `.dev-kit/CONSTRAINTS.md`. Skipped when the project has its own. The question explains what the file adds for your repo (below).
 9. **Report** `.dev-kit/init-report.md`, and a check that `git status` is unchanged.
 
 **Standards by topic** (design: [09](09-init-and-standards.md), section 9.6). Rules are written only for what the agent cannot know or has been seen to get wrong; never naming or style.
 - **Probe first:** what the linter covers; in-house libraries (internal packages, how many files use them against framework controls, what recent files use, their component list); central services and permission sources, found with the graph.
 - **Topic by topic, in order:** architecture, coding, testing, security, ui, api, data, ops, process; topics with nothing to offer are skipped. One question per topic (two at most) combining:
   1. the **kit checklist** for that topic (`standards/<topic>/`): `validated` files pre-ticked, `experimental` files not; single items can be switched off;
-  2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team;
+  2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team; for an in-house library it also asks whether the old version is still allowed and which framework controls stay allowed;
   3. the option **"add another convention for this topic"**.
 - At most 12 standards questions, then **one open question**: "other conventions the agent should know?"
 - The agent drafts the rules in the standard format, **reads them back for your confirmation**, then writes project rules to `.dev-kit/standards/<topic>/` and team rules to the team folder (asked once, remembered in `~/.dev-kit/config.yml`).
 
 **Kit standards** (all `experimental` until measured on new bugs): `review/finding-quality` (always on), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
+
+**`CONSTRAINTS.md` versus standards.** Both are optional parts of your setup, but they answer different questions:
+
+| | Standards (`.dev-kit/standards/`) | `CONSTRAINTS.md` |
+|---|---|---|
+| Answers | How is code written in this repo? | How good must a change be before it ships? |
+| Content | Rules the agent cannot guess, by topic, with IDs (for example "use the in-house controls") | Numbers with the command that checks each (for example "zero type errors: `tsc --noEmit`", "changed lines ≥ 80% covered"), a floor that always applies (no new `@ts-ignore`, stubs, skipped tests, secrets), agreed exceptions |
+| Used when | Planning, coding and review | `dk:pre-pr-check` step 1: a change that breaks it is a blocker |
+| Purpose | Code that fits the repo | The agent cannot quietly lower the bar to get green |
+
+Without `CONSTRAINTS.md`, `dk:pre-pr-check` still flags new skips, suppressions, deleted asserts and weakened thresholds in the diff. The file adds numeric gates for dimensions the repo does not check yet (coverage, type errors, security scans, performance or accessibility budgets). It costs up to four more questions (which dimensions, block or warn, target numbers or "measure today and hold", slowest acceptable check) and possibly a tool to install, always asked first. Its benefit has not been measured in the dev-kit lab, which is why the default is no. The interview comes from the `constraint-driven-development` part (agent-skills).
 
 **Outputs:** `config.yml`, the `.dev-kit/` directory, the standards you chose, the init report, optionally `.dev-kit/CONSTRAINTS.md` and the graph indexes. Nothing to commit.
 

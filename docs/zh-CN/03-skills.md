@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.1 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -38,19 +38,30 @@
 5. *提问：* **graph 索引**（默认是；大型仓库的预期占用，每约 3,000 个文件大致 150 MB 和 600 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入 `.git/info/exclude`。
 6. **Baseline：** 运行一次测试和构建。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。
 7. **按 topic 的 standards**（见下）。
-8. *提问：* **`CONSTRAINTS.md`**（可选，默认否）→ `.dev-kit/CONSTRAINTS.md`。如果项目自带，则跳过。
+8. *提问：* **`CONSTRAINTS.md`**（可选，默认否）→ `.dev-kit/CONSTRAINTS.md`。如果项目自带，则跳过。该问题会说明这个文件能为你的仓库增加什么（见下文）。
 9. **报告** `.dev-kit/init-report.md`，并检查 `git status` 没有变化。
 
 **按 topic 的 standards**（设计：[09](../en/09-init-and-standards.md)，英文，9.6 节）。只为 agent 无法知道、或已被观察到会出错的内容写 rule；绝不涉及命名或风格。
 - **先探查：** linter 覆盖了什么；in-house 库（内部包、使用它们的文件数与使用框架控件的文件数对比、最近的文件用什么、它们的组件列表）；中心服务和权限来源，用 graph 查找。
 - **逐个 topic，按顺序：** `architecture`、`coding`、`testing`、`security`、`ui`、`api`、`data`、`ops`、`process`；没有可提供内容的 topic 会被跳过。每个 topic 一个问题（最多两个），合并以下内容：
   1. 该 topic 的 **kit 清单**（`standards/<topic>/`）：`validated` 文件预先勾选，`experimental` 文件不勾选；单个条目可以关闭；
-  2. 根据探查结果给出的**带依据的项目或团队 rule 建议**（例如 “68 个文件使用 `<ui-…>`，4 个使用 `mat-input`：新代码应该使用 in-house 控件吗？”），每条都标明范围：项目或团队；
+  2. 根据探查结果给出的**带依据的项目或团队 rule 建议**（例如 “68 个文件使用 `<ui-…>`，4 个使用 `mat-input`：新代码应该使用 in-house 控件吗？”），每条都标明范围：项目或团队；对于 in-house 库，还会询问旧版本是否仍允许使用，以及哪些框架控件仍然允许使用；
   3. 选项 **“为该 topic 添加另一个约定”**。
 - 最多 12 个 standards 问题，然后是**一个开放问题**：“agent 还应该知道其他约定吗？”
 - agent 按标准格式起草 rule，**读给你确认**，然后把项目 rule 写入 `.dev-kit/standards/<topic>/`，把团队 rule 写入团队文件夹（只问一次，记在 `~/.dev-kit/config.yml` 中）。
 
 **Kit standards**（在新 bug 上测量之前全部是 `experimental`）：`review/finding-quality`（始终开启）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
+
+**`CONSTRAINTS.md` 与 standards 的区别。** 两者都是 setup 中的可选部分，但回答的是不同的问题：
+
+| | Standards（`.dev-kit/standards/`） | `CONSTRAINTS.md` |
+|---|---|---|
+| 回答 | 这个仓库里的代码怎么写？ | 一个变更要达到多好才能发布？ |
+| 内容 | agent 猜不到的 rule，按 topic 分组，带 ID（例如 “使用 in-house 控件”） | 数字，以及检查每个数字的命令（例如 “零类型错误：`tsc --noEmit`”、“变更行覆盖率 ≥ 80%”），始终适用的底线（不新增 `@ts-ignore`、stub、被跳过的测试、secret），以及商定的例外 |
+| 使用时机 | 规划、编码和 review | `dk:pre-pr-check` 第 1 步：违反它的变更是 blocker |
+| 目的 | 让代码契合仓库 | agent 不能悄悄降低标准来让检查变绿 |
+
+没有 `CONSTRAINTS.md` 时，`dk:pre-pr-check` 仍会标出 diff 中新增的跳过、抑制、被删除的 assert 和被削弱的阈值。该文件为仓库尚未检查的维度增加数字门槛（覆盖率、类型错误、安全扫描、性能或无障碍预算）。它最多多花四个问题（哪些维度、阻止还是警告、目标数字或 “今天测量并保持”、可接受的最慢检查），并且可能需要安装工具，这一点始终会先询问。它的收益尚未在 dev-kit lab 中测量，所以默认是否。该访谈来自 `constraint-driven-development` part（agent-skills）。
 
 **输出：** `config.yml`、`.dev-kit/` 目录、你选择的 standards、init 报告，以及可选的 `.dev-kit/CONSTRAINTS.md` 和 graph 索引。无需提交任何内容。
 

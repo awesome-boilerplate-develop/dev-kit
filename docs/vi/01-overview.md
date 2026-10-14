@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/01-overview.md source_commit=v1.2.0 review=human -->
+<!-- i18n: source=docs/en/01-overview.md source_commit=v1.2.1 review=human -->
 [English](../en/01-overview.md) | Tiếng Việt | [简体中文](../zh-CN/01-overview.md) | [日本語](../ja/01-overview.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/01-overview.md](../en/01-overview.md)) là bản chuẩn.

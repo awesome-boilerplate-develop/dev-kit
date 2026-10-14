@@ -1,5 +1,11 @@
 # dev-kit changelog
 
+## 1.2.1 (2026-10-14)
+- **The `CONSTRAINTS.md` question explains itself:** what the file is (a pass bar as numbers with the command that checks each, a floor, exceptions), how it differs from the standards just chosen, what `dk:pre-pr-check` already flags without it, what it would add for this repo (from the probe), its cost (up to 4 more questions, maybe a tool to install) and that its benefit is unmeasured. Docs 03 gets a "`CONSTRAINTS.md` versus standards" table.
+- **In-house library rules ask the design's follow-ups** (docs 09, 9.6): whether the old version is still allowed in new code and which framework controls stay allowed, in the same topic question.
+- **History check:** the per-topic `dk:init` existed only in the design (docs 09) and notes before 1.2.0; no earlier `skills/init/SKILL.md` had topic questions, so nothing was lost when the public repo was created.
+- **Verified:** asked alone in a real worktree, the `CONSTRAINTS.md` question listed what the repo already checks (type check, coverage run, Sonar, CI) and what is missing (no lint gate, no coverage threshold for changed lines).
+
 ## 1.2.0 (2026-10-14): merged `dk:init` with the standards checklist, one question at a time
 - **`dk:init` follows the approved design (docs 09, 9.2 and 9.6).** It probes first, then asks one question per message in a fixed order: graph tools (only if missing), commands and base branch, graph indexes, baseline (only if red), standards by topic, an open question, the read-back of drafted rules, `CONSTRAINTS.md` (optional). Each question carries its evidence and a default. This replaces 1.1.0's single plan-and-approve step.
 - **Standards by topic:** `architecture`, `coding`, `testing`, `security`, `ui`, `api`, `data`, `ops`, `process`, skipping topics with nothing to offer. Each topic shows the kit checklist (every item, `validated` pre-ticked, `experimental` not), rules suggested from the code with evidence (in-house libraries, central services, permission sources) with a project or team scope, and an "add another convention" option. At most 12 standards questions; no naming or style questions (principle 0). Drafted rules are read back before they are written; team rules go to a team folder remembered in `~/.dev-kit/config.yml`.
