@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.3 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.4 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -44,7 +44,7 @@
 **按 topic 的 standards**（设计：[09](../en/09-init-and-standards.md)，英文，9.6 节）。只为 agent 无法知道、或已被观察到会出错的内容写 rule；绝不涉及命名或风格。
 - **先探查：** linter 覆盖了什么；in-house 库（内部包、使用它们的文件数与使用框架控件的文件数对比、最近的文件用什么、它们的组件列表）；中心服务和权限来源，用 graph 查找。
 - **逐个 topic，按顺序：** `architecture`、`coding`、`testing`、`security`、`ui`、`api`、`data`、`ops`、`process`；没有可提供内容的 topic 会被跳过。每个 topic 一个问题（最多两个），合并以下内容：
-  1. 该 topic 的 **kit 清单**（`standards/<topic>/`）：`validated` 文件预先勾选，`experimental` 文件不勾选；单个条目可以关闭；
+  1. 该 topic 的 **kit 清单**（`standards/<topic>/`）：`validated` 文件预先勾选，`experimental` 文件不勾选；单个条目可以关闭。没有 kit 文件的 topic（目前是 `architecture`、`api`、`data`、`ops`、`process`）会说明原因：这些 topic 取决于具体仓库，所以按原则 0，它们的 rule 只来自建议部分；
   2. 根据探查结果给出的**带依据的项目或团队 rule 建议**（例如 “68 个文件使用 `<ui-…>`，4 个使用 `mat-input`：新代码应该使用 in-house 控件吗？”），每条都标明范围：项目或团队；对于 in-house 库，还会询问旧版本是否仍允许使用，以及哪些框架控件仍然允许使用；
   3. 选项 **“为该 topic 添加另一个约定”**。
 

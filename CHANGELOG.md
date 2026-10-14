@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.2.4 (2026-10-15)
+- **`dk:init` explains an empty kit checklist:** on a topic with no kit file (`architecture`, `api`, `data`, `ops`, `process`) it says in one line that the kit writes a rule only when the agent cannot learn it from the code or keeps failing at it (principle 0), and that this topic's rules come from the probe suggestions. Checked with one `dk:init standards` run on a real Angular repo.
+- **No kit `architecture` file, by decision:** a draft (layers, adapters, contracts, config) was reviewed against principle 0 and dropped: most items are readable from neighbouring code, and no confirmed backtest bug backs them.
+
 ## 1.2.3 (2026-10-15)
 - **Cursor support dropped:** removed `.cursor-plugin/plugin.json` and `harness/cursor.md`, dropped `cursor` from the Harness section of the 5 controllers and from `.version-bump.json`, and listed Cursor under "Not supported" in the READMEs, `harness/README.md` and docs 05.
 - **Why:** it was never verified: `cursor-agent` needs a login that the test machine did not have. The probe results in docs 06 stay as history.

@@ -41,7 +41,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 **Standards by topic** (design: [09](09-init-and-standards.md), section 9.6). Rules are written only for what the agent cannot know or has been seen to get wrong; never naming or style.
 - **Probe first:** what the linter covers; in-house libraries (internal packages, how many files use them against framework controls, what recent files use, their component list); central services and permission sources, found with the graph.
 - **Topic by topic, in order:** architecture, coding, testing, security, ui, api, data, ops, process; topics with nothing to offer are skipped. One question per topic (two at most) combining:
-  1. the **kit checklist** for that topic (`standards/<topic>/`): `validated` files pre-ticked, `experimental` files not; single items can be switched off;
+  1. the **kit checklist** for that topic (`standards/<topic>/`): `validated` files pre-ticked, `experimental` files not; single items can be switched off. A topic with no kit file (today `architecture`, `api`, `data`, `ops`, `process`) says why: these depend on the repo, so under principle 0 their rules come only from the suggestions;
   2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team; for an in-house library it also asks whether the old version is still allowed and which framework controls stay allowed;
   3. the option **"add another convention for this topic"**.
 

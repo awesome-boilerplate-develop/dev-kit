@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/01-overview.md source_commit=v1.2.3 review=machine -->
+<!-- i18n: source=docs/en/01-overview.md source_commit=v1.2.4 review=machine -->
 [English](../en/01-overview.md) | [Tiếng Việt](../vi/01-overview.md) | [简体中文](../zh-CN/01-overview.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [01-overview.md](../en/01-overview.md)

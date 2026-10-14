@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.3 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.2.4 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -44,7 +44,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 **Tiêu chuẩn theo topic** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
 - **Probe trước:** linter bao phủ những gì; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng); các service trung tâm và nguồn permission, tìm bằng graph.
 - **Lần lượt từng topic, theo thứ tự:** `architecture`, `coding`, `testing`, `security`, `ui`, `api`, `data`, `ops`, `process`; topic không có gì để đề xuất thì bỏ qua. Mỗi topic một câu hỏi (tối đa hai) gộp:
-  1. **checklist của kit** cho topic đó (`standards/<topic>/`): file `validated` được tick sẵn, file `experimental` thì không; từng mục có thể tắt riêng;
+  1. **checklist của kit** cho topic đó (`standards/<topic>/`): file `validated` được tick sẵn, file `experimental` thì không; từng mục có thể tắt riêng. Topic chưa có file kit (hiện là `architecture`, `api`, `data`, `ops`, `process`) sẽ nói rõ lý do: các topic này phụ thuộc từng repo, nên theo nguyên tắc 0, rule của chúng chỉ đến từ phần gợi ý;
   2. **rule đề xuất cho dự án hoặc team kèm bằng chứng** từ probe (ví dụ "68 file dùng `<ui-…>`, 4 file dùng `mat-input`: code mới có nên dùng control nội bộ không?"), mỗi rule kèm phạm vi: dự án hoặc team; với thư viện nội bộ, nó còn hỏi phiên bản cũ có còn được phép không và những control của framework nào vẫn được phép;
   3. lựa chọn **"thêm một quy ước khác cho topic này"**.
 
