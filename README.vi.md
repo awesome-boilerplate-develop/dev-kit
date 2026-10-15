@@ -77,6 +77,37 @@ Sau đó cho OpenCode đọc thư mục kit, trong `~/.config/opencode/opencode.
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
+### Cập nhật
+
+Làm mới catalog của marketplace rồi cập nhật plugin; sau đó mở phiên mới để agent nạp skill mới. Xem phiên bản bằng lệnh liệt kê plugin của CLI (hoặc `CHANGELOG.md`).
+
+```bash
+# Claude Code (from `claude plugin --help`; restart required)
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+
+# Codex
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+
+# GitHub Copilot CLI (from `copilot plugin --help`)
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+
+# Antigravity: install again; it replaces its copy
+agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
+
+# omp
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
+
+# OpenCode: pull the clone; re-link in case a skill folder was added
+git -C ~/dev-kit pull
+for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
+```
+
+Lệnh của Codex, Antigravity và omp đã được chạy cho từng bản phát hành ngày 2026-10-15; dòng của Claude Code và Copilot lấy theo phần help của chính các CLI đó và chưa được chạy ở đây.
+
 ### Các CLI khác
 
 - **Không hỗ trợ:** Gemini CLI (Google đã chuyển người dùng gói miễn phí sang Antigravity), pi (lõi pi không có công cụ subagent), Cursor (chưa từng kiểm chứng; đã bỏ).

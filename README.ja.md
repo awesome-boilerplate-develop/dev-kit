@@ -77,6 +77,37 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
+### 更新
+
+marketplace のカタログを更新してからプラグインを更新し、そのあと新しいセッションを開いてエージェントに新しい skill を読み込ませます。バージョンは CLI のプラグイン一覧（または `CHANGELOG.md`）で確認できます。
+
+```bash
+# Claude Code (from `claude plugin --help`; restart required)
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+
+# Codex
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+
+# GitHub Copilot CLI (from `copilot plugin --help`)
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+
+# Antigravity: install again; it replaces its copy
+agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
+
+# omp
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
+
+# OpenCode: pull the clone; re-link in case a skill folder was added
+git -C ~/dev-kit pull
+for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
+```
+
+Codex、Antigravity、omp のコマンドは 2026-10-15 の各リリースで実際に実行しました。Claude Code と Copilot の行は各 CLI のヘルプに基づいており、ここでは実行していません。
+
 ### その他の CLI
 
 - **非対応:** Gemini CLI（Google は無料枠のユーザーを Antigravity に移行しました）、pi（pi のコアに subagent ツールがありません）、Cursor（一度も検証できなかったため削除しました）。

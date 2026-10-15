@@ -74,6 +74,37 @@ Then let OpenCode read the kit folder, in `~/.config/opencode/opencode.json`:
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
+### Updating
+
+Refresh the marketplace catalog, then update the plugin; start a new session afterwards so the agent loads the new skills. Check the version with the CLI's plugin list (or `CHANGELOG.md`).
+
+```bash
+# Claude Code (from `claude plugin --help`; restart required)
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+
+# Codex
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+
+# GitHub Copilot CLI (from `copilot plugin --help`)
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+
+# Antigravity: install again; it replaces its copy
+agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
+
+# omp
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
+
+# OpenCode: pull the clone; re-link in case a skill folder was added
+git -C ~/dev-kit pull
+for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
+```
+
+The Codex, Antigravity and omp commands were run for each release on 2026-10-15; the Claude Code and Copilot lines follow those CLIs' own help and were not run here.
+
 ### Other CLIs
 
 - **Not supported:** Gemini CLI (Google moved free-tier users to Antigravity), pi (no subagent tool in pi core), Cursor (never verified; dropped).

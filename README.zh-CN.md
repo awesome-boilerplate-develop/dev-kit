@@ -77,6 +77,37 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
+### 更新
+
+先刷新 marketplace 的目录，再更新插件；之后开启新会话，让 agent 加载新的 skill。可用 CLI 的插件列表命令（或 `CHANGELOG.md`）查看版本。
+
+```bash
+# Claude Code (from `claude plugin --help`; restart required)
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+
+# Codex
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+
+# GitHub Copilot CLI (from `copilot plugin --help`)
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+
+# Antigravity: install again; it replaces its copy
+agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
+
+# omp
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
+
+# OpenCode: pull the clone; re-link in case a skill folder was added
+git -C ~/dev-kit pull
+for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
+```
+
+Codex、Antigravity 和 omp 的命令已在 2026-10-15 的每次发布中实际运行；Claude Code 和 Copilot 的命令依据这些 CLI 自带的帮助，未在此运行。
+
 ### 其他 CLI
 
 - **不支持：** Gemini CLI（Google 已把免费层用户迁移到 Antigravity）、pi（pi 核心没有 subagent 工具）、Cursor（从未验证，已移除）。
