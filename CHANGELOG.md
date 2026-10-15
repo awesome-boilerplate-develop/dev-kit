@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.3.0 (2026-10-15)
+- **`dk:init` topic questions end with a Recommended line:** the agent's best pick for the repo (kit files, items to switch off, suggested rules with scope), one reason per part from the probe. An `experimental` kit file is recommended when the probe finds the situations its items cover; items the linter or compiler already checks are left out; a suggested rule is recommended only with a clear usage direction and no fact still needed from the user; a lint rule is preferred when a linter could enforce it. With nothing qualifying it says `Recommended: nothing` and why.
+- **"default" now accepts the Recommended line** (was: `validated` files only, no suggested rule, which in practice enabled nothing since every kit file is still `experimental`). "skip" enables nothing; drafted rules are still read back before writing.
+- **Checked** on a real Angular repo: architecture → `Recommended: nothing` (every suggestion needed a fact from the user); coding → `coding/review-basics (experimental)` plus a subscription-cleanup project rule backed by counts; `: any` (480 uses, no linter) was not recommended. A first run recommended a rule "if I had to pick" that still needed confirmation; the rule was tightened and the rerun was clean.
+
 ## 1.2.4 (2026-10-15)
 - **`dk:init` explains an empty kit checklist:** on a topic with no kit file (`architecture`, `api`, `data`, `ops`, `process`) it says in one line that the kit writes a rule only when the agent cannot learn it from the code or keeps failing at it (principle 0), and that this topic's rules come from the probe suggestions. Checked with one `dk:init standards` run on a real Angular repo.
 - **No kit `architecture` file, by decision:** a draft (layers, adapters, contracts, config) was reviewed against principle 0 and dropped: most items are readable from neighbouring code, and no confirmed backtest bug backs them.

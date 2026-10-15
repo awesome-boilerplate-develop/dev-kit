@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/glossary.md source_commit=v1.2.4 review=machine -->
+<!-- i18n: source=docs/en/glossary.md source_commit=v1.3.0 review=machine -->
 [English](../en/glossary.md) | [Tiếng Việt](../vi/glossary.md) | 简体中文 | [日本語](../ja/glossary.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[glossary.md](../en/glossary.md)。

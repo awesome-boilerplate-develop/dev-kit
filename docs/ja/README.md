@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/README.md source_commit=v1.2.4 review=machine -->
+<!-- i18n: source=docs/en/README.md source_commit=v1.3.0 review=machine -->
 [English](../en/README.md) | [Tiếng Việt](../vi/README.md) | [简体中文](../zh-CN/README.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [README.md](../en/README.md)
@@ -9,7 +9,7 @@ dev-kit（plugin 名 `dk`）は、エージェントがかんばんカード（�
 
 これらのドキュメントは、英語、ベトナム語（tier 1–2）、簡体字中国語と日本語（tier 1）で提供されています。正式な内容は英語版で、翻訳は遅れる場合があります。日本語版にないドキュメントは英語版へのリンクで、表の「言語」列に「英語」と示しています。
 
-> ドキュメントのバージョン: dev-kit **1.2.4**（2026-10-15）。1.0.0 が最初の公開リリースでした。ドキュメント内のそれ以前のバージョン番号（0.x）は非公開の lab での反復版です。数値は dev-kit の lab（非公開）（主に Haiku 5.5、一部 Sonnet 5.5、Claude Code 2.1.296）と、職場の非公開 Angular リポジトリでの backtest（Sonnet 5.5。Codex での実行が 1 回）によるものです。まだ測定していないものには ❓ を付けています。
+> ドキュメントのバージョン: dev-kit **1.3.0**（2026-10-15）。1.0.0 が最初の公開リリースでした。ドキュメント内のそれ以前のバージョン番号（0.x）は非公開の lab での反復版です。数値は dev-kit の lab（非公開）（主に Haiku 5.5、一部 Sonnet 5.5、Claude Code 2.1.296）と、職場の非公開 Angular リポジトリでの backtest（Sonnet 5.5。Codex での実行が 1 回）によるものです。まだ測定していないものには ❓ を付けています。
 
 ## 読む順番
 

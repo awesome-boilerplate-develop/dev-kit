@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.2.4 review=human -->
+<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.3.0 review=human -->
 [English](../en/07-maintenance.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/07-maintenance.md).
