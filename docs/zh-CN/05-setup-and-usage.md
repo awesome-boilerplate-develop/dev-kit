@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.7 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.8 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | 简体中文 | [日本語](../ja/05-setup-and-usage.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[05-setup-and-usage.md](../en/05-setup-and-usage.md)。
@@ -102,6 +102,19 @@ Use skill dk:init for this repo.
 ```
 
 agent 会先探查仓库，然后依次一次问一个问题：命令和基础分支、graph 索引、baseline（仅在它是红的时候）、分两遍的 standards（先是写代码的 rule，再是 review 清单；每一遍都是若干组清单，外加一个收集你自己约定的循环），以及可选的 `CONSTRAINTS.md`。每个问题都会给出依据和一行 Recommended；回复 “default”、“skip” 或你自己的答案。它会创建 `.dev-kit/`（被 git 忽略，无需提交）。之后若要重做某一部分：`dk:init index`、`dk:init baseline`、`dk:init standards [rules|review]`。
+
+**在各个 CLI 上启动 `dk:init`**（dev-kit 1.4.x，2026-10-15 在一个私有仓库上的运行；如需要，可在第一条消息里加上"用越南语提问和回答"或你的语言）：
+
+| CLI | 第一条消息 | 交互会话中的提问 | 每轮一条命令（headless） |
+|---|---|---|---|
+| Claude Code | `/dk:init`（Claude Code 有自己的 `init`） | 未用 1.4.x 运行 | `claude -p … --resume <session>`：每轮一个问题，选项以文字给出（已检查） |
+| Codex | `$dk:init` | 未用 1.4.x 运行 | `codex exec`，然后 `codex exec resume <id> "<回答>"`：每轮一个问题（已检查）；`resume` 接受 `-c sandbox_mode=…`，不接受 `-s` |
+| Copilot CLI | `/dk:init` | `ask_user` 表单（已检查） | `copilot -p` 采用所有默认值，不提问（已检查） |
+| Antigravity | `/dk:init`，用 `agy -i` 启动 | 带 "Write-in…" 行的 `ask_question` 表单（已检查） | `agy -p` 自动跳过表单并采用所有默认值（已检查） |
+| OpenCode | `/init …`（skill 没有命名空间；在 `opencode run` 中这会加载该 skill） | 未运行 | `opencode run`，然后 `opencode run -c "<回答>"`：每轮一个问题（已检查）；先在 `external_directory` 中允许 kit 目录（[opencode.md](../../harness/opencode.md)） |
+| omp | `/dk:init` | 未用 1.4.x 运行 | `omp -p`，然后 `omp -p -c "<回答>"`：每轮一个问题（已检查） |
+
+实际使用时，请运行交互会话并自己回答；headless 模式用于脚本化检查。
 
 ## 5.8 日常使用
 

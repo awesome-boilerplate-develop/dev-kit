@@ -100,6 +100,19 @@ Use skill dk:init for this repo.
 
 The agent probes the repo first, then asks one question at a time, in order: commands and base branch, graph indexes, the baseline (only if it is red), the standards in two passes (rules for writing code, then the review checklist; each a list of groups and a loop for your own conventions), and the optional `CONSTRAINTS.md`. Each question shows its evidence and a Recommended line; reply "default", "skip" or your answer. It creates `.dev-kit/` (ignored by git, nothing to commit). To redo one part later: `dk:init index`, `dk:init baseline`, `dk:init standards [rules|review]`.
 
+**Starting `dk:init` on each CLI** (dev-kit 1.4.x, runs of 2026-10-15 on one private repo; add "answer in Vietnamese" or your language to the first message if you want):
+
+| CLI | First message | Questions in the interactive session | One prompt per turn (headless) |
+|---|---|---|---|
+| Claude Code | `/dk:init` (Claude Code has its own `init`) | not run with 1.4.x | `claude -p … --resume <session>`: one question per turn, choices as text (checked) |
+| Codex | `$dk:init` | not run with 1.4.x | `codex exec` then `codex exec resume <id> "<answer>"`: one question per turn (checked); `resume` takes `-c sandbox_mode=…`, not `-s` |
+| Copilot CLI | `/dk:init` | `ask_user` forms (checked) | `copilot -p` takes every default and asks nothing (checked) |
+| Antigravity | `/dk:init`, started with `agy -i` | `ask_question` forms with a "Write-in…" line (checked) | `agy -p` auto-skips the forms and takes every default (checked) |
+| OpenCode | `/init …` (skills have no namespace; in `opencode run` this loaded the skill) | not run | `opencode run` then `opencode run -c "<answer>"`: one question per turn (checked); allow the kit folder in `external_directory` first ([opencode.md](../../harness/opencode.md)) |
+| omp | `/dk:init` | not run with 1.4.x | `omp -p` then `omp -p -c "<answer>"`: one question per turn (checked) |
+
+For real use, run the interactive session and answer yourself; headless modes are for scripted checks.
+
 ## 5.8 Daily use
 
 Call a controller by card type and paste the card in:

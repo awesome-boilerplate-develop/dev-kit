@@ -20,6 +20,8 @@ The script reports an error when:
 
 Links inside code fences (illustrative examples) are ignored.
 
+After editing a kit standards file, run `python3 scripts/check_standards.py standards --no-files` (CI runs it too): frontmatter, section names and item IDs. `dk:init` runs the same script, with the `applies_to` check, on the project files it writes.
+
 ## 7.3 Updating from upstream
 
 1. Download the new version of the original kit into a temporary folder, next to the pinned one. The current commit is recorded in `UPSTREAM.md`.

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.7 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.8 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)
@@ -102,6 +102,19 @@ Use skill dk:init for this repo.
 ```
 
 エージェントはまずリポジトリを調べ、そのあと質問を 1 つずつ順番に行います: コマンドとベースブランチ、グラフのインデックス、baseline（red の場合のみ）、2 つのパスに分けた standards（コードを書くための rule、続いてレビューのチェックリスト。それぞれがグループの一覧と、あなた自身の規約のためのループです）、そして任意の `CONSTRAINTS.md` です。各質問には根拠と Recommended の行が示されます。「default」「skip」またはあなたの答えを返してください。`.dev-kit/`（git に無視され、コミットするものはありません）を作成します。あとで 1 つの部分だけやり直すには: `dk:init index`、`dk:init baseline`、`dk:init standards [rules|review]`。
+
+**各 CLI での `dk:init` の始め方**（dev-kit 1.4.x、2026-10-15 に 1 つの非公開リポジトリで実行。必要なら最初のメッセージに「ベトナム語で質問と回答」などの言語指定を加える）:
+
+| CLI | 最初のメッセージ | 対話セッションでの質問 | 1 ターン 1 コマンド（headless） |
+|---|---|---|---|
+| Claude Code | `/dk:init`（Claude Code には独自の `init` がある） | 1.4.x では未実行 | `claude -p … --resume <session>`: 1 ターンに 1 問、選択肢はテキスト（確認済み） |
+| Codex | `$dk:init` | 1.4.x では未実行 | `codex exec` のあと `codex exec resume <id> "<回答>"`: 1 ターンに 1 問（確認済み）。`resume` は `-s` ではなく `-c sandbox_mode=…` を受け付ける |
+| Copilot CLI | `/dk:init` | `ask_user` フォーム（確認済み） | `copilot -p` はすべての既定値を採用し、何も尋ねない（確認済み） |
+| Antigravity | `/dk:init`、`agy -i` で起動 | 「Write-in…」行付きの `ask_question` フォーム（確認済み） | `agy -p` はフォームを自動スキップし、すべての既定値を採用する（確認済み） |
+| OpenCode | `/init …`（skill に名前空間はない。`opencode run` ではこれで skill が読み込まれた） | 未実行 | `opencode run` のあと `opencode run -c "<回答>"`: 1 ターンに 1 問（確認済み）。先に `external_directory` で kit フォルダを許可する（[opencode.md](../../harness/opencode.md)） |
+| omp | `/dk:init` | 1.4.x では未実行 | `omp -p` のあと `omp -p -c "<回答>"`: 1 ターンに 1 問（確認済み） |
+
+実際に使うときは対話セッションで自分で答える。headless モードはスクリプトによる確認用。
 
 ## 5.8 日常の使い方
 

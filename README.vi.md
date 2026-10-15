@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.4.7 review=human -->
+<!-- i18n: source=README.md source_commit=v1.4.8 review=human -->
 [English](README.md) | Tiếng Việt | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([README.md](README.md)) là bản chuẩn.
@@ -99,7 +99,7 @@ Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý 
 - **Controller mỏng.** Mỗi controller là một skill ngắn, làm việc trực tiếp trong session. Các playbook dài hơn mà nó mượn (TDD, debugging, planning, review…) nằm trong `parts/` và chỉ được đọc khi một bước cần đến, nên không tốn context lúc bắt đầu session.
 - **Rule có bằng chứng.** [`rules/RULES.md`](rules/RULES.md) liệt kê từng rule, trạng thái bật/tắt và kết quả lab đứng sau nó. Một rule chỉ được bật nếu nó giúp ích trên ít nhất 5 tác vụ chưa từng thấy.
 - **Độ sâu review theo rủi ro.** `dk:pre-pr-check` chọn self-review, một reviewer hoặc bốn (standards, spec, security, tests) tùy theo kích thước và loại của diff.
-- **Báo cáo được máy kiểm tra.** [`scripts/check_report.py`](scripts/check_report.py) từ chối một báo cáo cho đến khi finding "certain" nằm trong code đã đổi, không phải nhận xét chung chung kiểu thiếu test, và chỉ trích dẫn những rule có thật.
+- **Báo cáo được máy kiểm tra.** [`scripts/check_report.py`](scripts/check_report.py) từ chối một báo cáo cho đến khi mọi finding (certain hay suspect) nằm trong code đã đổi, finding certain không phải nhận xét chung chung kiểu thiếu test, và chỉ trích dẫn những rule có thật. [`scripts/check_standards.py`](scripts/check_standards.py) kiểm các file standards mà `dk:init` ghi ra.
 - **Của riêng bạn, không bao giờ push.** Mọi thứ dev-kit ghi (config, spec, plan, báo cáo, tiêu chuẩn project của bạn) nằm trong `.dev-kit/`, thư mục này tự bị git bỏ qua; dev-kit không bao giờ sửa `.gitignore`, `CLAUDE.md`, `AGENTS.md` hay bất kỳ file nào đang được git theo dõi.
 - **Tiêu chuẩn theo lớp.** Tiêu chuẩn của kit, một thư mục dùng chung (`standards.team`, hiện điền tay; `dk:init` chỉ ghi vào repo), và tiêu chuẩn project của riêng bạn trong `.dev-kit/standards/`; mỗi reviewer chỉ nhận các chủ đề thuộc vai trò của mình.
 - **Công cụ graph (tùy chọn).** Với các index của [codegraph](https://github.com/colbymchenry/codegraph) và code-review-graph, controller tìm code, đo blast radius và chạy `detect-changes` trước khi review.

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.4.7 review=human -->
+<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.4.8 review=human -->
 [English](../en/07-maintenance.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/07-maintenance.md).
@@ -22,6 +22,8 @@ Script báo lỗi khi:
 - một link Markdown tương đối bị hỏng.
 
 Link nằm trong code fence (ví dụ minh họa) được bỏ qua.
+
+Sau khi sửa một file standards của kit, chạy `python3 scripts/check_standards.py standards --no-files` (CI cũng chạy): kiểm frontmatter, tên section và ID các mục. `dk:init` chạy cùng script này, có kiểm `applies_to`, trên các file của dự án mà nó ghi ra.
 
 ## 7.3 Cập nhật từ upstream
 

@@ -17,6 +17,8 @@ jobs:
           python-version: "3.12"
       - name: References between controllers and parts
         run: python3 scripts/check_parts.py .
+      - name: Kit standards files
+        run: python3 scripts/check_standards.py standards --no-files
       - name: Manifest versions in sync
         run: python3 scripts/bump_version.py --check
       - name: Translations (stale translations are warnings)

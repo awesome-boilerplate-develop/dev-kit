@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.7 review=human -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.8 review=human -->
 [English](../en/05-setup-and-usage.md) | Tiếng Việt | [简体中文](../zh-CN/05-setup-and-usage.md) | [日本語](../ja/05-setup-and-usage.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/05-setup-and-usage.md](../en/05-setup-and-usage.md)) là bản chuẩn.
@@ -102,6 +102,19 @@ Use skill dk:init for this repo.
 ```
 
 Agent probe repo trước, rồi hỏi từng câu một, theo thứ tự: lệnh và base branch, index graph, baseline (chỉ khi nó đỏ), tiêu chuẩn theo hai lượt (rule khi viết code, rồi checklist review; mỗi lượt là một danh sách các nhóm và một vòng lặp cho quy ước riêng của bạn), và `CONSTRAINTS.md` tùy chọn. Mỗi câu hỏi cho thấy bằng chứng và một dòng Recommended; hãy trả lời "default", "skip" hoặc câu trả lời của bạn. Nó tạo `.dev-kit/` (được git bỏ qua, không có gì để commit). Để làm lại một phần sau này: `dk:init index`, `dk:init baseline`, `dk:init standards [rules|review]`.
+
+**Khởi động `dk:init` trên từng CLI** (dev-kit 1.4.x, các lần chạy ngày 2026-10-15 trên một repo private; thêm "hỏi và trả lời bằng tiếng Việt" vào tin nhắn đầu nếu muốn):
+
+| CLI | Tin nhắn đầu | Câu hỏi trong phiên tương tác | Mỗi lượt một lệnh (headless) |
+|---|---|---|---|
+| Claude Code | `/dk:init` (Claude Code có `init` riêng của nó) | chưa chạy với 1.4.x | `claude -p … --resume <session>`: mỗi lượt một câu hỏi, lựa chọn dạng chữ (đã kiểm) |
+| Codex | `$dk:init` | chưa chạy với 1.4.x | `codex exec` rồi `codex exec resume <id> "<câu trả lời>"`: mỗi lượt một câu hỏi (đã kiểm); `resume` nhận `-c sandbox_mode=…`, không nhận `-s` |
+| Copilot CLI | `/dk:init` | form `ask_user` (đã kiểm) | `copilot -p` lấy mọi mặc định và không hỏi gì (đã kiểm) |
+| Antigravity | `/dk:init`, mở bằng `agy -i` | form `ask_question` có dòng "Write-in…" (đã kiểm) | `agy -p` tự bỏ qua các form và lấy mọi mặc định (đã kiểm) |
+| OpenCode | `/init …` (skill không có namespace; trong `opencode run` lệnh này nạp được skill) | chưa chạy | `opencode run` rồi `opencode run -c "<câu trả lời>"`: mỗi lượt một câu hỏi (đã kiểm); trước đó cho phép thư mục kit trong `external_directory` ([opencode.md](../../harness/opencode.md)) |
+| omp | `/dk:init` | chưa chạy với 1.4.x | `omp -p` rồi `omp -p -c "<câu trả lời>"`: mỗi lượt một câu hỏi (đã kiểm) |
+
+Khi dùng thật, hãy chạy phiên tương tác và tự trả lời; các chế độ headless dành cho kiểm tra bằng script.
 
 ## 5.8 Dùng hằng ngày
 

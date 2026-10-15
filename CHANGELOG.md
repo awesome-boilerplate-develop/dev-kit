@@ -1,5 +1,14 @@
 # dev-kit changelog
 
+## 1.4.8 (2026-10-15)
+Fixes from running `dk:pre-pr-check` on a real branch with the standards `dk:init` wrote.
+- **`check_report.py --base`:** suspect findings must also sit in the changed lines; pre-existing code is dropped (R1), not moved to suspect. The old message said "move to suspect or drop", which contradicted R1; the end-to-end run listed two repo-rule findings on code the agent itself marked as outside the diff. The new check fails exactly those two; 31 earlier backtest reports give the same result as before when run without `--base`.
+- **`scripts/check_standards.py` (new), run by `dk:init` after writing:** frontmatter (`id` equals the path, `topic` is a template topic and matches its folder, `scope`, `status`), every `applies_to` glob matches a tracked file, only the five section names and each at most once, item IDs of one to three capital letters and a number, unique, and every ID a Review line names is defined. The agent fixes the files until it prints OK (at most 3 tries) and puts the output in `init-report.md`. On files from earlier runs it caught a duplicated `## Do not flag`, an `id`/folder mismatch, and IDs such as `DATE-1` or `R_CHK1`. CI runs it on the kit's own standards (`--no-files`); it found `review/finding-quality` missing `topic`, now added.
+- **IDs and placement:** the topic's letter plus a number (`V` for review-only checks), never changed after they are shown; pass-2 items go to the topic file of what they check (pipeline and dependency checks to `ops/`).
+- **Index size:** counts code files only, not templates or styles (the previous estimate counted ~1,450 files under `src/` for ~850 indexed).
+- **Docs 05:** a table for starting `dk:init` on each CLI (first message, interactive questions, headless behavior), from the 2026-10-15 runs. Docs 03 no longer mentions a scope in the confirmation (removed in 1.4.3).
+- **Checked** with agy (Gemini 3.8 Flash), headless `dk:init standards` on the same clone (~6.5 minutes): the agent ran `check_standards.py` (seen 3 times in its steps) and reported OK in `init-report.md`; the 3 files pass it; IDs `A1`–`A5`, `V1`, `V2`, `D1`, `I1`, `I2`, all `experimental`. Not followed: the environment-file check went to `architecture/` instead of `ops/`, and the date rule in `coding/` used `D` instead of `C`; the script checks format, not these choices.
+
 ## 1.4.7 (2026-10-15)
 Fixes from an interactive `dk:init` run with agy (Gemini 3.8 Flash), driven through its real UI.
 - **The choice tool is only the last line of a question:** before calling it, the agent writes a message the user can read with the evidence, the group's list in detail, the drafted items of a read-back, the `CONSTRAINTS.md` explanation and the "how it fits this repo" part of a confirmation. In the run before the fix, every question was a bare form whose labels were the only information.

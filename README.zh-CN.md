@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.4.7 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.4.8 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | 简体中文 | [日本語](README.ja.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](README.md)。
@@ -99,7 +99,7 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 - **精简的 controller。** 每个 controller 都是一个简短的 skill，直接在当前 session 中工作。它借用的较长 playbook（TDD、调试、规划、review……）放在 `parts/` 中，只有当某个步骤需要时才会读取，因此在 session 开始时不占用上下文。
 - **有证据的 rule。** [`rules/RULES.md`](rules/RULES.md) 列出每条 rule、它是否开启，以及背后的 lab 结果。只有当一条 rule 在至少 5 个它没见过的任务上起到了帮助，才会被打开。
 - **按风险决定 review 深度。** `dk:pre-pr-check` 会根据 diff 的大小和类型，选择 self-review、一个 reviewer 或四个 reviewer（标准、spec、安全、测试）。
-- **机器检查的报告。** [`scripts/check_report.py`](scripts/check_report.py) 会拒绝一份报告，直到其中的 “certain” finding 位于被修改的代码中、不是泛泛的“缺少测试”之类的评语，并且只引用存在的 rule。
+- **机器检查的报告。** [`scripts/check_report.py`](scripts/check_report.py) 会拒绝一份报告，直到其中每个 finding（certain 或 suspect）都位于被修改的代码中、certain finding 不是泛泛的“缺少测试”之类的评语，并且只引用存在的 rule。[`scripts/check_standards.py`](scripts/check_standards.py) 检查 `dk:init` 写入的 standards 文件。
 - **个人使用，从不推送。** dev-kit 写入的所有内容（配置、specs、plans、reports、你的项目标准）都放在 `.dev-kit/` 中，它会在 git 中自我忽略；dev-kit 从不修改 `.gitignore`、`CLAUDE.md`、`AGENTS.md` 或任何其他被跟踪的文件。
 - **分层的标准。** kit 标准、一个共享文件夹（`standards.team`，目前需手动设置；`dk:init` 只写入当前仓库），以及位于 `.dev-kit/standards/` 的你自己的项目标准；每个 reviewer 只会收到与其角色相关的主题。
 - **可选的 graph 工具。** 有了 [codegraph](https://github.com/colbymchenry/codegraph) 和 code-review-graph 索引，controller 会用它们来查找代码、衡量 blast radius，并在 review 之前运行 `detect-changes`。

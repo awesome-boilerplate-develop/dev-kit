@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.4.7 review=human -->
+<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.4.8 review=human -->
 [English](../en/02-architecture.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/02-architecture.md).
@@ -23,7 +23,7 @@ dev-kit/
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
 ├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
-├── scripts/                # check_parts.py, check_report.py, bump_version.py, install-graph-tools.sh
+├── scripts/                # check_parts.py, check_report.py, check_standards.py, bump_version.py, install-graph-tools.sh
 ├── UPSTREAM.md  LICENSES/  CHANGELOG.md  README.md  docs/
 ```
 

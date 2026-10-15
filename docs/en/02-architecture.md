@@ -20,7 +20,7 @@ dev-kit/
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
 ├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
-├── scripts/                # check_parts.py, check_report.py, bump_version.py, install-graph-tools.sh
+├── scripts/                # check_parts.py, check_report.py, check_standards.py, bump_version.py, install-graph-tools.sh
 ├── UPSTREAM.md  LICENSES/  CHANGELOG.md  README.md  docs/
 ```
 

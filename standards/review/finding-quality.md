@@ -1,5 +1,6 @@
 ---
 id: review/finding-quality
+topic: review
 scope: kit
 status: experimental
 applies_to: ["**/*"]

@@ -54,8 +54,8 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
   3. **Do not flag:** what the linter, compiler and CI enforce, the kit's lines, repo noise;
   4. **your own checks, in a loop**, as in pass 1.
 
-  Then the checklist is read back and written into the same topic files.
-- **What you add in your own words is confirmed first:** the agent drafts it as it will be written (trigger, where it applies, new code only or existing code too, exceptions, severity, scope), checks it against the code (how many places follow it and how many do not, conflicts, whether a tool or a kept rule already covers it, whether a reviewer can check it at all) and asks "Is this what you mean?": as drafted, narrower, wider, or your correction.
+  Then the checklist is read back and written into the topic files of what each item checks. After writing, `scripts/check_standards.py` checks the files (frontmatter and `id` against the path, `applies_to` globs against tracked files, section names, IDs: one to three capital letters and a number, unique, every ID a Review line names defined); the agent fixes them until it prints OK.
+- **What you add in your own words is confirmed first:** the agent drafts it as it will be written (trigger, where it applies, new code only or existing code too, exceptions, severity), checks it against the code (how many places follow it and how many do not, conflicts, whether a tool or a kept rule already covers it, whether a reviewer can check it at all) and asks "Is this what you mean?": as drafted, narrower, wider, or your correction.
 - No question limit: the loops end when you say no. Headless runs take each Recommended line and end the loops. Redo one pass with `dk:init standards rules` or `dk:init standards review`.
 
 **Kit standards** (all `experimental` until measured on new bugs): `review/finding-quality` (always on), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).

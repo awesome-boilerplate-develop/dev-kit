@@ -1,7 +1,7 @@
 """Machine-check a pre-pr-check report against rules R1/C2.
 Usage: python3 check_report.py <report.md> [--base <branch>]
-With --base (run inside a repo): a "certain" finding must point to a file in the diff, and at least one line must be
-inside or next to (±5 lines) the changed code; otherwise it may be pre-existing code (R1) → move to suspect or drop.
+With --base (run inside a repo): every finding, certain or suspect, must point to a file in the diff, and at least one
+line must be inside or next to (±5 lines) the changed code; otherwise it is pre-existing code, which R1 says not to flag → drop it.
 Run from inside a repo: if the repo has .code-review-graph/, the Graph line must have a detect-changes summary (or
 "detect-changes failed: <error>"); it must not say "no .code-review-graph/ index" (rule G1).
 A "certain" finding that cites no rule (an id that really exists in the kit/team/project standards, or a specific place in a spec; R1–R7 do not count)
@@ -130,21 +130,22 @@ if base:
         if m and current:
             start, count = int(m.group(1)), int(m.group(2) or 1)
             changed[current].append((start, start + max(count, 1) - 1))
-    for c in certain:
-        loc = c[2] if len(c) > 2 else ""
-        refs = re.findall(LOC, loc)
-        if not refs:
-            continue
-        ok = False
-        for f, ln in refs:
-            files = [k for k in changed if k == f or k.endswith("/" + f) or f.endswith(k)]
-            for k in files:
-                if not ln:
-                    ok = True
-                elif any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
-                    ok = True
-        if not ok:
-            problems.append(f"certain finding points outside the changed lines (pre-existing code? rule R1): {loc}")
+    for tier, rows_ in (("certain", certain), ("suspect", suspect)):
+        for c in rows_:
+            loc = c[2] if len(c) > 2 else ""
+            refs = re.findall(LOC, loc)
+            if not refs:
+                continue
+            ok = False
+            for f, ln in refs:
+                files = [k for k in changed if k == f or k.endswith("/" + f) or f.endswith(k)]
+                for k in files:
+                    if not ln:
+                        ok = True
+                    elif any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
+                        ok = True
+            if not ok:
+                problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
 blockers = [c for c in certain if c and c[0].lower().startswith("blocker") and "fixed" not in " ".join(c).lower()]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
