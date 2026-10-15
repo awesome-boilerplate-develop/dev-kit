@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -48,7 +48,7 @@
   1. **Architecture:** 調査が標準の一覧になる（原則 0 により kit に architecture のファイルはない）。近くのコードがすでに示していることは勧めない。
   2. リポジトリに合う Implement の項目を持つ kit ファイルごとに 1 グループ: `coding/review-basics`、`testing/basics`、`security/web`、`ui/forms-and-actions`。
   3. 社内ライブラリごとに 1 グループ（古いバージョンをまだ許可するか、どのフレームワークのコントロールを引き続き許可するか）。
-  4. **あなた自身の規約（ループ）:** 調査から得たその他の提案と自由入力、そのあと、あなたが no と答えるまで、答えるたびに「ほかに規約はありますか?」と尋ねる。
+  4. **あなた自身の規約（ループ）:** 調査から得たその他の提案と自由入力、そのあと、あなたが no と答えるまで、答えるたびに質問する。質問は文脈から組み立て、「ほかに何かありますか?」だけの質問にはしない: 直前に追加したもの、残した rule がカバーする範囲、まだどの rule も触れていない領域を最大 3 つ（根拠つき。例: 日付の扱いと、そのライブラリとファイル数）、そしてそれらの領域を名指しする質問 1 つ。
 
   そのあと、パス 1 の rule を読み返してあなたの確認を取り、書き込む。
 - **パス 2、レビューのチェックリスト**（`## Review`/`## Do not flag`/`## Severity`。pre-pr-check が使う）: パス 1 で残した rule は再び尋ねず、それぞれが自身の severity で確認される。`review/finding-quality` は常にオン。

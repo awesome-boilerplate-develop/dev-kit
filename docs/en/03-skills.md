@@ -45,7 +45,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
   1. **Architecture:** the probe is the standard list (the kit has no architecture file under principle 0); what neighbouring code already shows is not recommended;
   2. one group per kit file with Implement items that fit the repo: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;
   3. one group per in-house library (is the old version still allowed, which framework controls stay allowed);
-  4. **your own conventions, in a loop:** the other probe suggestions plus free text, then "Any other convention?" after every answer until you say no.
+  4. **your own conventions, in a loop:** the other probe suggestions plus free text, then a question after every answer until you say no. The question is built from the context, never a bare "anything else?": what was just added, what the kept rules cover, up to 3 areas no rule touches yet with their evidence (for example date handling with the library and file count), and one question naming them.
 
   Then the pass-1 rules are read back for your confirmation and written.
 - **Pass 2, review checklist** (`## Review`/`## Do not flag`/`## Severity`, used by pre-pr-check): rules kept in pass 1 are not asked again, each is checked at its severity, and `review/finding-quality` is always on.

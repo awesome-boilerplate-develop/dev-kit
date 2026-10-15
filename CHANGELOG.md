@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.4.1 (2026-10-15)
+- **The loop question fits the context:** instead of a bare "anything else?", each loop turn says what was just added, what the kept rules cover so far, up to 3 new areas no rule touches yet with their evidence (earlier ones by letter only), and ends with one question naming those areas. A claim that a linter or the compiler already covers something must name the config that shows it. Pass 2's loop does the same with the kinds of change the checklist does not cover.
+- **Checked** on a real Angular repo (pass-1 loop, 2 runs): the first run listed 5 areas, had no actual question sentence, and claimed the compiler checks `any` (no linter, and explicit `any` is not a compile error); after tightening, the rerun listed 3 areas with counts and asked one question naming them.
+
 ## 1.4.0 (2026-10-15)
 - **`dk:init` standards in two passes:** pass 1 asks the **rules for writing code** (`## Design`/`## Implement`: architecture from the probe, each fitting kit file, in-house libraries, then the user's own conventions); pass 2 asks the **review checklist** (`## Review`/`## Do not flag`/`## Severity`: severity of the kept rules, review-only checks, the Do-not-flag list, then the user's own checks). Rules kept in pass 1 are not asked again in pass 2. Each pass is read back before it is written, into the same topic files.
 - **One group per question, like a brainstorm:** each question shows its list in detail (what each item asks, why, where the repo hits it, with counts) and a Recommended line.

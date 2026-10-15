@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -48,7 +48,7 @@
   1. **Architecture：** 探查结果就是 standards 清单（按原则 0，kit 中没有 architecture 文件）；相邻代码已经体现出来的内容不会被推荐；
   2. 每个含有适合该仓库的 Implement 条目的 kit 文件一组：`coding/review-basics`、`testing/basics`、`security/web`、`ui/forms-and-actions`；
   3. 每个 in-house 库一组（旧版本是否仍允许使用，哪些框架控件仍然允许使用）；
-  4. **你自己的约定，循环进行：** 探查得出的其他建议加上自由文本，然后每次回答后都问 “还有其他约定吗？”，直到你回答没有。
+  4. **你自己的约定，循环进行：** 探查得出的其他建议加上自由文本，然后每次回答后都再问一次，直到你回答没有。这个问题根据上下文构建，从不是空泛的“还有别的吗？”：刚加入了什么、已保留的 rule 覆盖了哪些方面、最多 3 个还没有任何 rule 涉及的方面及其依据（例如日期处理，附上所用库和文件数），以及一个点名这些方面的问题。
 
   随后，第 1 遍的 rule 会读回给你确认并写入。
 - **第 2 遍，review 清单**（`## Review`/`## Do not flag`/`## Severity`，供 pre-pr-check 使用）：第 1 遍中保留的 rule 不会再问，每条都按其 severity 检查，`review/finding-quality` 始终开启。

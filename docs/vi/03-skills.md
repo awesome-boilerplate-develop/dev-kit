@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.0 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -48,7 +48,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
   1. **Architecture:** probe chính là danh sách tiêu chuẩn (kit không có file architecture, theo nguyên tắc 0); những gì code lân cận đã cho thấy thì không được khuyến nghị;
   2. mỗi file kit có mục Implement phù hợp với repo là một nhóm: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;
   3. mỗi thư viện nội bộ là một nhóm (phiên bản cũ còn được phép không, control nào của framework vẫn được phép);
-  4. **quy ước riêng của bạn, theo vòng lặp:** các đề xuất khác từ probe cộng với văn bản tự do, rồi hỏi "Còn quy ước nào khác không?" sau mỗi câu trả lời cho đến khi bạn nói không.
+  4. **quy ước riêng của bạn, theo vòng lặp:** các đề xuất khác từ probe cộng với văn bản tự do, rồi hỏi tiếp sau mỗi câu trả lời cho đến khi bạn nói không. Câu hỏi được dựng theo ngữ cảnh, không bao giờ là câu trống "còn gì nữa không?": điều vừa thêm, các rule đã giữ đang phủ những phần nào, tối đa 3 vùng chưa có rule nào kèm bằng chứng (ví dụ xử lý ngày giờ, kèm thư viện và số file), và một câu hỏi gọi tên các vùng đó.
 
   Sau đó các rule của lượt 1 được đọc lại cho bạn xác nhận và được ghi.
 - **Lượt 2, checklist review** (`## Review`/`## Do not flag`/`## Severity`, được pre-pr-check dùng): rule đã giữ ở lượt 1 không bị hỏi lại, mỗi rule được kiểm theo mức severity của nó, và `review/finding-quality` luôn bật.
