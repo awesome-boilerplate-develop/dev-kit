@@ -17,6 +17,7 @@
 | Tracker (GitHub Issues…) | Not built | Specs are currently local files in `.dev-kit/specs/` |
 | Hosts other than Claude Code | Done (0.8.12) | Codex, Copilot CLI, Antigravity, OpenCode, omp load the kit; review quality measured only once on Codex ([05](05-setup-and-usage.md), [06](06-evidence.md)) |
 | `CONSTRAINTS.md` read automatically by pre-pr-check | Done (1.1.0) | pre-pr-check step 1 checks the diff against `.dev-kit/CONSTRAINTS.md` (or the project's own) when it exists; not measured |
+| Several repos for one developer | Not built (planned after single-repo use is solid) | 1.4.3 removed the project-or-team question from `dk:init`; see 8.5 |
 
 ## 8.3 Rules waiting for evidence
 
@@ -35,6 +36,22 @@
 5. **Cost:** do bugs need to come down below 1.5× baseline (currently 1.8×)? That would mean dropping review or the report for small bugs.
 
 ## 8.5 Ideas for later
+
+### Several repos for one developer (planned, not built)
+
+The current focus is one repo at a time: `dk:init` writes everything to that repo's `.dev-kit/standards/` (1.4.3). The next step, once single-repo use is solid, is to let one developer reuse rules across their own repos of the same product (for example several micro-frontends that share a control library and permission conventions).
+
+What already exists: the five controllers load every `*.md` under `standards.team` in `.dev-kit/config.yml` (rule T1), so a folder set by hand already works; `dk:init` just does not offer it.
+
+What it would add:
+- **Label:** call the layer "shared across your repos" on screen rather than "team".
+- **No per-item question:** items stay in the repo by default. At each pass's read-back, the agent points out the items that do not depend on this repo (an in-house library rule, a permission-key convention used by several repos) and asks once whether to move them to the shared folder (default: no).
+- **Remembered path:** the shared folder is asked once and saved in `~/.dev-kit/config.yml`; `dk:init` in another repo writes that path into its own `standards.team` (missing today: in the test runs the field stayed `team: ""`).
+- **Shown in the next repo:** the next repo's `dk:init` lists the shared rules already loaded, so they are not asked again, and its probe checks whether they fit that repo.
+
+How to check it: write a shared rule in repo A, run `dk:init` and one controller in repo B, and confirm that B loads the rule (it appears in the report's standards list) without asking it again.
+
+Open questions: what to do when a shared rule does not fit one repo (a project rule overrides it, project > team > kit); whether team mode (below) later replaces this folder.
 
 ### Team mode (not built)
 
