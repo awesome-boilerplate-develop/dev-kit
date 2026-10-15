@@ -275,6 +275,20 @@ Bước dò của phần standards có dùng các index graph mà nó dựng kh�
 - **Tốc độ và chi phí:** B trung bình 370 s và 277 nghìn token, so với A 434 s và 314 nghìn; với 2 lần mỗi bên và A dao động từ 360 đến 507 s, kết luận là "không chậm hơn", chưa phải đã đo được là nhanh hơn.
 - **Rule:** hai bên ra phần lớn cùng các sự thật; B có thêm chi tiết chỉ graph mới thấy, như các service theo bệnh nhân kế thừa một service nền dùng chung. Cả bốn lần đều qua `check_standards.py`.
 
+### Form chọn dễ đọc và độ phù hợp với stack trên omp (dev-kit 1.4.11)
+
+Một lần chạy `dk:init` tương tác của người dùng trên omp với một app React Native (bản 1.4.10) cho thấy ba câu hỏi kit liên tiếp (`testing`, `security`, `ui`) mà phần đánh giá chỉ nằm trong phần suy luận của agent: form ghi "Giữ U2, tắt U1/U3/U4/U5" mà không nói các ID đó là gì, và `security/web` được đưa cho một app di động. Bản 1.4.11 yêu cầu một tin nhắn thường trước mỗi nhóm, các lựa chọn phải giải thích ID, và mỗi mục nói rõ có hợp với stack không.
+
+Chạy lại với 1.4.11 trên omp (GPT-6.1 Sol), `dk:init standards` trên bản clone mới của cùng app, chế độ tương tác; agent tự kiểm, một lần chạy:
+
+| Nhóm | Tin nhắn trước form | Form |
+|---|---|---|
+| kiến trúc, `coding`, `testing`, `security`, `ui` | một tin nhắn thường kèm bảng 6–8 dòng (mục, lý do, bằng chứng trong repo), lần nào cũng có | phần câu hỏi liệt kê từng ID kèm vài chữ; nhãn vẫn chỉ nêu ID, dòng mô tả nói ý nghĩa |
+
+- **`security/web`:** tin nhắn nói tên là "web" nhưng file bao gồm app di động, hiểu `localStorage` là storage thiết bị không mã hóa (`AsyncStorage`), đánh dấu các mục phía server S1–S3 là không áp dụng cho app client, và khuyến nghị S4–S6.
+- **Còn lại:** nhãn kiểu "Giữ S4, S5, S6; tắt S1, S2, S3" vẫn chỉ nêu ID; ý nghĩa nằm ở phần câu hỏi và dòng mô tả.
+- Lần chạy đầu của đợt này mất vì script driver của mình (kiểm tra ổn định trên dòng trạng thái, rồi một từ khóa trùng với lựa chọn "dừng" ở baseline đỏ), không phải do kit.
+
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 
 | Phát hiện | Thay đổi trong dev-kit |

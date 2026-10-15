@@ -272,6 +272,20 @@ Did the standards probe use the graph indexes it builds? Not before: on agy, the
 - **Speed and cost:** B averaged 370 s and 277k tokens against A's 434 s and 314k; with 2 runs a side and A varying from 360 to 507 s, this is "not slower", not a measured speed-up.
 - **Rules:** largely the same facts on both sides; B added details only the graph showed, such as patient-scoped services inheriting a shared base service. All four runs passed `check_standards.py`.
 
+### Readable choice forms and stack fit on omp (dev-kit 1.4.11)
+
+A user's interactive `dk:init` run on omp against a React Native app (1.4.10) showed three kit questions in a row (`testing`, `security`, `ui`) whose evaluation sat only in the agent's reasoning: the forms said "Keep U2, turn off U1/U3/U4/U5" with no hint of what those IDs were, and `security/web` was offered to a mobile app. 1.4.11 requires a normal reply before every group and choices that explain their IDs, and has each item say whether it fits the stack.
+
+Rerun with 1.4.11 on omp (GPT-6.1 Sol), `dk:init standards` on a fresh clone of the same app, interactive; agent-checked, one run:
+
+| Group | Reply before the form | Form |
+|---|---|---|
+| architecture, `coding`, `testing`, `security`, `ui` | a normal reply with a table of 6–8 rows (item, why, repo evidence), every time | the question text lists each ID with a few words; labels still name IDs, the description line says what they mean |
+
+- **`security/web`:** the reply said the name is "web" but the file covers mobile apps, read `localStorage` as unencrypted device storage (`AsyncStorage`), marked the server-side items S1–S3 as not applying to a client app, and recommended S4–S6.
+- **Left:** option labels such as "Keep S4, S5, S6; off S1, S2, S3" still name IDs only; the meaning is in the question text and the description.
+- The first attempt of the run was lost to my driver script (stability check on a status line, then a keyword that matched the "stop" choice at a red baseline), not to the kit.
+
 
 ## 6.4 Findings that went into the design
 
