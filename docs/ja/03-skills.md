@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.5 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.6 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -24,7 +24,7 @@
 **使う場面:** マシンまたはリポジトリで初めて dev-kit を使うとき。セットアップを再確認するとき。または 1 つの部分だけやり直すとき: `dk:init index`（例えば新しい worktree で）、`dk:init baseline`、`dk:init standards [rules|review]`。
 
 **原則:**
-- **まず調査し、そのあと質問を 1 つずつ、決まった順番で行う。** 各質問には、エージェントが見つけたものと、文字付きの選択肢が示される: `A` は推奨の答えで「(Recommended)」と付けて内容を書き切り、`B`〜`D` は実際の代替案、最後の行は常に自分で答えを入力する「Other」（CLI に選択ツールがあればそれを使う。例: Copilot の `ask_user`、omp の `ask`）。あなたの答えを待ってから次へ進む。「default」と「skip」は常に使える。コードがすでに答えているものは決して尋ねない。
+- **まず調査し、そのあと質問を 1 つずつ、決まった順番で行う。** 各質問には、エージェントが見つけたものと、文字付きの選択肢が示される: `A` は推奨の答えで「(Recommended)」と付けて内容を書き切り、`B`〜`D` は実際の代替案、最後の行は常に自分で答えを入力する「Other」（CLI に選択ツールがあればそれを使う。例: Antigravity の `ask_question`、Copilot の `ask_user`、omp の `ask`。Antigravity は自由入力用の「Write-in...」行を自分で追加する）。あなたの答えを待ってから次へ進む。「default」と「skip」は常に使える。コードがすでに答えているものは決して尋ねない。
 - 再実行では、足りないものを確認して補うだけで、既存のファイルは上書きしない。
 - 何かをインストールしたり、リポジトリの外を変更したりするときは、事前に確認する。
 - `.dev-kit/` は個人用: 作成したものは一切コミットされず、`.gitignore` のような追跡されているファイルも編集しない。

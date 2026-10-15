@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.5 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.6 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -24,7 +24,7 @@
 **使用场景：** 在一台机器或一个仓库上首次使用 dev-kit；重新检查设置；或重新运行其中一部分：`dk:init index`（例如在新的 worktree 中）、`dk:init baseline`、`dk:init standards [rules|review]`。
 
 **原则：**
-- **先探查，再按固定顺序一次问一个问题。** 每个问题都会显示 agent 发现了什么，然后给出字母选项：`A` 是推荐答案，标注 “(Recommended)” 并写全内容，`B`–`D` 是真正的备选，最后一行始终是 “Other”，供你自己输入答案（CLI 有选择工具时通过它提问，例如 Copilot 的 `ask_user` 或 omp 的 `ask`）。等你回答后才问下一个。“default” 和 “skip” 始终可用。代码已经能回答的事，它不会问。
+- **先探查，再按固定顺序一次问一个问题。** 每个问题都会显示 agent 发现了什么，然后给出字母选项：`A` 是推荐答案，标注 “(Recommended)” 并写全内容，`B`–`D` 是真正的备选，最后一行始终是 “Other”，供你自己输入答案（CLI 有选择工具时通过它提问，例如 Antigravity 的 `ask_question`、Copilot 的 `ask_user` 或 omp 的 `ask`；Antigravity 会自己加上用于自由输入的 “Write-in...” 一行）。等你回答后才问下一个。“default” 和 “skip” 始终可用。代码已经能回答的事，它不会问。
 - 重新运行只会检查并补全缺失的部分；不会覆盖已有文件。
 - 安装任何东西或修改仓库之外的任何内容，都要先询问。
 - `.dev-kit/` 是个人的：它创建的任何内容都不会被提交，也从不修改 `.gitignore` 等被跟踪的文件。

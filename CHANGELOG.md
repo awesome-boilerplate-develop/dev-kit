@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.4.6 (2026-10-15)
+- **Choice tools:** Antigravity's `ask_question` joins Copilot `ask_user` and omp `ask`. The "(Recommended)" choice goes first; "Other" is added only when the tool has no free-text line of its own (Antigravity adds "Write-in..."). A tool answer that comes back skipped or empty (headless runs auto-skip) means nobody can answer: take `A`, list it as an assumption, never ask again.
+- **Harness note (Antigravity):** questions use `ask_question`; interactive `agy -i` shows them as a numbered list with "Write-in..."; headless `agy -p` auto-skips them, so `dk:init` takes every default.
+- **Checked** on a real Angular repo with agy 1.3.5 (Gemini 3.8 Flash). Interactive: question 1 showed `1. (Recommended) Base master-p2b, test npm run test-headless, build npm run build, no lint`, three alternatives and `5. Write-in...`. Headless: 19 questions were auto-skipped and the agent ran the whole setup with defaults in one turn (~15 minutes), with the choices also written as text.
+
 ## 1.4.5 (2026-10-15)
 - **Every `dk:init` question ends with choices plus Other:** at most 4 lettered choices, `A` being the recommended answer marked "(Recommended)" and spelled out in full, `B`–`D` real alternatives, and a last "Other: type your own answer" line; "default" or Enter means `A`. When the harness has a choice tool (Copilot `ask_user`, omp `ask`) the same choices go through it. No question ends with only "type default or a value".
 - **Checked** on a real Angular repo with Claude Code (headless, so the choices came as text): the commands/base-branch question, the graph-index question and the architecture group all ended with `A. (Recommended) …`, alternatives and `Other`. The choice-tool path was not exercised.

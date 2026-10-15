@@ -18,7 +18,7 @@ Prepare, never run controller logic. Re-running only checks and fills gaps; neve
 - `B`, `C`, `D` are the real alternatives (another branch, "skip", "stop"); no filler choices;
 - the last line is always "Other: type your own answer" (a change, a value, item IDs, free text).
 
-"default" or Enter means `A`. If your harness gives you a tool that asks the user with choices (Copilot `ask_user`, omp `ask`), use it with the same choices and put the evidence in the message before it; otherwise write the choices as text. Never end a question with only "type default or a value".
+"default" or Enter means `A`. If your harness gives you a tool that asks the user with choices (Antigravity `ask_question`, Copilot `ask_user`, omp `ask`), use it with the same choices, `A` first with its "(Recommended)" label, and put the evidence in the message before it; add "Other" as a choice only if the tool does not offer free text itself. If the tool comes back skipped or empty (a headless run auto-skips it), nobody can answer: take `A` and list it as an assumption, as for any headless run; do not ask the same question again. Without such a tool, write the choices as text. Never end a question with only "type default or a value".
 
 ## Machine (skipped when already done)
 

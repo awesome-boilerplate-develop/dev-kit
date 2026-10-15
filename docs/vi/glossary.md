@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/glossary.md source_commit=v1.4.5 review=human -->
+<!-- i18n: source=docs/en/glossary.md source_commit=v1.4.6 review=human -->
 [English](../en/glossary.md) | Tiếng Việt | [简体中文](../zh-CN/glossary.md) | [日本語](../ja/glossary.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/glossary.md](../en/glossary.md)) là bản chuẩn.
