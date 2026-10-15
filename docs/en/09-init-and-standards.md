@@ -116,7 +116,7 @@ For `experimental`, `dk:init` suggests the file but does not pre-tick it. For `v
 |---|---|
 | `review/finding-quality.md` | The finding gate, shared by every reviewer (section 9.5) |
 | `coding/review-basics.md` | Errors are not swallowed, async operations have an in-flight state, `null`/optional values have a handling path, logic matches places that do the same thing, follow neighbouring code patterns |
-| `security/web.md` | Authorization checked on the exact object (IDOR), untrusted input, secrets, personal data (including medical) kept out of logs and client-side storage. References OWASP Top 10:2025, ASVS 5.0 |
+| `security/basics.md` | Authorization checked on the exact object (IDOR), untrusted input, secrets, personal data (including medical) kept out of logs and client-side storage. References OWASP Top 10:2025, ASVS 5.0 |
 | `testing/basics.md` | A bug fix has a reproducing test that goes red then green; tests of error branches must be able to fail; test behaviour, not implementation details |
 | `ui/forms-and-actions.md` | Error messages have their own conditions, validators that can actually trigger, write operations do not run concurrently, loading and error states. References WCAG 2.2 for accessibility |
 

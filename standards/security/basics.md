@@ -1,5 +1,5 @@
 ---
-id: security/web
+id: security/basics
 topic: security
 scope: kit
 status: experimental

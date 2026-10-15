@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.11 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.5.0 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -43,10 +43,10 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 
 **Tiêu chuẩn theo hai lượt** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
 - **Probe trước:** linter và compiler bao phủ những gì; cấu trúc (các layer, cách truy cập dữ liệu, module, contract được expose, config, permission key), tìm bằng graph; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng).
-- **Mỗi câu hỏi một nhóm, như một buổi brainstorm:** danh sách của nhóm đó nêu chi tiết (từng mục: hỏi gì, vì sao, repo này vướng ở đâu, kèm các con số từ lệnh agent đã chạy; mỗi mục nói rõ có áp dụng cho stack này không, vì một file kit như `security/web` được đưa ra theo `applies_to` bất kể nền tảng; file kit được đánh dấu `validated` hoặc `experimental`), viết thành một tin nhắn bình thường chứ không chỉ nằm trong phần suy luận; các lựa chọn sau đó nêu từng mục được giữ hoặc tắt kèm vài chữ nói nó là gì, để chỉ riêng form cũng đủ để chọn; rồi một dòng **Recommended** với một lý do cho mỗi phần. "default" là nhận đúng dòng Recommended đang hiển thị, "skip" là không lấy gì, hoặc bạn trả lời từng mục. Mọi mục được giữ đều thuộc repo này; không có câu hỏi dự án hay team (hiện làm từng repo một). Một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì trở thành một lựa chọn để bạn quyết.
+- **Mỗi câu hỏi một nhóm, như một buổi brainstorm:** danh sách của nhóm đó nêu chi tiết (từng mục: hỏi gì, vì sao, repo này vướng ở đâu, kèm các con số từ lệnh agent đã chạy; mỗi mục nói rõ có áp dụng cho stack này không, vì một file kit được đưa ra theo `applies_to` bất kể nền tảng; file kit được đánh dấu `validated` hoặc `experimental`), viết thành một tin nhắn bình thường chứ không chỉ nằm trong phần suy luận; các lựa chọn sau đó nêu từng mục được giữ hoặc tắt kèm vài chữ nói nó là gì, để chỉ riêng form cũng đủ để chọn; rồi một dòng **Recommended** với một lý do cho mỗi phần. "default" là nhận đúng dòng Recommended đang hiển thị, "skip" là không lấy gì, hoặc bạn trả lời từng mục. Mọi mục được giữ đều thuộc repo này; không có câu hỏi dự án hay team (hiện làm từng repo một). Một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì trở thành một lựa chọn để bạn quyết.
 - **Lượt 1, rule khi viết code** (`## Design`/`## Implement`, được story-runner, bug-fixer, code-refactor dùng):
   1. **Architecture:** probe chính là danh sách tiêu chuẩn (kit không có file architecture, theo nguyên tắc 0); những gì code lân cận đã cho thấy thì không được khuyến nghị;
-  2. mỗi file kit có mục Implement phù hợp với repo là một nhóm: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;
+  2. mỗi file kit có mục Implement phù hợp với repo là một nhóm: `coding/review-basics`, `testing/basics`, `security/basics`, `ui/forms-and-actions`;
   3. mỗi thư viện nội bộ là một nhóm (phiên bản cũ còn được phép không, control nào của framework vẫn được phép);
   4. **quy ước riêng của bạn, theo vòng lặp:** các đề xuất khác từ probe cộng với văn bản tự do, rồi hỏi tiếp sau mỗi câu trả lời cho đến khi bạn nói không. Câu hỏi được dựng theo ngữ cảnh, không bao giờ là câu trống "còn gì nữa không?": điều vừa thêm, các rule đã giữ đang phủ những phần nào, tối đa 3 vùng chưa có rule nào kèm bằng chứng (ví dụ xử lý ngày giờ, kèm thư viện và số file), và một câu hỏi gọi tên các vùng đó.
 
@@ -61,7 +61,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 - **Những gì bạn tự thêm bằng lời được xác nhận trước:** agent soạn lại đúng dạng sẽ ghi (trigger, áp dụng ở đâu, chỉ code mới hay cả code cũ, ngoại lệ, mức độ), đối chiếu với code (bao nhiêu chỗ đang theo và bao nhiêu chỗ chưa, chỗ xung đột, công cụ hay rule đã giữ có phủ chưa, reviewer có kiểm được hay không) rồi hỏi "Có đúng ý bạn không?": giữ như bản nháp, hẹp hơn, rộng hơn, hoặc bạn sửa lại.
 - Không giới hạn số câu hỏi: các vòng lặp kết thúc khi bạn nói không. Chạy headless thì nhận từng dòng Recommended và kết thúc các vòng lặp. Làm lại một lượt bằng `dk:init standards rules` hoặc `dk:init standards review`.
 
-**Tiêu chuẩn của kit** (tất cả là `experimental` cho đến khi đo trên các bug mới): `review/finding-quality` (luôn bật), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
+**Tiêu chuẩn của kit** (tất cả là `experimental` cho đến khi đo trên các bug mới): `review/finding-quality` (luôn bật), `coding/review-basics`, `security/basics` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
 
 **`CONSTRAINTS.md` so với tiêu chuẩn.** Cả hai đều là phần tùy chọn trong thiết lập của bạn, nhưng chúng trả lời những câu hỏi khác nhau:
 

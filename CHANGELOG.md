@@ -1,5 +1,12 @@
 # dev-kit changelog
 
+## 1.5.0 (2026-10-15)
+**Breaking: a kit standard id changed.**
+- **`security/web` is now `security/basics`** (`standards/security/basics.md`): the file is not about the web only (it covers client apps of any platform; its items 1.4.11 already mapped to mobile equivalents), and `basics` matches `testing/basics` and `coding/review-basics`. Item IDs `S1`–`S6` and their text are unchanged. This replaces 1.4.11's decision to keep the old id: the name kept confusing users (a React Native app was offered "web" security), so the rename is done once, now, with every reference in the kit moved (skill `init`, docs 03 and 09 in four languages); entries below this one keep the old name as history.
+- **Action needed in a repo initialized before 1.5.0:** in `.dev-kit/config.yml`, change `security/web` to `security/basics` in `standards.kit`, and `security/web#<item>` to `security/basics#<item>` in `standards.disable`. Reports that cite `security/web#…` no longer pass `check_report.py` (the id is not found), as for any removed id.
+- **An id with no file is named, not skipped silently:** controllers (rule T1) now name an id in `standards.kit` or `standards.disable` that matches no file in the report. Without this, the rename would have dropped the security standards from an old config without a word.
+- **Checked:** no `security/web` left outside the changelog and past evidence; `check_standards.py` OK on the kit; `check_report.py` rejects a report citing `security/web#S2` and accepts the same report citing `security/basics#S2`; the two initialized clones on this machine had their `config.yml` migrated.
+
 ## 1.4.11 (2026-10-15)
 Fixes from an interactive `dk:init` run on omp against a React Native app.
 - **A choice form must be readable on its own:** the run's kit questions after the first two showed the agent's evaluation only as reasoning, and forms such as "Keep U2, turn off U1/U3/U4/U5" with no hint of what those IDs are. The skill now says: reasoning is not a reply (the list and evidence are written as a normal reply before every group, the last as much as the first); a choice that names item IDs says in a few words what each kept and each switched-off ID is, and the group's items go in the tool's question text too.

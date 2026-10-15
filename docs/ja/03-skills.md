@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.11 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.5.0 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -43,10 +43,10 @@
 
 **2 つのパスに分けた standards**（設計: [09](../en/09-init-and-standards.md)、英語、セクション 9.6）。rule を書くのは、エージェントが知り得ないこと、または誤りやすいことが確認されたことだけで、命名やスタイルは対象外。
 - **まず調査:** linter とコンパイラがカバーしている範囲、構造（レイヤー、データへのアクセス方法、モジュール、公開されているコントラクト、設定、権限キー。グラフで見つける）、社内ライブラリ（社内パッケージ、フレームワークのコントロールに対して何ファイルが使っているか、最近のファイルが何を使っているか、そのコンポーネント一覧）。
-- **ブレインストームのように、質問ごとに 1 グループ:** そのグループの一覧を詳しく示し（各項目について、何を求めるか、なぜか、このリポジトリのどこに当てはまるか。数は agent が実行したコマンドから得たもの。各項目がこのスタックに当てはまるかも示す。`security/web` のような kit ファイルは、プラットフォームにかかわらず `applies_to` で提示されるため。kit ファイルには `validated` か `experimental` を付ける）、通常の返信として書き（推論の中だけにはしない）、選択肢では、残す項目も外す項目も、それが何かを数語で示してフォームだけで選べるようにし、そのあとに各部分に理由を 1 つ付けた **Recommended** の行を示す。「default」は Recommended を表示どおりに受け入れ、「skip」は何も採用せず、または項目ごとに答える。残したものはすべてこのリポジトリに属する。プロジェクトかチームかは尋ねない（現時点では 1 リポジトリずつ）。使用状況の根拠のない「X は Y を置き換える」という主張は、選択肢として尋ねられる。
+- **ブレインストームのように、質問ごとに 1 グループ:** そのグループの一覧を詳しく示し（各項目について、何を求めるか、なぜか、このリポジトリのどこに当てはまるか。数は agent が実行したコマンドから得たもの。各項目がこのスタックに当てはまるかも示す。kit ファイルは、プラットフォームにかかわらず `applies_to` で提示されるため。kit ファイルには `validated` か `experimental` を付ける）、通常の返信として書き（推論の中だけにはしない）、選択肢では、残す項目も外す項目も、それが何かを数語で示してフォームだけで選べるようにし、そのあとに各部分に理由を 1 つ付けた **Recommended** の行を示す。「default」は Recommended を表示どおりに受け入れ、「skip」は何も採用せず、または項目ごとに答える。残したものはすべてこのリポジトリに属する。プロジェクトかチームかは尋ねない（現時点では 1 リポジトリずつ）。使用状況の根拠のない「X は Y を置き換える」という主張は、選択肢として尋ねられる。
 - **パス 1、コードを書くための rule**（`## Design`/`## Implement`。story-runner、bug-fixer、code-refactor が使う）:
   1. **Architecture:** 調査が標準の一覧になる（原則 0 により kit に architecture のファイルはない）。近くのコードがすでに示していることは勧めない。
-  2. リポジトリに合う Implement の項目を持つ kit ファイルごとに 1 グループ: `coding/review-basics`、`testing/basics`、`security/web`、`ui/forms-and-actions`。
+  2. リポジトリに合う Implement の項目を持つ kit ファイルごとに 1 グループ: `coding/review-basics`、`testing/basics`、`security/basics`、`ui/forms-and-actions`。
   3. 社内ライブラリごとに 1 グループ（古いバージョンをまだ許可するか、どのフレームワークのコントロールを引き続き許可するか）。
   4. **あなた自身の規約（ループ）:** 調査から得たその他の提案と自由入力、そのあと、あなたが no と答えるまで、答えるたびに質問する。質問は文脈から組み立て、「ほかに何かありますか?」だけの質問にはしない: 直前に追加したもの、残した rule がカバーする範囲、まだどの rule も触れていない領域を最大 3 つ（根拠つき。例: 日付の扱いと、そのライブラリとファイル数）、そしてそれらの領域を名指しする質問 1 つ。
 
@@ -61,7 +61,7 @@
 - **あなたが自分の言葉で追加したものは、まず確認する:** agent は書き込む形のまま起草し（トリガー、適用範囲、新しいコードだけか既存コードも含むか、例外、深刻度）、コードと照らし合わせ（従っている箇所と従っていない箇所の数、衝突、ツールや残した rule がすでにカバーしているか、レビュアーが確認できるか）、「この意味で合っていますか?」と尋ねる: 草稿どおり、より狭く、より広く、またはあなたの修正。
 - 質問数の上限はない: ループはあなたが no と答えると終わる。headless の実行では各 Recommended の行をそのまま採用し、ループを終える。1 つのパスだけやり直すには `dk:init standards rules` または `dk:init standards review`。
 
-**Kit の standards**（新しいバグで測定するまですべて `experimental`）: `review/finding-quality`（常にオン）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
+**Kit の standards**（新しいバグで測定するまですべて `experimental`）: `review/finding-quality`（常にオン）、`coding/review-basics`、`security/basics`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
 
 **`CONSTRAINTS.md` と standards の違い。** どちらもセットアップの任意の部分ですが、答える問いが異なります:
 

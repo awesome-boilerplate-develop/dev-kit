@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.4.11 review=human -->
+<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.5.0 review=human -->
 [English](../en/02-architecture.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/02-architecture.md).
