@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.2 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -58,6 +58,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
   4. **kiểm tra riêng của bạn, theo vòng lặp**, như ở lượt 1.
 
   Sau đó checklist được đọc lại và ghi vào chính các file topic đó.
+- **Những gì bạn tự thêm bằng lời được xác nhận trước:** agent soạn lại đúng dạng sẽ ghi (trigger, áp dụng ở đâu, chỉ code mới hay cả code cũ, ngoại lệ, mức độ, phạm vi), đối chiếu với code (bao nhiêu chỗ đang theo và bao nhiêu chỗ chưa, chỗ xung đột, công cụ hay rule đã giữ có phủ chưa, reviewer có kiểm được hay không) rồi hỏi "Có đúng ý bạn không?": giữ như bản nháp, hẹp hơn, rộng hơn, hoặc bạn sửa lại.
 - Không giới hạn số câu hỏi: các vòng lặp kết thúc khi bạn nói không. Chạy headless thì nhận từng dòng Recommended và kết thúc các vòng lặp. Làm lại một lượt bằng `dk:init standards rules` hoặc `dk:init standards review`.
 
 **Tiêu chuẩn của kit** (tất cả là `experimental` cho đến khi đo trên các bug mới): `review/finding-quality` (luôn bật), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).

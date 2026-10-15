@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.2 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -58,6 +58,7 @@
   4. **あなた自身のチェック（ループ）**。パス 1 と同じ。
 
   そのあと、チェックリストを読み返し、同じトピックのファイルに書き込む。
+- **あなたが自分の言葉で追加したものは、まず確認する:** agent は書き込む形のまま起草し（トリガー、適用範囲、新しいコードだけか既存コードも含むか、例外、深刻度、スコープ）、コードと照らし合わせ（従っている箇所と従っていない箇所の数、衝突、ツールや残した rule がすでにカバーしているか、レビュアーが確認できるか）、「この意味で合っていますか?」と尋ねる: 草稿どおり、より狭く、より広く、またはあなたの修正。
 - 質問数の上限はない: ループはあなたが no と答えると終わる。headless の実行では各 Recommended の行をそのまま採用し、ループを終える。1 つのパスだけやり直すには `dk:init standards rules` または `dk:init standards review`。
 
 **Kit の standards**（新しいバグで測定するまですべて `experimental`）: `review/finding-quality`（常にオン）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。

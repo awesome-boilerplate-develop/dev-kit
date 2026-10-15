@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.4.2 (2026-10-15)
+- **Items the user adds in their own words are confirmed in context** (rules, review checks, Do-not-flag lines, in any group or loop), as their own question before they are kept: the agent drafts the item as it will be written (trigger, where it applies, new code only or existing code too, exceptions, severity, scope), checks it against the code (how many places follow it and how many do not, with an example of each; conflicts; whether a tool or a kept rule already covers it), then asks "Is this what you mean?" with `A` as drafted, `B` narrower, `C` wider, or a correction.
+- **Checked** on a real Angular repo, one addition per pass. Pass 1, "toasts take their text from translation keys": 76 toast calls, none with a literal first argument, the calls that pass a variable named, and a narrower "new code only" choice offered. Pass 2, "PRs that change a master screen need before/after screenshots": the agent noted that `dk:pre-pr-check` reads the branch diff, not the PR description, so a reviewer cannot verify it, and offered "only when `*.html`/`*.scss` change" as the narrower choice.
+
 ## 1.4.1 (2026-10-15)
 - **The loop question fits the context:** instead of a bare "anything else?", each loop turn says what was just added, what the kept rules cover so far, up to 3 new areas no rule touches yet with their evidence (earlier ones by letter only), and ends with one question naming those areas. A claim that a linter or the compiler already covers something must name the config that shows it. Pass 2's loop does the same with the kinds of change the checklist does not cover.
 - **Checked** on a real Angular repo (pass-1 loop, 2 runs): the first run listed 5 areas, had no actual question sentence, and claimed the compiler checks `any` (no linter, and explicit `any` is not a compile error); after tightening, the rerun listed 3 areas with counts and asked one question naming them.

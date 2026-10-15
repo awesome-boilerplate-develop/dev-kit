@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.1 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.2 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -58,6 +58,7 @@
   4. **你自己的检查，循环进行**，与第 1 遍相同。
 
   随后，清单会读回给你确认，并写入同一批 topic 文件。
+- **你用自己的话添加的内容会先确认：** agent 按将要写入的形式起草（触发条件、适用范围、只针对新代码还是也包括旧代码、例外、严重程度、范围），对照代码检查（多少处遵循、多少处不遵循、冲突、工具或已保留的 rule 是否已覆盖、reviewer 能否检查），然后问“这是你的意思吗？”：按草稿、更窄、更宽，或你的修改。
 - 没有问题数量上限：循环在你回答没有时结束。headless 运行会采用每个 Recommended 行并结束循环。用 `dk:init standards rules` 或 `dk:init standards review` 重做其中一遍。
 
 **Kit standards**（在新 bug 上测量之前全部是 `experimental`）：`review/finding-quality`（始终开启）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
