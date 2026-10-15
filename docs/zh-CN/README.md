@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/README.md source_commit=v1.3.0 review=machine -->
+<!-- i18n: source=docs/en/README.md source_commit=v1.4.0 review=machine -->
 [English](../en/README.md) | [Tiếng Việt](../vi/README.md) | 简体中文 | [日本語](../ja/README.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](../en/README.md)。
@@ -9,7 +9,7 @@ dev-kit（plugin 名称 `dk`）是一套帮助 agent 处理 kanban 卡片的 ski
 
 这些文档提供英文、越南语（第 1–2 层）、简体中文和日语（第 1 层）版本。以英文为准；译文可能滞后。
 
-> 文档版本：dev-kit **1.3.0**（2026-10-15）。1.0.0 是首个公开版本；文档中更早的版本号（0.x）是私有 lab 中的迭代版本。数字来自 dev-kit lab（私有）（主要是 Haiku 5.5，部分是 Sonnet 5.5，Claude Code 2.1.296），以及在工作中的一个私有 Angular 仓库上做的 backtest（Sonnet 5.5；有一次运行在 Codex 上）。尚未测量的内容标记为 ❓。
+> 文档版本：dev-kit **1.4.0**（2026-10-15）。1.0.0 是首个公开版本；文档中更早的版本号（0.x）是私有 lab 中的迭代版本。数字来自 dev-kit lab（私有）（主要是 Haiku 5.5，部分是 Sonnet 5.5，Claude Code 2.1.296），以及在工作中的一个私有 Angular 仓库上做的 backtest（Sonnet 5.5；有一次运行在 Codex 上）。尚未测量的内容标记为 ❓。
 
 ## 阅读顺序
 

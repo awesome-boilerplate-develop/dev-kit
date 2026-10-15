@@ -1,5 +1,12 @@
 # dev-kit changelog
 
+## 1.4.0 (2026-10-15)
+- **`dk:init` standards in two passes:** pass 1 asks the **rules for writing code** (`## Design`/`## Implement`: architecture from the probe, each fitting kit file, in-house libraries, then the user's own conventions); pass 2 asks the **review checklist** (`## Review`/`## Do not flag`/`## Severity`: severity of the kept rules, review-only checks, the Do-not-flag list, then the user's own checks). Rules kept in pass 1 are not asked again in pass 2. Each pass is read back before it is written, into the same topic files.
+- **One group per question, like a brainstorm:** each question shows its list in detail (what each item asks, why, where the repo hits it, with counts) and a Recommended line.
+- **Loops for the user's own conventions** ask "anything else?" after every answer, "default" included; only "no" or "skip" ends them. The 12-question limit and the single open question are gone.
+- `dk:init standards [rules|review]` reruns one pass (replaces `[topic]`).
+- **Checked** with one run on a real Angular repo: 14 standards questions, 0.60 USD; three deviations found there and fixed (docs 06).
+
 ## 1.3.0 (2026-10-15)
 - **`dk:init` topic questions end with a Recommended line:** the agent's best pick for the repo (kit files, items to switch off, suggested rules with scope), one reason per part from the probe. An `experimental` kit file is recommended when the probe finds the situations its items cover; items the linter or compiler already checks are left out; a suggested rule is recommended only with a clear usage direction and no fact still needed from the user; a lint rule is preferred when a linter could enforce it. With nothing qualifying it says `Recommended: nothing` and why.
 - **"default" now accepts the Recommended line** (was: `validated` files only, no suggested rule, which in practice enabled nothing since every kit file is still `experimental`). "skip" enables nothing; drafted rules are still read back before writing.

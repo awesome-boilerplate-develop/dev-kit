@@ -210,6 +210,16 @@ Fresh git worktrees of three private repositories, Claude Code with Sonnet 5.5, 
   - With no drafted rules, the read-back joined the open question in C → now allowed.
 - **After the fix (repo B, topic questions only):** the `coding` question stated "experimental, so the default is off", and unproven ideas (`: any` in 124 files, unsubscribe style) were asked as questions. A second run also proposed `architecture` rules that the first run had skipped: what the probe finds varies between runs.
 
+### `dk:init` standards in two passes (dev-kit 1.4.0)
+
+One run of `dk:init standards` on repo B (fresh worktree, `.dev-kit/` from an earlier run with the standards removed), Claude Code with Sonnet 5.5, one answer per turn with `--resume`; mostly "default", one custom convention, "no" to end each loop. Single run, agent-checked, not confirmed by a human.
+
+- **Pass 1:** 9 questions: architecture (7 items from the probe, such as the federated module contract, the permission-key file and its key pattern, values in every environment file, keys in both translation files), the 4 kit files (`security/web` recommended without S1 and S3, `ui/forms-and-actions` without U5, each with a reason), in-house libraries (5 packages but only 2 importing files, against 30+ own components: Recommended "no rule"), 2 loop turns, 1 read-back.
+- **The agent checked the user's own convention against the code:** "open add/edit dialogs through `common-dialog`" met 3 files using it and 54 using the dialog service directly; it wrote the rule as said and flagged the gap at the read-back.
+- **Pass 2:** 5 questions: severity, review-only checks, Do not flag (compiler flags, `.editorconfig`, Sonar in CI), 1 loop turn, 1 read-back. Items went under `## Review`, `## Do not flag` and `## Severity` of the same two project files; `git status` unchanged.
+- **Cost:** 0.60 USD for 15 turns (pass 1 + pass 2 + the `CONSTRAINTS.md` question).
+- **Deviations, fixed in 1.4.0 and rerun on pass 2:** "default" ended the loops (now only "no" or "skip" does; rerun: the loop asked again after "default"); review-only checks restated pass-1 rules, for example translation keys and environment values (now excluded; rerun: the agent left them out and said why); a placement rule that neighbouring code already shows was recommended (now kept out of Recommended, not rerun).
+
 
 ## 6.4 Findings that went into the design
 

@@ -9,7 +9,7 @@ description: Set up dev-kit for this machine and repo, including the standards c
 
 Prepare, never run controller logic. Re-running only checks and fills gaps; never overwrite existing files. dev-kit is personal (rule O1): nothing it creates is committed, and it never edits a tracked file.
 
-**Parts of a run.** `dk:init` runs everything below. `dk:init index` runs step 5 only (for example in a new worktree), `dk:init baseline` step 6 (the known-failure list may only shrink), `dk:init standards [topic]` step 7 (one topic if named).
+**Parts of a run.** `dk:init` runs everything below. `dk:init index` runs step 5 only (for example in a new worktree), `dk:init baseline` step 6 (the known-failure list may only shrink), `dk:init standards [rules|review]` step 7 (both passes, or the one named).
 
 **How to ask: probe first, then one question at a time, in order.** Before each question, find out what you can from the code, the graph and the files, and show that evidence with the question. Ask **one question per message**, in the order of the steps below, each with a default and short options, and wait for the answer before moving on. Number them ("Question 3 — commands"). "default" and "skip" are always valid answers. Never ask what the code already answers, and never batch questions. If nobody can answer (headless run), take the defaults and list them as assumptions in the report.
 
@@ -37,29 +37,43 @@ Prepare, never run controller logic. Re-running only checks and fills gaps; neve
    On yes: write `.dev-kit/CONSTRAINTS.md` via part `constraint-driven-development` (`${CLAUDE_PLUGIN_ROOT}/parts/`), keeping its one-question-at-a-time interview.
 9. **Report.** Write `.dev-kit/init-report.md`: found, created, missing, the answers and assumptions, the standards enabled, commands run with output. Compare `git status --porcelain` with step 3: it must be unchanged; fix anything new by adding it to `.git/info/exclude` (never `.gitignore`), or report it.
 
-## Step 7: standards by topic
+## Step 7: standards in two passes
 
 Rules are written only for what the agent **cannot know by itself** or has been seen to get wrong (principle 0, `docs/en/09-init-and-standards.md`). Never ask about naming or style: the agent reads it from neighbouring code, and the linter checks the rest.
 
 **Probe first, no questions.** Use the graph and the files to find what the code cannot tell a newcomer:
 - what the linter and compiler already enforce (reviewers must not report it again);
-- in-house libraries: internal-scope packages in `package.json` (old and new versions), how many files import each, template tag prefixes against framework controls (`mat-*` and similar), which one recent files use, and the component list from the package's `public-api.d.ts` / `index.d.ts`;
-- central services (`codegraph callers` on the HTTP client or data layer), where permission keys come from, how personal or medical data is handled.
+- the structure: layers and folders with file counts, how data is reached (`codegraph callers` on the HTTP client or data layer), the module system, what the repo exposes to others (public API, federated remotes, events), where config and environment values live, where permission keys come from, how personal or medical data is handled;
+- in-house libraries: internal-scope packages in `package.json` (old and new versions), how many files import each, template tag prefixes against framework controls (`mat-*` and similar), which one recent files use, and the component list from the package's `public-api.d.ts` / `index.d.ts`.
 
-**Then go topic by topic, in this order:** `architecture`, `coding`, `testing`, `security`, `ui`, `api`, `data`, `ops`, `process`. Skip a topic that has neither a kit file fitting the stack nor probe evidence. For each remaining topic, ask **one question** (two at most), built from:
-1. **Kit checklist:** the files in `${CLAUDE_PLUGIN_ROOT}/standards/<topic>/`, each with its status (`validated` or `experimental`) and **every item** (ID and a one-line summary), so the user can switch off single items (`<id>#<item>`). When the topic has no kit file, say why in one line: the kit writes a rule only when the agent cannot learn it from the code or keeps failing at it (principle 0), and this topic depends on the repo, so its rules come from the suggestions below.
-2. **Suggested project or team rules, with evidence** from the probe, for example: "68 files use `<ui-…>`, 4 use `mat-input`, recent files use `<ui-…>`: should new code use the in-house controls?" Every number or claim in a suggestion comes from a command you ran (show the count); a direction such as "X replaces Y" needs usage evidence (recent files use X, or X is used more than Y), otherwise ask it as a question instead of stating it. For each rule the user keeps, ask its scope: project or team. For an in-house library rule, draft it from the probe (Implement, Review, Do not flag, with the component list from its `public-api.d.ts`) and ask only what the code cannot show, in the same question: is the old version still allowed in new code, and which framework controls stay allowed (the exceptions for `Do not flag`)?
-3. **Always the option "add another convention for this topic"** (free text; it costs no question unless chosen).
-4. **Recommended:** your best pick for this repo, as one line the user can accept as is, for example `coding/review-basics (experimental, C4 off) + CODE-1 (project)`, with one reason per part from the probe. Build it like this:
-   - **Kit file:** recommend a `validated` file whose `applies_to` matches the repo. Recommend an `experimental` file when the probe found the situations its items cover (show the count, such as HTTP calls, async buttons, forms) and label it experimental. Leave an item out when the linter or compiler already checks it, or nothing in the repo triggers it.
-   - **Suggested rule:** recommend it when usage shows a clear direction (the majority, or what recent files use) and no linter or compiler check already enforces it; give the scope. If a linter could enforce it, recommend the lint rule instead of a review rule. A suggestion that still needs a fact from the user (which version, which folder, whether to allow the old way) is not recommended; keep it as a question.
-   - The line is one decision, never "if I had to pick". If nothing qualifies, write `Recommended: nothing` and say why.
+**How each question looks.** One **group** per question, like a brainstorm: one question per message, multiple choice where possible, wait for the answer.
+- **The list in detail:** every item with its ID, what it asks of the code, why, and where this repo hits it (a count or a file from a command you ran). Mark each kit file `validated` or `experimental`. A claim such as "X replaces Y" needs usage evidence (recent files use X, or X is used more than Y); otherwise it becomes a choice (`A: shared/services` / `B: services`).
+- **Recommended:** one line the user can accept as is, one reason per part from the probe. Recommend an `experimental` kit file when the probe found the situations its items cover; leave out items the linter or compiler already checks or nothing in the repo triggers; recommend a repo item only when usage shows a clear direction and no fact is still needed from the user; prefer a lint rule when a linter could enforce it. The line is one decision, never "if I had to pick"; with nothing qualifying, write `Recommended: nothing` and why.
+- **Answers:** "default" accepts the Recommended line exactly as shown; "skip" takes nothing from the group; otherwise item by item (letters or IDs, `<id>#<item>` to switch off one kit item). For each repo item the user keeps, ask its scope (project or team) in the same answer. Never enable a file or keep an item that was not on the screen.
+- Skip a group with nothing to show. Number the questions ("Question 9 — rules: coding").
 
-Answers: "default" accepts the **Recommended** line exactly as shown; "skip" enables nothing for the topic; anything else is taken item by item. Never enable a file or keep a rule that was not on the screen.
+### Pass 1: rules for writing code (`## Design`, `## Implement`)
 
-At most 12 standards questions in total. After the last topic, ask **one open question** (not counted): "Besides the above, does the team or project have other conventions the agent should know?"
+Used by `dk:story-runner`, `dk:bug-fixer` and `dk:code-refactor` while writing code. Groups, in order:
+1. **Architecture**, from the probe: the kit has no architecture file (principle 0: it depends on the repo), so the probe is the standard list. Present the structure as items to confirm: layers and where new code goes, how data is reached, the module system, exposed contracts, config and environment values, permission keys. Each item is a candidate rule with its evidence. Keep out of Recommended what an agent sees by reading neighbouring code (where an existing kind of file already lives, a pattern every file follows); recommend placement only when two places compete or recent files moved.
+2. **One group per kit file** with `## Design` or `## Implement` items whose `applies_to` matches the repo: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`. Show the items of those sections only.
+3. **In-house libraries**, one group each: draft the rule from the probe (Implement, Review, Do not flag, with the component list) and ask only what the code cannot show: is the old version still allowed in new code, and which framework controls stay allowed (the `Do not flag` exceptions).
+4. **Your own conventions (loop):** list the other repo suggestions the probe supports, each with its evidence, as choices, plus free text. After every answer, "default" included (it takes the Recommended line), ask again: "Any other convention for writing code here?", listing what is still on offer. Only "no" or "skip" ends the loop.
 
-**Write, after confirmation.**
-- Turn kept suggestions and free-text answers into rule items in `${CLAUDE_PLUGIN_ROOT}/templates/standard.md` format: sort them into topic and scope, one idea per item with an ID, a trigger ("When X, …"), a one-line why and a severity. Say so when an answer breaks principle 0 (the agent already knows it, or a linter checks it) and suggest not writing it.
-- **Read the drafted rules back** as their own question and write them only after the user confirms. With no drafted rules, the read-back of the kit choices may join the open question.
-- Project rules → `.dev-kit/standards/<topic>/<name>.md`. Team rules → the team folder (`standards.team`): if none is known, ask once for a path (outside the repo, shared however the team likes) and save it to `~/.dev-kit/config.yml` for the next repos. Ticked kit files → `standards.kit`; switched-off kit items → `standards.disable`.
+Then **read the pass-1 rules back** (drafted repo rules and kit choices) as their own question; write only after the user confirms.
+
+### Pass 2: review checklist (`## Review`, `## Do not flag`, `## Severity`)
+
+Used by `dk:pre-pr-check` and its reviewers. Do not ask again about items kept in pass 1: each one is checked in review at its severity. Open with one line saying so, and that `review/finding-quality` (the finding gate, R1–R7 and the certain/suspect tiers) is always on. Groups, in order:
+1. **Severity:** a table of the rules kept in pass 1, each with its severity (kit items show theirs; propose one for each repo rule from the probe: blocker when data is written wrongly or a contract breaks, major when a user sees wrong behavior, minor otherwise). The user may change a repo rule's severity; a kit item's severity changes only through a project rule that overrides it (`docs/en/09-init-and-standards.md` 9.3).
+2. **Review-only checks:** what a reviewer checks that is not a rule for writing code, found in the probe as "when the diff touches X, check Y", for example: version pins that must match another file, generated or vendored files that must not be hand-edited, a migration that needs a rollback, a changed public contract whose consumers must be told. Leave out any check that restates a rule kept in pass 1 (an environment value in every file, a translation key in every language): that rule is already checked. Show each with the file count or path.
+3. **Do not flag:** what the linter, compiler and CI already enforce (from the probe), the `## Do not flag` lines of the enabled kit files, and repo patterns that would only be noise (for example a legacy folder the team does not touch). The user adds or removes items.
+4. **Your own checks (loop):** as in pass 1: "Anything else reviewers should check, or should not report?" after every answer, "default" included. Only "no" or "skip" ends the loop.
+
+Then **read the pass-2 checklist back** as its own question; write only after the user confirms.
+
+There is no question limit; the loops end when the user says no. In a headless run, take each Recommended line, end the loops at once, and list the choices as assumptions in the report.
+
+**Write, after each read-back.**
+- Turn kept items and free-text answers into items in `${CLAUDE_PLUGIN_ROOT}/templates/standard.md` format: one idea per item with an ID, a trigger ("When X, …"), a one-line why and a severity. Pass-1 items go under `## Design` or `## Implement`, pass-2 items under `## Review`, `## Do not flag` and `## Severity` of the same topic file. Say so when an answer breaks principle 0 (the agent already knows it, or a linter checks it) and suggest not writing it.
+- Project items → `.dev-kit/standards/<topic>/<name>.md`. Team items → the team folder (`standards.team`): if none is known, ask once for a path (outside the repo, shared however the team likes) and save it to `~/.dev-kit/config.yml` for the next repos. Kit files kept in either pass → `standards.kit`; switched-off kit items → `standards.disable`.

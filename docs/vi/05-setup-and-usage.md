@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.3.0 review=human -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.0 review=human -->
 [English](../en/05-setup-and-usage.md) | Tiếng Việt | [简体中文](../zh-CN/05-setup-and-usage.md) | [日本語](../ja/05-setup-and-usage.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/05-setup-and-usage.md](../en/05-setup-and-usage.md)) là bản chuẩn.
@@ -101,7 +101,7 @@ Lab đã đo 17 tác vụ SWE Django (Haiku): có và không có index đều gi
 Use skill dk:init for this repo.
 ```
 
-Agent probe repo trước, rồi hỏi từng câu một, theo thứ tự: lệnh và base branch, index graph, baseline (chỉ khi nó đỏ), checklist tiêu chuẩn lần lượt từng topic kèm các rule nó đề xuất từ code, một câu hỏi mở về các quy ước khác, và `CONSTRAINTS.md` tùy chọn. Mỗi câu hỏi cho thấy bằng chứng và một giá trị mặc định; hãy trả lời "default", "skip" hoặc câu trả lời của bạn. Nó tạo `.dev-kit/` (được git bỏ qua, không có gì để commit). Để làm lại một phần sau này: `dk:init index`, `dk:init baseline`, `dk:init standards [topic]`.
+Agent probe repo trước, rồi hỏi từng câu một, theo thứ tự: lệnh và base branch, index graph, baseline (chỉ khi nó đỏ), tiêu chuẩn theo hai lượt (rule khi viết code, rồi checklist review; mỗi lượt là một danh sách các nhóm và một vòng lặp cho quy ước riêng của bạn), và `CONSTRAINTS.md` tùy chọn. Mỗi câu hỏi cho thấy bằng chứng và một dòng Recommended; hãy trả lời "default", "skip" hoặc câu trả lời của bạn. Nó tạo `.dev-kit/` (được git bỏ qua, không có gì để commit). Để làm lại một phần sau này: `dk:init index`, `dk:init baseline`, `dk:init standards [rules|review]`.
 
 ## 5.8 Dùng hằng ngày
 

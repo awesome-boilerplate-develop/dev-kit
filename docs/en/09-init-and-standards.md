@@ -30,7 +30,7 @@ Repo part (each repo or worktree)
 ```
 
 - **No reload needed after install:** checked; dev-kit uses CLIs, not MCP.
-- **Re-run a single part:** `dk:init index` (new worktree), `dk:init baseline` (the list may only shrink), `dk:init standards [topic]`.
+- **Re-run a single part:** `dk:init index` (new worktree), `dk:init baseline` (the list may only shrink), `dk:init standards [rules|review]`.
 
 ## 9.3 Standards
 
@@ -163,9 +163,8 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
    - ui: "68 files use `<ui-…>`, 4 files use `mat-input`. Does the team prefer its own control set?"
    - api: "Every HTTP call goes through `XxxRequestService` (`codegraph callers`). Record it as a rule?"
    - security: "Authorization goes through `rbacResourceKeys`. Is there a separate policy for patient data?"
-4. **At most 1–2 questions per topic,** total ≤ 12; "skip" is a valid answer. Always ask the scope: project or team.
-   - **Every topic has an extra option** "Add another convention for this topic". If not chosen, it costs no question.
-   - **The standards part ends with one open question:** "Besides the suggestions above, does the team or project have other conventions the agent should know?" This question does not count toward the limit of 12.
+4. **Two passes since 1.4.0** (was: one question per topic, ≤ 12 in total, one open question at the end). Pass 1 asks the rules for writing code (`## Design`/`## Implement`): architecture from the probe, then each fitting kit file, then in-house libraries, then a loop of the user's own conventions. Pass 2 asks the review checklist (`## Review`/`## Do not flag`/`## Severity`): severity of the kept rules, review-only checks that do not restate a rule, the Do-not-flag list, then a loop of the user's own checks. One group per question, each with its list in detail and a Recommended line; "skip" is a valid answer. Always ask the scope: project or team.
+   - **Each loop asks again after every answer** ("Any other convention?"), "default" included; only "no" or "skip" ends it. There is no question limit.
    - The agent sorts free-form answers into the right topic and scope, writes them as rule items following the quality criteria (9.3), **reads them back to the user for confirmation** before writing. Any idea that violates principle 0 (the agent already knows it, or the linter checks it) is called out, and the agent suggests not writing it.
 5. **Do not ask about naming or style:** that falls under principle 0.
 6. **Auto-probe in-house control sets/libraries** (tried on a real Angular repo):
@@ -198,7 +197,7 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
 | Finding quality | The same 6 PRs: you mark each finding correct or false | Correct rate in the "certain" tier ≥ 70%; no already-caught bug lost |
 | Kit rules | **New** bugs, not used to draft the rules | More caught than with the rules off; noise rises only slightly |
 | Team rule (a team's own control set) | One UI card, done with and without the team rule; count the places that use a framework control instead of the team control | Fewer wrong uses |
-| Questions at init | 2–3 real repos | Guessed answers are mostly right; ≤ 12 questions. **Measured on 3 repos (1.2.0–1.2.2): ≤ 12 met; 6 of 7 checked claims right (agent-checked); see [06](06-evidence.md)** |
+| Questions at init | 2–3 real repos | Guessed answers are mostly right. **Measured on 3 repos (1.2.0–1.2.2): ≤ 12 questions, the bar at the time; 6 of 7 checked claims right (agent-checked). Since 1.4.0 (two passes with loops) there is no question limit: 14 standards questions on one repo; see [06](06-evidence.md)** |
 
 ## 9.9 Open questions
 

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.3.0 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.0 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -21,7 +21,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 
 ## 3.1 `dk:init`
 
-**Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; để kiểm tra lại phần thiết lập; hoặc để chạy lại một phần: `dk:init index` (ví dụ trong một worktree mới), `dk:init baseline`, `dk:init standards [topic]`.
+**Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; để kiểm tra lại phần thiết lập; hoặc để chạy lại một phần: `dk:init index` (ví dụ trong một worktree mới), `dk:init baseline`, `dk:init standards [rules|review]`.
 
 **Nguyên tắc:**
 - **Probe trước, rồi hỏi từng câu một, theo thứ tự cố định.** Mỗi câu hỏi cho thấy những gì agent tìm thấy, một giá trị mặc định và vài lựa chọn ngắn; nó chờ câu trả lời của bạn rồi mới sang câu tiếp theo. "default" và "skip" luôn dùng được. Nó không bao giờ hỏi điều mà code đã trả lời.
@@ -37,21 +37,28 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 4. *Câu hỏi:* **lệnh và base branch** (xác nhận hoặc sửa). Sau đó nó tạo `.dev-kit/` cùng một `.gitignore` chứa `*` và ghi `config.yml`.
 5. *Câu hỏi:* **index graph** (mặc định có; dung lượng dự kiến với repo lớn, khoảng 150 MB và 600 MB cho mỗi ~3,000 file). Các thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện) được đưa vào `.git/info/exclude`.
 6. **Baseline:** chạy test và build một lần. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1). Nếu test **không chạy được** (package restore, xác thực, thiếu một service), nó nói rõ và hỏi dừng hay tiếp tục với baseline được đánh dấu `not-measured` trong `config.yml`; chạy lại `dk:init baseline` khi môi trường đã hoạt động.
-7. **Tiêu chuẩn theo topic** (bên dưới).
+7. **Tiêu chuẩn theo hai lượt** (bên dưới).
 8. *Câu hỏi:* **`CONSTRAINTS.md`** (tùy chọn, mặc định là không) → `.dev-kit/CONSTRAINTS.md`. Bỏ qua khi dự án đã có file riêng. Câu hỏi giải thích file này bổ sung gì cho repo của bạn (bên dưới).
 9. **Báo cáo** `.dev-kit/init-report.md`, và kiểm tra `git status` không đổi.
 
-**Tiêu chuẩn theo topic** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
-- **Probe trước:** linter bao phủ những gì; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng); các service trung tâm và nguồn permission, tìm bằng graph.
-- **Lần lượt từng topic, theo thứ tự:** `architecture`, `coding`, `testing`, `security`, `ui`, `api`, `data`, `ops`, `process`; topic không có gì để đề xuất thì bỏ qua. Mỗi topic một câu hỏi (tối đa hai) gộp:
-  1. **checklist của kit** cho topic đó (`standards/<topic>/`): mỗi file kèm trạng thái (`validated` hoặc `experimental`) và toàn bộ các mục, có thể tắt riêng từng mục. Topic chưa có file kit (hiện là `architecture`, `api`, `data`, `ops`, `process`) sẽ nói rõ lý do: các topic này phụ thuộc từng repo, nên theo nguyên tắc 0, rule của chúng chỉ đến từ phần gợi ý;
-  2. **rule đề xuất cho dự án hoặc team kèm bằng chứng** từ probe (ví dụ "68 file dùng `<ui-…>`, 4 file dùng `mat-input`: code mới có nên dùng control nội bộ không?"), mỗi rule kèm phạm vi: dự án hoặc team; với thư viện nội bộ, nó còn hỏi phiên bản cũ có còn được phép không và những control của framework nào vẫn được phép;
-  3. lựa chọn **"thêm một quy ước khác cho topic này"**;
-  4. dòng **Recommended**: lựa chọn tốt nhất agent đề xuất cho repo, mỗi phần kèm một lý do lấy từ probe. Agent khuyến nghị file kit `experimental` khi probe thấy đúng các tình huống mà các mục của file đó nhắm tới (và ghi rõ là experimental), bỏ các mục linter hoặc compiler đã kiểm, chỉ khuyến nghị rule đề xuất khi cách dùng trong code có hướng rõ ràng, và chỉ sang lint rule khi linter có thể kiểm được.
+**Tiêu chuẩn theo hai lượt** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
+- **Probe trước:** linter và compiler bao phủ những gì; cấu trúc (các layer, cách truy cập dữ liệu, module, contract được expose, config, permission key), tìm bằng graph; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng).
+- **Mỗi câu hỏi một nhóm, như một buổi brainstorm:** danh sách của nhóm đó nêu chi tiết (từng mục: hỏi gì, vì sao, repo này vướng ở đâu, kèm các con số từ lệnh agent đã chạy; file kit được đánh dấu `validated` hoặc `experimental`), rồi một dòng **Recommended** với một lý do cho mỗi phần. "default" là nhận đúng dòng Recommended đang hiển thị, "skip" là không lấy gì, hoặc bạn trả lời từng mục, kèm phạm vi dự án hoặc team cho các mục của repo. Một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì trở thành một lựa chọn để bạn quyết.
+- **Lượt 1, rule khi viết code** (`## Design`/`## Implement`, được story-runner, bug-fixer, code-refactor dùng):
+  1. **Architecture:** probe chính là danh sách tiêu chuẩn (kit không có file architecture, theo nguyên tắc 0); những gì code lân cận đã cho thấy thì không được khuyến nghị;
+  2. mỗi file kit có mục Implement phù hợp với repo là một nhóm: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;
+  3. mỗi thư viện nội bộ là một nhóm (phiên bản cũ còn được phép không, control nào của framework vẫn được phép);
+  4. **quy ước riêng của bạn, theo vòng lặp:** các đề xuất khác từ probe cộng với văn bản tự do, rồi hỏi "Còn quy ước nào khác không?" sau mỗi câu trả lời cho đến khi bạn nói không.
 
-  Trả lời "default" là nhận đúng dòng Recommended đang hiển thị; "skip" không bật gì cho topic đó; các rule nháp vẫn được đọc lại cho bạn xác nhận trước khi ghi. Mọi con số trong một đề xuất đến từ một lệnh agent đã chạy; một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì được hỏi dưới dạng câu hỏi.
-- Tối đa 12 câu hỏi về tiêu chuẩn, rồi **một câu hỏi mở**: "còn quy ước nào khác agent nên biết không?"
-- Agent soạn các rule theo định dạng tiêu chuẩn, **đọc lại cho bạn xác nhận**, rồi ghi rule của dự án vào `.dev-kit/standards/<topic>/` và rule của team vào thư mục team (hỏi một lần, được nhớ trong `~/.dev-kit/config.yml`).
+  Sau đó các rule của lượt 1 được đọc lại cho bạn xác nhận và được ghi.
+- **Lượt 2, checklist review** (`## Review`/`## Do not flag`/`## Severity`, được pre-pr-check dùng): rule đã giữ ở lượt 1 không bị hỏi lại, mỗi rule được kiểm theo mức severity của nó, và `review/finding-quality` luôn bật.
+  1. **Severity** của các rule đã giữ (mục kit giữ nguyên mức của nó; agent đề xuất một mức cho mỗi rule của repo);
+  2. **các kiểm tra chỉ dành cho review** ("khi diff chạm X, hãy kiểm Y"), không bao giờ chỉ nhắc lại một rule của lượt 1;
+  3. **Do not flag:** những gì linter, compiler và CI đã cưỡng chế, các dòng của kit, nhiễu của repo;
+  4. **kiểm tra riêng của bạn, theo vòng lặp**, như ở lượt 1.
+
+  Sau đó checklist được đọc lại và ghi vào chính các file topic đó.
+- Không giới hạn số câu hỏi: các vòng lặp kết thúc khi bạn nói không. Chạy headless thì nhận từng dòng Recommended và kết thúc các vòng lặp. Làm lại một lượt bằng `dk:init standards rules` hoặc `dk:init standards review`.
 
 **Tiêu chuẩn của kit** (tất cả là `experimental` cho đến khi đo trên các bug mới): `review/finding-quality` (luôn bật), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
 

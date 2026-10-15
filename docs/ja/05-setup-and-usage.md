@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.3.0 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.0 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)
@@ -101,7 +101,7 @@ lab では SWE の Django タスク 17 件（Haiku）を測定しました。イ
 Use skill dk:init for this repo.
 ```
 
-エージェントはまずリポジトリを調べ、そのあと質問を 1 つずつ順番に行います: コマンドとベースブランチ、グラフのインデックス、baseline（red の場合のみ）、トピックごとの standards チェックリスト（コードから提案される rule つき）、その他の規約についての自由質問 1 つ、そして任意の `CONSTRAINTS.md` です。各質問には根拠と既定値が示されます。「default」「skip」またはあなたの答えを返してください。`.dev-kit/`（git に無視され、コミットするものはありません）を作成します。あとで 1 つの部分だけやり直すには: `dk:init index`、`dk:init baseline`、`dk:init standards [topic]`。
+エージェントはまずリポジトリを調べ、そのあと質問を 1 つずつ順番に行います: コマンドとベースブランチ、グラフのインデックス、baseline（red の場合のみ）、2 つのパスに分けた standards（コードを書くための rule、続いてレビューのチェックリスト。それぞれがグループの一覧と、あなた自身の規約のためのループです）、そして任意の `CONSTRAINTS.md` です。各質問には根拠と Recommended の行が示されます。「default」「skip」またはあなたの答えを返してください。`.dev-kit/`（git に無視され、コミットするものはありません）を作成します。あとで 1 つの部分だけやり直すには: `dk:init index`、`dk:init baseline`、`dk:init standards [rules|review]`。
 
 ## 5.8 日常の使い方
 

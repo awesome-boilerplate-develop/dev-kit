@@ -18,7 +18,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 
 ## 3.1 `dk:init`
 
-**Use when:** using dev-kit for the first time on a machine or a repo; to re-check the setup; or to re-run one part: `dk:init index` (for example in a new worktree), `dk:init baseline`, `dk:init standards [topic]`.
+**Use when:** using dev-kit for the first time on a machine or a repo; to re-check the setup; or to re-run one part: `dk:init index` (for example in a new worktree), `dk:init baseline`, `dk:init standards [rules|review]`.
 
 **Principles:**
 - **Probe first, then ask one question at a time, in a fixed order.** Each question shows what the agent found, a default and short options; it waits for your answer before the next one. "default" and "skip" always work. It never asks what the code already answers.
@@ -34,21 +34,28 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 4. *Question:* **commands and base branch** (confirm or correct). Then it creates `.dev-kit/` with a `.gitignore` containing `*` and writes `config.yml`.
 5. *Question:* **graph indexes** (default yes; the expected size for a large repo, roughly 150 MB and 600 MB per ~3,000 files). Index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to `.git/info/exclude`.
 6. **Baseline:** runs tests and build once. *Question only if red:* **stop** (fix first) or **accept as a known baseline**, written to `.dev-kit/baseline.md`; from then on a run fails only when a test **outside** that list fails (rule B1). If the tests **could not run** (package restore, authentication, a missing service), it says so and asks whether to stop or continue with the baseline marked `not-measured` in `config.yml`; rerun `dk:init baseline` once the environment works.
-7. **Standards by topic** (below).
+7. **Standards in two passes** (below).
 8. *Question:* **`CONSTRAINTS.md`** (optional, default no) → `.dev-kit/CONSTRAINTS.md`. Skipped when the project has its own. The question explains what the file adds for your repo (below).
 9. **Report** `.dev-kit/init-report.md`, and a check that `git status` is unchanged.
 
-**Standards by topic** (design: [09](09-init-and-standards.md), section 9.6). Rules are written only for what the agent cannot know or has been seen to get wrong; never naming or style.
-- **Probe first:** what the linter covers; in-house libraries (internal packages, how many files use them against framework controls, what recent files use, their component list); central services and permission sources, found with the graph.
-- **Topic by topic, in order:** architecture, coding, testing, security, ui, api, data, ops, process; topics with nothing to offer are skipped. One question per topic (two at most) combining:
-  1. the **kit checklist** for that topic (`standards/<topic>/`): each file with its status (`validated` or `experimental`) and every item, which can be switched off one by one. A topic with no kit file (today `architecture`, `api`, `data`, `ops`, `process`) says why: these depend on the repo, so under principle 0 their rules come only from the suggestions;
-  2. **suggested project or team rules with evidence** from the probe (for example "68 files use `<ui-…>`, 4 use `mat-input`: should new code use the in-house controls?"), each with its scope: project or team; for an in-house library it also asks whether the old version is still allowed and which framework controls stay allowed;
-  3. the option **"add another convention for this topic"**;
-  4. a **Recommended** line: the agent's best pick for this repo, with one reason per part from the probe. It recommends an `experimental` kit file when the probe finds the situations its items cover (and labels it experimental), drops items the linter or compiler already checks, recommends a suggested rule only when usage shows a clear direction, and points to a lint rule when a linter could enforce it.
+**Standards in two passes** (design: [09](09-init-and-standards.md), section 9.6). Rules are written only for what the agent cannot know or has been seen to get wrong; never naming or style.
+- **Probe first:** what the linter and compiler cover; the structure (layers, how data is reached, modules, exposed contracts, config, permission keys), found with the graph; in-house libraries (internal packages, how many files use them against framework controls, what recent files use, their component list).
+- **One group per question, like a brainstorm:** the group's list in detail (every item: what it asks, why, where this repo hits it, with counts from commands the agent ran; kit files marked `validated` or `experimental`), then a **Recommended** line with one reason per part. "default" accepts Recommended exactly as shown, "skip" takes nothing, or answer item by item, with project or team scope for repo items. A claim like "X replaces Y" without usage evidence becomes a choice.
+- **Pass 1, rules for writing code** (`## Design`/`## Implement`, used by story-runner, bug-fixer, code-refactor):
+  1. **Architecture:** the probe is the standard list (the kit has no architecture file under principle 0); what neighbouring code already shows is not recommended;
+  2. one group per kit file with Implement items that fit the repo: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;
+  3. one group per in-house library (is the old version still allowed, which framework controls stay allowed);
+  4. **your own conventions, in a loop:** the other probe suggestions plus free text, then "Any other convention?" after every answer until you say no.
 
-  Answering "default" accepts the Recommended line exactly as shown; "skip" enables nothing for the topic; the drafted rules are still read back before anything is written. Every count in a suggestion comes from a command the agent ran; a claim like "X replaces Y" without usage evidence is asked as a question.
-- At most 12 standards questions, then **one open question**: "other conventions the agent should know?"
-- The agent drafts the rules in the standard format, **reads them back for your confirmation**, then writes project rules to `.dev-kit/standards/<topic>/` and team rules to the team folder (asked once, remembered in `~/.dev-kit/config.yml`).
+  Then the pass-1 rules are read back for your confirmation and written.
+- **Pass 2, review checklist** (`## Review`/`## Do not flag`/`## Severity`, used by pre-pr-check): rules kept in pass 1 are not asked again, each is checked at its severity, and `review/finding-quality` is always on.
+  1. **Severity** of the kept rules (kit items keep theirs; the agent proposes one per repo rule);
+  2. **review-only checks** ("when the diff touches X, check Y"), never a restatement of a pass-1 rule;
+  3. **Do not flag:** what the linter, compiler and CI enforce, the kit's lines, repo noise;
+  4. **your own checks, in a loop**, as in pass 1.
+
+  Then the checklist is read back and written into the same topic files.
+- No question limit: the loops end when you say no. Headless runs take each Recommended line and end the loops. Redo one pass with `dk:init standards rules` or `dk:init standards review`.
 
 **Kit standards** (all `experimental` until measured on new bugs): `review/finding-quality` (always on), `coding/review-basics`, `security/web` (OWASP Top 10:2025, ASVS 5.0), `testing/basics`, `ui/forms-and-actions` (WCAG 2.2).
 

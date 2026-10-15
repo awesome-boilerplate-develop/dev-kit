@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.3.0 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.4.0 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -212,6 +212,16 @@ Git worktree mới của ba repository private, Claude Code với Sonnet 5.5, m�
   - Test không chạy được chưa có đường xử lý xác định; agent tự ứng biến "not measured" → giờ là một nhánh xác định (`baseline: not-measured` trong `config.yml`).
   - Khi không có rule nào được soạn, bước đọc lại bị gộp vào câu hỏi mở ở C → giờ được phép.
 - **Sau khi sửa (repo B, chỉ các câu hỏi theo topic):** câu hỏi `coding` nêu "experimental, nên mặc định là tắt", và những ý chưa được chứng minh (`: any` trong 124 file, kiểu unsubscribe) được hỏi dưới dạng câu hỏi. Lần chạy thứ hai còn đề xuất các rule `architecture` mà lần đầu đã bỏ qua: những gì probe tìm thấy thay đổi giữa các lần chạy.
+
+### Tiêu chuẩn của `dk:init` theo hai lượt (dev-kit 1.4.0)
+
+Một lần chạy `dk:init standards` trên repo B (worktree mới, `.dev-kit/` từ lần chạy trước với phần tiêu chuẩn đã xóa), Claude Code với Sonnet 5.5, mỗi lượt một câu trả lời với `--resume`; phần lớn là "default", một quy ước riêng, "no" để kết thúc mỗi vòng lặp. Một lần chạy duy nhất, do agent tự kiểm, chưa được người xác nhận.
+
+- **Lượt 1:** 9 câu hỏi: architecture (7 mục từ probe, như contract module federated, file permission key và pattern của key, giá trị trong mọi file environment, key trong cả hai file dịch), 4 file kit (`security/web` được khuyến nghị bỏ S1 và S3, `ui/forms-and-actions` bỏ U5, mỗi cái kèm lý do), thư viện nội bộ (5 package nhưng chỉ 2 file import, so với 30+ component riêng: Recommended là "không có rule"), 2 lượt của vòng lặp, 1 lần đọc lại.
+- **Agent đã kiểm quy ước riêng của người dùng với code:** "mở dialog thêm/sửa qua `common-dialog`" gặp 3 file dùng nó và 54 file dùng thẳng dialog service; nó viết rule đúng như được nói và nêu khoảng chênh ở bước đọc lại.
+- **Lượt 2:** 5 câu hỏi: severity, các kiểm tra chỉ dành cho review, Do not flag (cờ compiler, `.editorconfig`, Sonar trong CI), 1 lượt của vòng lặp, 1 lần đọc lại. Các mục được đặt dưới `## Review`, `## Do not flag` và `## Severity` của cùng hai file dự án; `git status` không đổi.
+- **Chi phí:** 0.60 USD cho 15 lượt (lượt 1 + lượt 2 + câu hỏi `CONSTRAINTS.md`).
+- **Sai lệch, đã sửa ở 1.4.0 và chạy lại ở lượt 2:** "default" kết thúc các vòng lặp (giờ chỉ "no" hoặc "skip" mới kết thúc; chạy lại: vòng lặp hỏi lại sau "default"); các kiểm tra chỉ dành cho review nhắc lại rule của lượt 1, ví dụ key dịch và giá trị environment (giờ đã loại ra; chạy lại: agent bỏ chúng và nói lý do); một rule về vị trí đặt code mà code lân cận đã cho thấy lại được khuyến nghị (giờ không đưa vào Recommended, chưa chạy lại).
 
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 

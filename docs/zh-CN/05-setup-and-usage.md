@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.3.0 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.0 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | 简体中文 | [日本語](../ja/05-setup-and-usage.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[05-setup-and-usage.md](../en/05-setup-and-usage.md)。
@@ -101,7 +101,7 @@ lab 测量了 17 个 SWE Django 任务（Haiku）：有索引和没有索引都�
 Use skill dk:init for this repo.
 ```
 
-agent 会先探查仓库，然后依次一次问一个问题：命令和基础分支、graph 索引、baseline（仅在它是红的时候）、按 topic 逐个过一遍的 standards 清单（附带它根据代码建议的 rule）、一个关于其他约定的开放问题，以及可选的 `CONSTRAINTS.md`。每个问题都会给出依据和默认值；回复 “default”、“skip” 或你自己的答案。它会创建 `.dev-kit/`（被 git 忽略，无需提交）。之后若要重做某一部分：`dk:init index`、`dk:init baseline`、`dk:init standards [topic]`。
+agent 会先探查仓库，然后依次一次问一个问题：命令和基础分支、graph 索引、baseline（仅在它是红的时候）、分两遍的 standards（先是写代码的 rule，再是 review 清单；每一遍都是若干组清单，外加一个收集你自己约定的循环），以及可选的 `CONSTRAINTS.md`。每个问题都会给出依据和一行 Recommended；回复 “default”、“skip” 或你自己的答案。它会创建 `.dev-kit/`（被 git 忽略，无需提交）。之后若要重做某一部分：`dk:init index`、`dk:init baseline`、`dk:init standards [rules|review]`。
 
 ## 5.8 日常使用
 

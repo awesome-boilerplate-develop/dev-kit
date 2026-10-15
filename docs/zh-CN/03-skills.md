@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.3.0 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.0 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -21,7 +21,7 @@
 
 ## 3.1 `dk:init`
 
-**使用场景：** 在一台机器或一个仓库上首次使用 dev-kit；重新检查设置；或重新运行其中一部分：`dk:init index`（例如在新的 worktree 中）、`dk:init baseline`、`dk:init standards [topic]`。
+**使用场景：** 在一台机器或一个仓库上首次使用 dev-kit；重新检查设置；或重新运行其中一部分：`dk:init index`（例如在新的 worktree 中）、`dk:init baseline`、`dk:init standards [rules|review]`。
 
 **原则：**
 - **先探查，再按固定顺序一次问一个问题。** 每个问题都会显示 agent 发现了什么、一个默认值和简短的选项；等你回答后才问下一个。“default” 和 “skip” 始终可用。代码已经能回答的事，它不会问。
@@ -37,21 +37,28 @@
 4. *提问：* **命令和基础分支**（确认或更正）。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
 5. *提问：* **graph 索引**（默认是；大型仓库的预期占用，每约 3,000 个文件大致 150 MB 和 600 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入 `.git/info/exclude`。
 6. **Baseline：** 运行一次测试和构建。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。如果测试**无法运行**（package restore、认证、缺少服务），它会说明这一点，并询问是停止，还是继续并在 `config.yml` 中将 baseline 标记为 `not-measured`；环境可用后重新运行 `dk:init baseline`。
-7. **按 topic 的 standards**（见下）。
+7. **分两遍的 standards**（见下）。
 8. *提问：* **`CONSTRAINTS.md`**（可选，默认否）→ `.dev-kit/CONSTRAINTS.md`。如果项目自带，则跳过。该问题会说明这个文件能为你的仓库增加什么（见下文）。
 9. **报告** `.dev-kit/init-report.md`，并检查 `git status` 没有变化。
 
-**按 topic 的 standards**（设计：[09](../en/09-init-and-standards.md)，英文，9.6 节）。只为 agent 无法知道、或已被观察到会出错的内容写 rule；绝不涉及命名或风格。
-- **先探查：** linter 覆盖了什么；in-house 库（内部包、使用它们的文件数与使用框架控件的文件数对比、最近的文件用什么、它们的组件列表）；中心服务和权限来源，用 graph 查找。
-- **逐个 topic，按顺序：** `architecture`、`coding`、`testing`、`security`、`ui`、`api`、`data`、`ops`、`process`；没有可提供内容的 topic 会被跳过。每个 topic 一个问题（最多两个），合并以下内容：
-  1. 该 topic 的 **kit 清单**（`standards/<topic>/`）：每个文件都标明状态（`validated` 或 `experimental`）并列出全部条目，单个条目可以关闭。没有 kit 文件的 topic（目前是 `architecture`、`api`、`data`、`ops`、`process`）会说明原因：这些 topic 取决于具体仓库，所以按原则 0，它们的 rule 只来自建议部分；
-  2. 根据探查结果给出的**带依据的项目或团队 rule 建议**（例如 “68 个文件使用 `<ui-…>`，4 个使用 `mat-input`：新代码应该使用 in-house 控件吗？”），每条都标明范围：项目或团队；对于 in-house 库，还会询问旧版本是否仍允许使用，以及哪些框架控件仍然允许使用；
-  3. 选项 **“为该 topic 添加另一个约定”**；
-  4. 一行 **Recommended**：agent 针对该仓库的最佳选择，每一部分附一条来自探查的理由。探查发现某个 `experimental` kit 文件所针对的情形时，agent 会推荐它（并标明 experimental）；去掉 linter 或编译器已经检查的条目；只有当代码中的用法方向明确时才推荐建议的 rule；如果 linter 能强制执行，则改为推荐 lint rule。
+**分两遍的 standards**（设计：[09](../en/09-init-and-standards.md)，英文，9.6 节）。只为 agent 无法知道、或已被观察到会出错的内容写 rule；绝不涉及命名或风格。
+- **先探查：** linter 和编译器覆盖了什么；结构（层、数据如何获取、模块、对外暴露的契约、配置、权限 key），用 graph 查找；in-house 库（内部包、使用它们的文件数与使用框架控件的文件数对比、最近的文件用什么、它们的组件列表）。
+- **每个问题一组，像 brainstorm 一样：** 先详细列出该组的清单（每个条目：要求什么、为什么、这个仓库在哪里遇到、附 agent 运行过的命令得出的计数；kit 文件标明 `validated` 或 `experimental`），然后给出一行 **Recommended**，每一部分附一条理由。回答 “default” 即原样接受 Recommended，“skip” 什么都不采用，或者逐条回答；仓库条目还要标明范围：项目或团队。像 “X 取代 Y” 这样没有使用证据的说法，会变成一个选择题。
+- **第 1 遍，写代码的 rule**（`## Design`/`## Implement`，供 story-runner、bug-fixer、code-refactor 使用）：
+  1. **Architecture：** 探查结果就是 standards 清单（按原则 0，kit 中没有 architecture 文件）；相邻代码已经体现出来的内容不会被推荐；
+  2. 每个含有适合该仓库的 Implement 条目的 kit 文件一组：`coding/review-basics`、`testing/basics`、`security/web`、`ui/forms-and-actions`；
+  3. 每个 in-house 库一组（旧版本是否仍允许使用，哪些框架控件仍然允许使用）；
+  4. **你自己的约定，循环进行：** 探查得出的其他建议加上自由文本，然后每次回答后都问 “还有其他约定吗？”，直到你回答没有。
 
-  回答 “default” 即原样接受所显示的 Recommended 行；“skip” 不为该 topic 启用任何内容；起草的 rule 在写入前仍会读回给你确认。建议中的每个计数都来自 agent 运行过的命令；像 “X 取代 Y” 这样没有使用证据的说法，会作为问题来问。
-- 最多 12 个 standards 问题，然后是**一个开放问题**：“agent 还应该知道其他约定吗？”
-- agent 按标准格式起草 rule，**读给你确认**，然后把项目 rule 写入 `.dev-kit/standards/<topic>/`，把团队 rule 写入团队文件夹（只问一次，记在 `~/.dev-kit/config.yml` 中）。
+  随后，第 1 遍的 rule 会读回给你确认并写入。
+- **第 2 遍，review 清单**（`## Review`/`## Do not flag`/`## Severity`，供 pre-pr-check 使用）：第 1 遍中保留的 rule 不会再问，每条都按其 severity 检查，`review/finding-quality` 始终开启。
+  1. 保留的 rule 的 **Severity**（kit 条目沿用自己的；agent 为每条仓库 rule 提议一个）；
+  2. **仅用于 review 的检查**（“当 diff 涉及 X 时，检查 Y”），绝不是对第 1 遍 rule 的重述；
+  3. **Do not flag：** linter、编译器和 CI 已经强制执行的内容、kit 中的相应条目、仓库中的噪音；
+  4. **你自己的检查，循环进行**，与第 1 遍相同。
+
+  随后，清单会读回给你确认，并写入同一批 topic 文件。
+- 没有问题数量上限：循环在你回答没有时结束。headless 运行会采用每个 Recommended 行并结束循环。用 `dk:init standards rules` 或 `dk:init standards review` 重做其中一遍。
 
 **Kit standards**（在新 bug 上测量之前全部是 `experimental`）：`review/finding-quality`（始终开启）、`coding/review-basics`、`security/web`（OWASP Top 10:2025、ASVS 5.0）、`testing/basics`、`ui/forms-and-actions`（WCAG 2.2）。
 
