@@ -17,7 +17,8 @@
 | Tracker (GitHub Issues…) | Not built | Specs are currently local files in `.dev-kit/specs/` |
 | Hosts other than Claude Code | Done (0.8.12) | Codex, Copilot CLI, Antigravity, OpenCode, omp load the kit; review quality measured only once on Codex ([05](05-setup-and-usage.md), [06](06-evidence.md)) |
 | `CONSTRAINTS.md` read automatically by pre-pr-check | Done (1.1.0) | pre-pr-check step 1 checks the diff against `.dev-kit/CONSTRAINTS.md` (or the project's own) when it exists; not measured |
-| Several repos for one developer | Not built (planned after single-repo use is solid) | 1.4.3 removed the project-or-team question from `dk:init`; see 8.5 |
+| 1. Several repos for one developer | Not built (planned after single-repo use is solid) | 1.4.3 removed the project-or-team question from `dk:init`; see 8.5 |
+| 2. Team mode | Not built (planned after several repos) | Shared, committed setup for a team; see 8.5 |
 
 ## 8.3 Rules waiting for evidence
 
@@ -53,7 +54,9 @@ How to check it: write a shared rule in repo A, run `dk:init` and one controller
 
 Open questions: what to do when a shared rule does not fit one repo (a project rule overrides it, project > team > kit); whether team mode (below) later replaces this folder.
 
-### Team mode (not built)
+### Team mode (planned second, not built)
+
+Planned after "several repos for one developer": that step settles how shared rules are found, loaded and overridden by one person, which team mode then extends to several people.
 
 1.1.0 made dev-kit strictly personal (rule O1). A team that wants to share its setup could later opt in to a **team mode**, chosen once in `dk:init` (for example `mode: personal | team` in `config.yml`, default `personal`).
 
