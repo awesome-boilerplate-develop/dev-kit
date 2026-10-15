@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.8 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.9 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -57,7 +57,7 @@
   3. **Do not flag:** linter、コンパイラ、CI が強制していること、kit の行、リポジトリのノイズ。
   4. **あなた自身のチェック（ループ）**。パス 1 と同じ。
 
-  そのあと、チェックリストを読み返し、各項目が確認する対象のトピックのファイルに書き込む。書き込み後、`scripts/check_standards.py` がファイルを確認する（frontmatter と `id` がパスと一致するか、`applies_to` の glob が追跡中のファイルに一致するか、セクション名、ID: 大文字 1〜3 文字と数字、重複なし、Review 行が挙げる ID がすべて定義済みか）。エージェントは OK が出るまで修正する。
+  そのあと、チェックリストを読み返し、各項目が確認する対象のトピックのファイルに書き込む。書き込み後、`scripts/check_standards.py` がファイルを確認する（frontmatter と `id` がパスと一致するか、`applies_to` の glob が追跡中のファイルに一致するか、セクション名、ID: トピックの文字と数字（`A` architecture、`C` coding、`U` ui、`O` ops…。レビュー専用のチェックは `V`）、重複なし、Review 行が挙げる ID がすべて定義済みか）。エージェントは OK が出るまで修正する。
 - **あなたが自分の言葉で追加したものは、まず確認する:** agent は書き込む形のまま起草し（トリガー、適用範囲、新しいコードだけか既存コードも含むか、例外、深刻度）、コードと照らし合わせ（従っている箇所と従っていない箇所の数、衝突、ツールや残した rule がすでにカバーしているか、レビュアーが確認できるか）、「この意味で合っていますか?」と尋ねる: 草稿どおり、より狭く、より広く、またはあなたの修正。
 - 質問数の上限はない: ループはあなたが no と答えると終わる。headless の実行では各 Recommended の行をそのまま採用し、ループを終える。1 つのパスだけやり直すには `dk:init standards rules` または `dk:init standards review`。
 

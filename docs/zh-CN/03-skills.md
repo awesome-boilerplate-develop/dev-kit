@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.8 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.9 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -57,7 +57,7 @@
   3. **Do not flag：** linter、编译器和 CI 已经强制执行的内容、kit 中的相应条目、仓库中的噪音；
   4. **你自己的检查，循环进行**，与第 1 遍相同。
 
-  随后，清单会读回给你确认，并写入各条目所检查内容对应的 topic 文件。写入后，`scripts/check_standards.py` 会检查这些文件（frontmatter 及 `id` 与路径是否一致、`applies_to` 的 glob 是否匹配已跟踪的文件、section 名称、ID：一到三个大写字母加一个数字、不重复、Review 行提到的每个 ID 都有定义）；agent 会修正直到它输出 OK。
+  随后，清单会读回给你确认，并写入各条目所检查内容对应的 topic 文件。写入后，`scripts/check_standards.py` 会检查这些文件（frontmatter 及 `id` 与路径是否一致、`applies_to` 的 glob 是否匹配已跟踪的文件、section 名称、ID：topic 的字母加一个数字（`A` architecture、`C` coding、`U` ui、`O` ops…；仅用于 review 的检查用 `V`）、不重复、Review 行提到的每个 ID 都有定义）；agent 会修正直到它输出 OK。
 - **你用自己的话添加的内容会先确认：** agent 按将要写入的形式起草（触发条件、适用范围、只针对新代码还是也包括旧代码、例外、严重程度），对照代码检查（多少处遵循、多少处不遵循、冲突、工具或已保留的 rule 是否已覆盖、reviewer 能否检查），然后问“这是你的意思吗？”：按草稿、更窄、更宽，或你的修改。
 - 没有问题数量上限：循环在你回答没有时结束。headless 运行会采用每个 Recommended 行并结束循环。用 `dk:init standards rules` 或 `dk:init standards review` 重做其中一遍。
 

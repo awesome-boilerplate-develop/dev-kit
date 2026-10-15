@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.4.9 (2026-10-15)
+- **IDs follow the topic letter, and `check_standards.py` enforces it:** `## Design`/`## Implement` IDs are the topic's letter and a number (`A` architecture, `C` coding, `T` testing, `S` security, `U` ui including in-house component libraries, `P` api, `D` data, `O` ops, `R` process or review); a Review line that defines its own item uses `V` or the topic's letter. The agent decides an item's topic file when it first shows it. A date convention is coding, not data. The "own prefix for in-house libraries" allowance is gone. The kit's own standards already follow this.
+- **Placement examples:** environment, pipeline, deployment and dependency files go to `ops/`, translation files to `ui/`, exposed module contracts to `architecture/`.
+- **Checked** with an interactive agy rerun from an empty `.dev-kit/` (21 questions, ~34 minutes with index and baseline). The 1.4.8 index estimate counted 843 code files (~135 + ~506 MB; measured 137 + 529 MB). Both Write-in items were confirmed before being kept, and the environment check's confirmation said the reviewer reads the spec, not the PR description. All three review-only checks went to `ops/deployments-and-deps.md`; IDs `A1`–`A5`, `U1`, `U6`, `V1`–`V3`; the agent ran `check_standards.py` (OK, in `init-report.md`). Left: the toast confirmation gave code examples but no follow / not-follow counts.
+
 ## 1.4.8 (2026-10-15)
 Fixes from running `dk:pre-pr-check` on a real branch with the standards `dk:init` wrote.
 - **`check_report.py --base`:** suspect findings must also sit in the changed lines; pre-existing code is dropped (R1), not moved to suspect. The old message said "move to suspect or drop", which contradicted R1; the end-to-end run listed two repo-rule findings on code the agent itself marked as outside the diff. The new check fails exactly those two; 31 earlier backtest reports give the same result as before when run without `--base`.

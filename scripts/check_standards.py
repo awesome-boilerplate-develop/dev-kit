@@ -4,7 +4,8 @@ Default target: .dev-kit/standards under the repo root. Run from inside the repo
 least one tracked file (skip with --no-files, for the kit's own standards).
 Checks: frontmatter keys; topic is one of the template's topics (plus review) and equals its folder; id == <topic>/<file name>; scope and status values; only the
 sections Design, Implement, Review, Do not flag, Severity, each at most once; every Design/Implement item starts with
-an ID (1-3 capital letters and a number, e.g. A1, V2); IDs unique in the file; a Review line that starts with IDs
+an ID: the topic's letter and a number (A1 architecture, C coding, T testing, S security, U ui, P api, D data, O ops,
+R process or review); a Review line that defines its own item uses V (review-only check) or the topic's letter; IDs unique in the file; a Review line that starts with IDs
 ("A1, A3 on the diff", "C1–C5 → major") only names IDs defined in the file; a Review line with one ID and its own text
 ("V1 When the diff touches …") defines that ID.
 Prints each problem; exits 1 if there are problems, 0 if all files pass."""
@@ -14,7 +15,9 @@ import subprocess
 import sys
 
 SECTIONS = ["Design", "Implement", "Review", "Do not flag", "Severity"]
-TOPICS = ["architecture", "coding", "testing", "security", "ui", "api", "data", "ops", "process", "review"]
+LETTER = {"architecture": "A", "coding": "C", "testing": "T", "security": "S", "ui": "U", "api": "P", "data": "D",
+          "ops": "O", "process": "R", "review": "R"}
+TOPICS = list(LETTER)
 ID = r"[A-Z]{1,3}\d+"
 ID_LIST = re.compile(rf"^- ((?:{ID})(?:\s*[–-]\s*{ID})?(?:\s*(?:,|and)\s*(?:{ID})(?:\s*[–-]\s*{ID})?)*)\b(.*)$")
 
@@ -122,6 +125,17 @@ def check(path, problems):
             defined.append(ids[0])  # a review item: "R1 It is introduced by this change"
         else:
             refs.extend(ids)
+    letter = LETTER.get(meta.get("topic", ""))
+    if letter:
+        for name in ("Design", "Implement"):
+            for line in sections.get(name, []):
+                m = re.match(rf"^- ({ID}) ", line)
+                if m and not re.fullmatch(rf"{letter}\d+", m.group(1)):
+                    problems.append(f"{rel}: {name} ID {m.group(1)} must be '{letter}' and a number (topic {meta['topic']})")
+        for x in defined:
+            if x not in [i for n in ("Design", "Implement") for i in re.findall(rf"^- ({ID}) ", "\n".join(sections.get(n, [])), re.M)] \
+                    and not re.fullmatch(rf"(V|{letter})\d+", x):
+                problems.append(f"{rel}: Review ID {x} must be 'V' (review-only check) or '{letter}' and a number")
     for x in set(defined):
         if defined.count(x) > 1:
             problems.append(f"{rel}: ID {x} is defined {defined.count(x)} times")
