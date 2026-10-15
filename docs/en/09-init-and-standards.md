@@ -163,10 +163,10 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
    - ui: "68 files use `<ui-…>`, 4 files use `mat-input`. Does the team prefer its own control set?"
    - api: "Every HTTP call goes through `XxxRequestService` (`codegraph callers`). Record it as a rule?"
    - security: "Authorization goes through `rbacResourceKeys`. Is there a separate policy for patient data?"
-4. **Two passes since 1.4.0** (was: one question per topic, ≤ 12 in total, one open question at the end). Pass 1 asks the rules for writing code (`## Design`/`## Implement`): architecture from the probe, then each fitting kit file, then in-house libraries, then a loop of the user's own conventions. Pass 2 asks the review checklist (`## Review`/`## Do not flag`/`## Severity`): severity of the kept rules, review-only checks that do not restate a rule, the Do-not-flag list, then a loop of the user's own checks. One group per question, each with its list in detail and a Recommended line; "skip" is a valid answer. Always ask the scope: project or team.
+4. **Two passes since 1.4.0** (was: one question per topic, ≤ 12 in total, one open question at the end). Pass 1 asks the rules for writing code (`## Design`/`## Implement`): architecture from the probe, then each fitting kit file, then in-house libraries, then a loop of the user's own conventions. Pass 2 asks the review checklist (`## Review`/`## Do not flag`/`## Severity`): severity of the kept rules, review-only checks that do not restate a rule, the Do-not-flag list, then a loop of the user's own checks. One group per question, each with its list in detail and a Recommended line; "skip" is a valid answer. Since 1.4.3 the scope is not asked: dev-kit is set up one repo at a time and everything goes to `.dev-kit/standards/`; the team tier (`standards.team`) is still loaded when set by hand, and offering it in `dk:init` waits for multi-repo support.
    - **Each loop asks again after every answer** "default" included; only "no" or "skip" ends it. Since 1.4.1 the question is built from the context (what was added, what the kept rules cover, up to 3 uncovered areas with evidence, one question naming them), never a bare "anything else?".
    - **Every item the user adds in their own words is confirmed in context (1.4.2):** drafted as it will be written, checked against the code (follows / does not follow, conflicts, already covered, checkable at all), then "Is this what you mean?" with as-drafted, narrower and wider choices. There is no question limit.
-   - The agent sorts free-form answers into the right topic and scope, writes them as rule items following the quality criteria (9.3), **reads them back to the user for confirmation** before writing. Any idea that violates principle 0 (the agent already knows it, or the linter checks it) is called out, and the agent suggests not writing it.
+   - The agent sorts free-form answers into the right topic, writes them as rule items following the quality criteria (9.3), **reads them back to the user for confirmation** before writing. Any idea that violates principle 0 (the agent already knows it, or the linter checks it) is called out, and the agent suggests not writing it.
 5. **Do not ask about naming or style:** that falls under principle 0.
 6. **Auto-probe in-house control sets/libraries** (tried on a real Angular repo):
    - `package.json`: packages with an internal scope (for example `@<org>/components`, with both v1 and v2);
@@ -175,7 +175,6 @@ This keeps subtle behavioural bugs (exactly the kind the backtest is missing) wi
    - take the control list from the package's `public-api.d.ts` (or `index.d.ts`); no README needed.
 
    From this, draft a **draft rule** (Implement, Review, Do not flag) with evidence. The agent asks only what the code cannot show:
-   - scope (team or project);
    - whether the old version is still in use;
    - which framework controls are still allowed (exceptions).
 

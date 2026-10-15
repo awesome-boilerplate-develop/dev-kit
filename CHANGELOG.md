@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.4.3 (2026-10-15)
+- **No project-or-team question in `dk:init`:** dev-kit is set up one repo at a time, so everything kept goes to `.dev-kit/standards/`. `dk:init` no longer asks for or remembers a team folder (step 2 now says so); controllers still load `standards.team` when it is set by hand, and offering it in `dk:init` waits for multi-repo support. READMEs, docs 03 and docs 09 updated.
+- **Checked** on a real Angular repo: the architecture group and the confirmation of a user-added rule ran with no scope question.
+
 ## 1.4.2 (2026-10-15)
 - **Items the user adds in their own words are confirmed in context** (rules, review checks, Do-not-flag lines, in any group or loop), as their own question before they are kept: the agent drafts the item as it will be written (trigger, where it applies, new code only or existing code too, exceptions, severity, scope), checks it against the code (how many places follow it and how many do not, with an example of each; conflicts; whether a tool or a kept rule already covers it), then asks "Is this what you mean?" with `A` as drafted, `B` narrower, `C` wider, or a correction.
 - **Checked** on a real Angular repo, one addition per pass. Pass 1, "toasts take their text from translation keys": 76 toast calls, none with a literal first argument, the calls that pass a variable named, and a narrower "new code only" choice offered. Pass 2, "PRs that change a master screen need before/after screenshots": the agent noted that `dk:pre-pr-check` reads the branch diff, not the PR description, so a reviewer cannot verify it, and offered "only when `*.html`/`*.scss` change" as the narrower choice.

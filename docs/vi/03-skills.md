@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.2 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.3 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -43,7 +43,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 
 **Tiêu chuẩn theo hai lượt** (thiết kế: [09](../en/09-init-and-standards.md), mục 9.6). Rule chỉ được viết cho những gì agent không thể biết hoặc đã bị thấy làm sai; không bao giờ về cách đặt tên hay style.
 - **Probe trước:** linter và compiler bao phủ những gì; cấu trúc (các layer, cách truy cập dữ liệu, module, contract được expose, config, permission key), tìm bằng graph; các thư viện nội bộ (package nội bộ, bao nhiêu file dùng chúng so với các control của framework, các file gần đây dùng gì, danh sách component của chúng).
-- **Mỗi câu hỏi một nhóm, như một buổi brainstorm:** danh sách của nhóm đó nêu chi tiết (từng mục: hỏi gì, vì sao, repo này vướng ở đâu, kèm các con số từ lệnh agent đã chạy; file kit được đánh dấu `validated` hoặc `experimental`), rồi một dòng **Recommended** với một lý do cho mỗi phần. "default" là nhận đúng dòng Recommended đang hiển thị, "skip" là không lấy gì, hoặc bạn trả lời từng mục, kèm phạm vi dự án hoặc team cho các mục của repo. Một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì trở thành một lựa chọn để bạn quyết.
+- **Mỗi câu hỏi một nhóm, như một buổi brainstorm:** danh sách của nhóm đó nêu chi tiết (từng mục: hỏi gì, vì sao, repo này vướng ở đâu, kèm các con số từ lệnh agent đã chạy; file kit được đánh dấu `validated` hoặc `experimental`), rồi một dòng **Recommended** với một lý do cho mỗi phần. "default" là nhận đúng dòng Recommended đang hiển thị, "skip" là không lấy gì, hoặc bạn trả lời từng mục. Mọi mục được giữ đều thuộc repo này; không có câu hỏi dự án hay team (hiện làm từng repo một). Một nhận định kiểu "X thay thế Y" mà không có bằng chứng sử dụng thì trở thành một lựa chọn để bạn quyết.
 - **Lượt 1, rule khi viết code** (`## Design`/`## Implement`, được story-runner, bug-fixer, code-refactor dùng):
   1. **Architecture:** probe chính là danh sách tiêu chuẩn (kit không có file architecture, theo nguyên tắc 0); những gì code lân cận đã cho thấy thì không được khuyến nghị;
   2. mỗi file kit có mục Implement phù hợp với repo là một nhóm: `coding/review-basics`, `testing/basics`, `security/web`, `ui/forms-and-actions`;

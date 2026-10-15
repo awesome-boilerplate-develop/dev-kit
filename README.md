@@ -98,7 +98,7 @@ Per-CLI details (where the install lives, the subagent tool, known caveats): [`h
 - **Review depth by risk.** `dk:pre-pr-check` picks self-review, one reviewer or four (standards, spec, security, tests) from the size and kind of the diff.
 - **Machine-checked reports.** [`scripts/check_report.py`](scripts/check_report.py) rejects a report until a "certain" finding sits in the changed code, is not a generic missing-test remark, and cites only rules that exist.
 - **Personal, never pushed.** Everything dev-kit writes (config, specs, plans, reports, your project standards) lives in `.dev-kit/`, which ignores itself in git; dev-kit never edits `.gitignore`, `CLAUDE.md`, `AGENTS.md` or any other tracked file.
-- **Layered standards.** Kit standards, a team folder you share however you like (`standards.team`), and your own project standards in `.dev-kit/standards/`; each reviewer gets only the topics of its role.
+- **Layered standards.** Kit standards, a shared folder (`standards.team`, set by hand for now; `dk:init` writes only to the repo), and your own project standards in `.dev-kit/standards/`; each reviewer gets only the topics of its role.
 - **Optional graph tools.** With [codegraph](https://github.com/colbymchenry/codegraph) and code-review-graph indexes, controllers locate code, measure blast radius and run `detect-changes` before review.
 
 ## Evidence

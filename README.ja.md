@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.4.2 review=machine -->
+<!-- i18n: source=README.md source_commit=v1.4.3 review=machine -->
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [README.md](README.md)
@@ -101,7 +101,7 @@ CLI ごとの詳細（インストール先、subagent ツール、既知の注�
 - **リスクに応じたレビューの深さ。** `dk:pre-pr-check` は、diff の大きさと種類から、self-review、レビュアー 1 人、または 4 人（standards、spec、セキュリティ、テスト）のいずれかを選びます。
 - **機械でチェックするレポート。** [`scripts/check_report.py`](scripts/check_report.py) は、"certain" の finding が変更されたコード内にあり、一般的な「テスト不足」の指摘ではなく、存在する rule だけを引用するまで、レポートを受け付けません。
 - **個人用で、push されない。** dev-kit が書くもの（config、specs、plans、reports、あなたのプロジェクトの standards）はすべて `.dev-kit/` に置かれ、このフォルダは git から自分自身を無視します。dev-kit は `.gitignore`、`CLAUDE.md`、`AGENTS.md` など、追跡されているファイルを一切編集しません。
-- **階層化された standards。** kit の standards、好きな方法で共有できるチーム用フォルダ（`standards.team`）、`.dev-kit/standards/` にあなた自身のプロジェクトの standards。各レビュアーは自分の役割に合うトピックだけを受け取ります。
+- **階層化された standards。** kit の standards、共有フォルダ（`standards.team`。現時点では手動で設定し、`dk:init` はリポジトリにだけ書き込みます）、`.dev-kit/standards/` にあなた自身のプロジェクトの standards。各レビュアーは自分の役割に合うトピックだけを受け取ります。
 - **グラフツール（任意）。** [codegraph](https://github.com/colbymchenry/codegraph) と code-review-graph のインデックスがあれば、controller はコードを探し、blast radius を測り、レビュー前に `detect-changes` を実行します。
 
 ## 測定したこと
