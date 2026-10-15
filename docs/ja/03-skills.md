@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.3 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.4 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -34,9 +34,9 @@
 1. **グラフツール:** `scripts/install-graph-tools.sh --check` で確認する。*質問は、足りないものがあるときだけ:* インストールするか。断られた場合は「G1 off」で続行する。`codegraph install` と `code-review-graph install` は決して実行しない（MCP、hook、指示ファイルを登録するため）。
 2. **個人設定:** 以前のリポジトリでチームの standards フォルダが保存されていれば、`~/.dev-kit/config.yml` から読み込む。
 3. **調査のみ、質問なし:** コマンド、ベースブランチ、スタック、linter がすでに強制しているもの、すでに `.dev-kit/` の下で追跡されているファイル、プロジェクト自身の `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
-4. *質問:* **コマンドとベースブランチ**（確認または修正）。そのあと `*` を含む `.gitignore` を置いた `.dev-kit/` を作成し、`config.yml` を書く。
-5. *質問:* **グラフのインデックス**（既定は yes。大きなリポジトリで想定されるサイズ: 約 3,000 ファイルあたり、およそ 150 MB と 600 MB）。インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、`.git/info/exclude` に追加する。
-6. **Baseline:** テストとビルドを一度実行する。*質問は red のときだけ:* **停止**（先に直す）か、**既知の baseline として受け入れる**か。受け入れた場合は `.dev-kit/baseline.md` に書かれ、以後は、そのリストの**外**のテストが失敗したときだけ実行が失敗となる（rule B1）。テストが**実行できなかった**場合（パッケージの復元、認証、不足しているサービスなど）は、その旨を伝え、停止するか、`config.yml` で baseline を `not-measured` にしたまま続行するかを尋ねる。環境が整ったら `dk:init baseline` を再実行する。
+4. *質問:* **コマンドとベースブランチ**（確認または修正）。ベースブランチは `origin/HEAD` だけでなく、最近の PR がマージされているブランチと照らし合わせる。両者が違う場合は、コミット日とコミット数の差を添えて選択肢として尋ねる。そのあと `*` を含む `.gitignore` を置いた `.dev-kit/` を作成し、`config.yml` を書く。
+5. *質問:* **グラフのインデックス**（既定は yes。想定サイズはインデックス対象 1 ファイルあたり約 0.16 MB と 0.6 MB。約 850 ファイルで 136 MB と 529 MB を実測）。インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、リポジトリの exclude ファイル（`git rev-parse --git-path info/exclude`。すべての worktree で共有）に追加する。`.dev-kit/` は決して追加しない。
+6. **Baseline:** テストとビルドを一度実行し、出力を `.dev-kit/baseline-test.log` と `.dev-kit/baseline-build.log` に保存する（テストを二度実行しないため）。*質問は red のときだけ:* **停止**（先に直す）か、**既知の baseline として受け入れる**か。受け入れた場合は `.dev-kit/baseline.md` に書かれ、以後は、そのリストの**外**のテストが失敗したときだけ実行が失敗となる（rule B1）。テストが**実行できなかった**場合（パッケージの復元、認証、不足しているサービスなど）は、その旨を伝え、停止するか、`config.yml` で baseline を `not-measured` にしたまま続行するかを尋ねる。環境が整ったら `dk:init baseline` を再実行する。
 7. **2 つのパスに分けた standards**（下記）。
 8. *質問:* **`CONSTRAINTS.md`**（任意、既定は no）→ `.dev-kit/CONSTRAINTS.md`。プロジェクトに独自のものがある場合はスキップする。質問では、このファイルがあなたのリポジトリに何を加えるかを説明する（下記）。
 9. **レポート** `.dev-kit/init-report.md`。そして `git status` が変わっていないことの確認。

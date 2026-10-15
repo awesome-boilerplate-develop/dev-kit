@@ -1,5 +1,15 @@
 # dev-kit changelog
 
+## 1.4.4 (2026-10-15)
+Fixes from running `dk:init` on 6 CLIs against one private repo (docs 06).
+- **Base branch:** `origin/HEAD` is compared with the branch recent pull requests merge into and the current upstream (last commit date, commits ahead); when they differ, step 4 asks a choice with that evidence. Three of six CLIs had picked a branch nobody merged into any more.
+- **Exclude file:** `git rev-parse --path-format=absolute --git-path info/exclude` (`.git` is a file in a worktree; the file is shared by every worktree). Index folders are added in step 5 itself, `.dev-kit/` never, no duplicates; the report claims an added line only with the command that added it. Rule O1 says the same.
+- **Index size:** estimated per indexed file (about 0.16 MB codegraph, 0.6 MB code-review-graph; measured 136 MB and 529 MB for ~850 files), replacing "150 MB and 600 MB per ~3,000 files", which was about 2× low.
+- **Baseline:** test and build output go to `.dev-kit/baseline-test.log` / `baseline-build.log`; counts and failing names come from those files, so the suite runs once; never a shared `/tmp`.
+- **Asking:** only the questions the steps name, no "shall I continue?"; a read-back is its own message and an unanswered one is never a "no" (Codex had lost pass 2 this way); the Recommended line is checked against its own text; a confirmed item keeps its ID; the confirmation says when a check depends on what a reviewer cannot see (PR description, CI, screenshots).
+- **Harness notes:** OpenCode (an auto-rejected `external_directory` ends the turn silently: deny `*` and allow the kit; loading without installing via `OPENCODE_CONFIG_DIR`/`OPENCODE_CONFIG_CONTENT`; `realpath` the skill link instead of searching the disk); Copilot (headless asks nothing; `--allow-all-tools` does not cover paths outside the working directory).
+- **Checked** on the same repo after the fix: Claude Code steps 1–6 and Codex pass 2 (docs 06).
+
 ## 1.4.3 (2026-10-15)
 - **No project-or-team question in `dk:init`:** dev-kit is set up one repo at a time, so everything kept goes to `.dev-kit/standards/`. `dk:init` no longer asks for or remembers a team folder (step 2 now says so); controllers still load `standards.team` when it is set by hand, and offering it in `dk:init` waits for multi-repo support. READMEs, docs 03 and docs 09 updated.
 - **Checked** on a real Angular repo: the architecture group and the confirmation of a user-added rule ran with no scope question.

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.3 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.4 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -34,9 +34,9 @@
 1. **Graph 工具：** 用 `scripts/install-graph-tools.sh --check` 检查。*仅在缺失时提问：* 是否安装？如果你拒绝，则继续，并写 “G1 off”。它绝不运行 `codegraph install` 或 `code-review-graph install`（这两个命令会注册 MCP、hook 和指令文件）。
 2. **个人设置：** 如果之前某个仓库在 `~/.dev-kit/config.yml` 中保存了团队 standards 文件夹，就读取它。
 3. **探查，不提问：** 命令、基础分支、技术栈、linter 已经强制执行的内容、`.dev-kit/` 下已被跟踪的文件、项目自己的 `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
-4. *提问：* **命令和基础分支**（确认或更正）。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
-5. *提问：* **graph 索引**（默认是；大型仓库的预期占用，每约 3,000 个文件大致 150 MB 和 600 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入 `.git/info/exclude`。
-6. **Baseline：** 运行一次测试和构建。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。如果测试**无法运行**（package restore、认证、缺少服务），它会说明这一点，并询问是停止，还是继续并在 `config.yml` 中将 baseline 标记为 `not-measured`；环境可用后重新运行 `dk:init baseline`。
+4. *提问：* **命令和基础分支**（确认或更正）。基础分支会与近期 PR 合并进去的分支对照，而不只看 `origin/HEAD`；两者不同时会作为选项提问，并附上提交日期和相差的提交数。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
+5. *提问：* **graph 索引**（默认是；预期占用约为每个被索引文件 0.16 MB 和 0.6 MB，实测约 850 个文件为 136 MB 和 529 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入仓库的 exclude 文件（`git rev-parse --git-path info/exclude`，所有 worktree 共用）；`.dev-kit/` 从不加入该文件。
+6. **Baseline：** 运行一次测试和构建，并把输出保存到 `.dev-kit/baseline-test.log` 和 `.dev-kit/baseline-build.log`，避免再跑一遍测试。*仅在红时提问：* **停止**（先修复）或**接受为已知 baseline**，写入 `.dev-kit/baseline.md`；此后只有在此列表**之外**的测试失败时，运行才算失败（rule B1）。如果测试**无法运行**（package restore、认证、缺少服务），它会说明这一点，并询问是停止，还是继续并在 `config.yml` 中将 baseline 标记为 `not-measured`；环境可用后重新运行 `dk:init baseline`。
 7. **分两遍的 standards**（见下）。
 8. *提问：* **`CONSTRAINTS.md`**（可选，默认否）→ `.dev-kit/CONSTRAINTS.md`。如果项目自带，则跳过。该问题会说明这个文件能为你的仓库增加什么（见下文）。
 9. **报告** `.dev-kit/init-report.md`，并检查 `git status` 没有变化。

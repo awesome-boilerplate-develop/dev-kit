@@ -1,6 +1,6 @@
 {
   "name": "dk",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "dev-kit: 4 kanban-card controllers (story-runner, bug-fixer, code-refactor, pre-pr-check) + init, merged from Superpowers, Matt Pocock's skills and agent-skills; every rule backed by lab evidence.",
   "license": "MIT",
   "repository": "https://github.com/awesome-boilerplate-develop/dev-kit",

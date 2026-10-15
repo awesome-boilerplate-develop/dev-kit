@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.4.3 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.4.4 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -222,6 +222,33 @@ Một lần chạy `dk:init standards` trên repo B (worktree mới, `.dev-kit/`
 - **Lượt 2:** 5 câu hỏi: severity, các kiểm tra chỉ dành cho review, Do not flag (cờ compiler, `.editorconfig`, Sonar trong CI), 1 lượt của vòng lặp, 1 lần đọc lại. Các mục được đặt dưới `## Review`, `## Do not flag` và `## Severity` của cùng hai file dự án; `git status` không đổi.
 - **Chi phí:** 0.60 USD cho 15 lượt (lượt 1 + lượt 2 + câu hỏi `CONSTRAINTS.md`).
 - **Sai lệch, đã sửa ở 1.4.0 và chạy lại ở lượt 2:** "default" kết thúc các vòng lặp (giờ chỉ "no" hoặc "skip" mới kết thúc; chạy lại: vòng lặp hỏi lại sau "default"); các kiểm tra chỉ dành cho review nhắc lại rule của lượt 1, ví dụ key dịch và giá trị environment (giờ đã loại ra; chạy lại: agent bỏ chúng và nói lý do); một rule về vị trí đặt code mà code lân cận đã cho thấy lại được khuyến nghị (giờ không đưa vào Recommended, chưa chạy lại).
+
+### `dk:init` trên 6 CLI, một repo private (dev-kit 1.4.3, sửa ở 1.4.4)
+
+Mỗi CLI chạy một lần trên một worktree mới của một micro-frontend Angular private (~850 file được index, baseline đỏ 303 test). Tin nhắn đầu là `dk:init` kèm "hỏi và trả lời bằng tiếng Việt"; agent điều phối đóng vai người dùng theo kịch bản cố định (default, thêm một quy ước và một kiểm tra riêng, trả "không" để kết thúc vòng lặp). Agent tự kiểm, chưa có người xác nhận.
+
+| CLI | Model | Lượt | Thời gian | Chi phí | Kết quả |
+|---|---|---|---|---|---|
+| Claude Code 2.1.299 | Sonnet 5.5 | 22 | ~13 phút | 1,15 USD | đủ |
+| Codex 0.162.1 | model mặc định của tài khoản (`gpt-6-luna`) | 22 | ~31 phút | chỉ báo token | không ghi lượt 2 |
+| Copilot CLI 1.0.89 | Auto | 22 | ~33 phút | 10,56 AIC | đủ (chạy tương tác; headless không hỏi gì) |
+| Antigravity 1.3.5 | không báo | 22 | ~22 phút | chỉ báo token | đủ |
+| OpenCode 1.18.35 | một model miễn phí | 20 | ~27 phút | 0 | đủ, sau 4 lần khởi động hỏng |
+| omp 18.11.0 | Sonnet 5.5 qua Copilot | 22 | ~14,5 phút | ~1,51 USD | đủ |
+
+- Cả 6 CLI đều hỏi bằng tiếng Việt và `git status` không đổi.
+- **Cùng repo, kết quả khác nhau:** từ 3 đến 7 file standards của repo, từ 11 đến 34 dòng mục.
+- **Các lệch tìm thấy:**
+  - 3 CLI lấy base branch theo `origin/HEAD` (nhánh cập nhật lần cuối từ hai tháng trước), trong khi các PR gần đây merge vào một nhánh khác đi trước 1.181 commit;
+  - đường dẫn `.git/info/exclude` hỏng trong worktree; hai CLI báo đã thêm exclude mà không có lệnh ghi; `.dev-kit/` bị thêm dù `.gitignore` riêng của nó đã ẩn nó;
+  - dung lượng index bị ước thấp khoảng 2 lần theo con số cũ "mỗi 3.000 file" (đo được 136 MB và 529 MB cho ~850 file);
+  - hai CLI chạy bộ test hai lần để lấy tên test lỗi;
+  - Codex coi câu đọc lại chưa được trả lời là bị từ chối và mất lượt 2;
+  - hai câu hỏi trong một tin; dòng Recommended thiếu mục mà chính nội dung đã đề xuất; ID mục đã xác nhận bị đổi khi ghi; một kiểm tra phụ thuộc mô tả PR được xác nhận mà không nói reviewer chỉ thấy diff.
+- **Đã sửa ở 1.4.4 và chạy lại** (cùng repo, worktree mới, mỗi bên 1 lần):
+  - Claude Code, bước 1–6: base branch được hỏi thành lựa chọn kèm ngày, số commit và bằng chứng merge, đề xuất đúng nhánh; `.codegraph/` được thêm vào file exclude ngay ở bước 5 (`git status` sạch, không có dòng `.dev-kit/`); output test và build ghi vào `.dev-kit/baseline-*.log`, bộ test chạy một lần; không còn câu xin phép giữa các bước sau lần sửa thứ hai (lần chạy lại đầu hỏi "chạy luôn nhé?" trước baseline và hoãn dòng exclude sang bước 9); dòng Recommended tiếp theo khớp nội dung. Ước tính dung lượng đếm cả 1.455 file trong `src/` (230 MB và 870 MB), vẫn cao hơn thực tế.
+  - Codex, `dk:init standards review` từ trạng thái lượt 1 của lần chạy trước: câu đọc lại là một tin riêng, agent chờ, và sau "ok" thì ghi checklist review (`## Review`, `## Do not flag`, `## Severity`).
+- Chưa chạy lại để kiểm việc giữ ID mục và cảnh báo về mô tả PR.
 
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 

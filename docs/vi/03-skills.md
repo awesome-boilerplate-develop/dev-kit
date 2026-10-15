@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.3 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.4 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -34,9 +34,9 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 1. **Công cụ graph:** kiểm tra bằng `scripts/install-graph-tools.sh --check`. *Chỉ hỏi nếu thiếu một công cụ:* có cài không? Nếu bạn từ chối, nó tiếp tục với "G1 off". Nó không bao giờ chạy `codegraph install` hay `code-review-graph install` (hai lệnh đó đăng ký MCP, hook và các file hướng dẫn).
 2. **Thiết lập cá nhân:** đọc `~/.dev-kit/config.yml` nếu một repo trước đó đã lưu ở đó thư mục tiêu chuẩn của team.
 3. **Probe, không hỏi:** lệnh, base branch, stack, những gì linter đã ép buộc, các file đã được theo dõi trong `.dev-kit/`, `GLOSSARY.md` của chính dự án, `docs/adr/`, `CONSTRAINTS.md`.
-4. *Câu hỏi:* **lệnh và base branch** (xác nhận hoặc sửa). Sau đó nó tạo `.dev-kit/` cùng một `.gitignore` chứa `*` và ghi `config.yml`.
-5. *Câu hỏi:* **index graph** (mặc định có; dung lượng dự kiến với repo lớn, khoảng 150 MB và 600 MB cho mỗi ~3,000 file). Các thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện) được đưa vào `.git/info/exclude`.
-6. **Baseline:** chạy test và build một lần. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1). Nếu test **không chạy được** (package restore, xác thực, thiếu một service), nó nói rõ và hỏi dừng hay tiếp tục với baseline được đánh dấu `not-measured` trong `config.yml`; chạy lại `dk:init baseline` khi môi trường đã hoạt động.
+4. *Câu hỏi:* **lệnh và base branch** (xác nhận hoặc sửa). Base branch được đối chiếu với nhánh mà các PR gần đây merge vào, không chỉ dựa vào `origin/HEAD`; nếu hai nhánh khác nhau thì được hỏi thành lựa chọn, kèm ngày commit và số commit chênh lệch. Sau đó nó tạo `.dev-kit/` cùng một `.gitignore` chứa `*` và ghi `config.yml`.
+5. *Câu hỏi:* **index graph** (mặc định có; dung lượng dự kiến khoảng 0,16 MB và 0,6 MB cho mỗi file được index, đo được 136 MB và 529 MB với ~850 file). Các thư mục index vẫn hiện trong `git status` (codegraph giữ `.gitignore` riêng của nó ở trạng thái hiện) được đưa vào file exclude của repo (`git rev-parse --git-path info/exclude`, dùng chung cho mọi worktree); không bao giờ thêm `.dev-kit/` vào đó.
+6. **Baseline:** chạy test và build một lần, lưu output vào `.dev-kit/baseline-test.log` và `.dev-kit/baseline-build.log` để không phải chạy lại bộ test. *Chỉ hỏi nếu đỏ:* **dừng** (sửa trước) hoặc **chấp nhận làm baseline đã biết**, ghi vào `.dev-kit/baseline.md`; từ đó một lần chạy chỉ thất bại khi có test **ngoài** danh sách đó lỗi (rule B1). Nếu test **không chạy được** (package restore, xác thực, thiếu một service), nó nói rõ và hỏi dừng hay tiếp tục với baseline được đánh dấu `not-measured` trong `config.yml`; chạy lại `dk:init baseline` khi môi trường đã hoạt động.
 7. **Tiêu chuẩn theo hai lượt** (bên dưới).
 8. *Câu hỏi:* **`CONSTRAINTS.md`** (tùy chọn, mặc định là không) → `.dev-kit/CONSTRAINTS.md`. Bỏ qua khi dự án đã có file riêng. Câu hỏi giải thích file này bổ sung gì cho repo của bạn (bên dưới).
 9. **Báo cáo** `.dev-kit/init-report.md`, và kiểm tra `git status` không đổi.

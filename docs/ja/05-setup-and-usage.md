@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.3 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.4.4 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)

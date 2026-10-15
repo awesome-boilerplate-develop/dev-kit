@@ -220,6 +220,33 @@ One run of `dk:init standards` on repo B (fresh worktree, `.dev-kit/` from an ea
 - **Cost:** 0.60 USD for 15 turns (pass 1 + pass 2 + the `CONSTRAINTS.md` question).
 - **Deviations, fixed in 1.4.0 and rerun on pass 2:** "default" ended the loops (now only "no" or "skip" does; rerun: the loop asked again after "default"); review-only checks restated pass-1 rules, for example translation keys and environment values (now excluded; rerun: the agent left them out and said why); a placement rule that neighbouring code already shows was recommended (now kept out of Recommended, not rerun).
 
+### `dk:init` on 6 CLIs, one private repo (dev-kit 1.4.3, fixes in 1.4.4)
+
+One run per CLI on a fresh worktree of a private Angular micro-frontend (~850 indexed files, red baseline of 303 tests). The first message was `dk:init` with "ask and answer in Vietnamese"; the parent agent played the user with a fixed script (defaults, one own convention and one own check, "no" to end loops). Agent-checked, not confirmed by a human.
+
+| CLI | Model | Turns | Time | Cost | Outcome |
+|---|---|---|---|---|---|
+| Claude Code 2.1.299 | Sonnet 5.5 | 22 | ~13 min | 1.15 USD | complete |
+| Codex 0.162.1 | the account's default (`gpt-6-luna`) | 22 | ~31 min | tokens only | pass 2 not written |
+| Copilot CLI 1.0.89 | Auto | 22 | ~33 min | 10.56 AIC | complete (interactive; headless asks nothing) |
+| Antigravity 1.3.5 | not reported | 22 | ~22 min | tokens only | complete |
+| OpenCode 1.18.35 | a free hosted model | 20 | ~27 min | 0 | complete after 4 failed starts |
+| omp 18.11.0 | Sonnet 5.5 via Copilot | 22 | ~14.5 min | ~1.51 USD | complete |
+
+- Every question was in Vietnamese on all six; `git status` was unchanged on all six.
+- **Same repo, different results:** 3 to 7 repo standards files, 11 to 34 item lines.
+- **Deviations found:**
+  - the base branch was taken from `origin/HEAD` (a branch last updated two months earlier) on 3 CLIs, while recent pull requests merge into another branch 1,181 commits ahead;
+  - `.git/info/exclude` is a file path that fails in a worktree; two CLIs reported exclude lines they never wrote; `.dev-kit/` was added although its own `.gitignore` hides it;
+  - index sizes were underestimated about 2× from the old "per 3,000 files" figure (measured 136 MB and 529 MB for ~850 files);
+  - two CLIs ran the test suite twice to get failing names;
+  - Codex treated an unanswered read-back as declined and lost pass 2;
+  - two questions in one message; a Recommended line that left out items its own text recommended; confirmed item IDs renumbered when written; a user check that depends on the PR description confirmed without saying the reviewer only sees the diff.
+- **Fixed in 1.4.4 and rerun** (same repo, fresh worktree, 1 run each):
+  - Claude Code, steps 1–6: the base branch was asked as a choice with dates, commit counts and the merge evidence, proposing the right branch; `.codegraph/` went to the exclude file in step 5 (`git status` clean, no `.dev-kit/` line); test and build output went to `.dev-kit/baseline-*.log` and the suite ran once; no permission questions between steps after a second fix (the first rerun asked "run it now?" before the baseline and deferred the exclude line to step 9); the next Recommended line matched its text. The size estimate counted all 1,455 files under `src/` (230 MB and 870 MB), still an overestimate.
+  - Codex, `dk:init standards review` from the earlier run's pass-1 state: the read-back was its own message, the agent waited, and after "ok" wrote the review checklist (`## Review`, `## Do not flag`, `## Severity`).
+- Item-ID stability and the PR-description warning were not rerun.
+
 
 ## 6.4 Findings that went into the design
 
