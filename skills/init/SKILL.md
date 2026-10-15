@@ -51,10 +51,13 @@ Prepare, never run controller logic. Re-running only checks and fills gaps; neve
 
 Rules are written only for what the agent **cannot know by itself** or has been seen to get wrong (principle 0, `docs/en/09-init-and-standards.md`). Never ask about naming or style: the agent reads it from neighbouring code, and the linter checks the rest.
 
-**Probe first, no questions.** Use the graph and the files to find what the code cannot tell a newcomer:
-- what the linter and compiler already enforce (reviewers must not report it again);
-- the structure: layers and folders with file counts, how data is reached (`codegraph callers` on the HTTP client or data layer), the module system, what the repo exposes to others (public API, federated remotes, events), where config and environment values live, where permission keys come from, how personal or medical data is handled;
-- in-house libraries: internal-scope packages in `package.json` (old and new versions), how many files import each, template tag prefixes against framework controls (`mat-*` and similar), which one recent files use, and the component list from the package's `public-api.d.ts` / `index.d.ts`.
+**Probe first, no questions, graph first.** When step 5 built the indexes (`graph.codegraph` / `graph.crg` true), find the structure with the graph before reading files (rule G1, `${CLAUDE_PLUGIN_ROOT}/rules/graph-playbook.md`); grep and file reads are for what the graph cannot answer. Run once, in this order:
+1. Freshness: `codegraph sync` and `code-review-graph update -q`.
+2. **Areas of the code:** `code-review-graph architecture --detail-level minimal`: the communities (name, size) and warnings are the starting list for the architecture group.
+3. **Central pieces, by topic:** `codegraph explore "<topic>" --max-files 5` for each of: how the backend is called (HTTP or data access), permission or role checks, configuration and environment values, shared base classes or helpers, personal or medical data. Its "Blast radius" lines give symbols with caller counts (for example "`<permission key map>` — 93 callers"): use those counts as evidence. Follow one symbol with `codegraph callers <symbol>` or `codegraph node <symbol>`; these work on symbols defined in the repo, not on framework classes (`codegraph callers HttpClient` finds nothing).
+4. **Then files and grep, only for what the graph does not hold:** what the linter and compiler already enforce (their configs; reviewers must not report it again); in-house libraries: internal-scope packages in `package.json` (old and new versions), how many files import each, template tag prefixes against framework controls (`mat-*` and similar), which one recent files use, and the component list from the package's `public-api.d.ts` / `index.d.ts`; what the repo exposes to others (public API, federated remotes, events) when the graph did not show it.
+
+Without indexes, do steps 2–4 with files and grep. In `init-report.md`, list the graph commands you ran.
 
 **How each question looks.** One **group** per question, like a brainstorm: one question per message, multiple choice where possible, wait for the answer.
 - **The list in detail:** every item with its ID, what it asks of the code, why, and where this repo hits it (a count or a file from a command you ran). Mark each kit file `validated` or `experimental`. A claim such as "X replaces Y" needs usage evidence (recent files use X, or X is used more than Y); otherwise it becomes a choice (`A: shared/services` / `B: services`).

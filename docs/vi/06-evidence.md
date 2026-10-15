@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.4.9 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.4.10 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -258,6 +258,22 @@ Controller có dùng những gì `dk:init` đã ghi không? Một lần chạy v
 - **Rule của repo bắt được một vấn đề thật:** nhánh viết cứng hai chuỗi quyền trong một file model thay vì lấy từ file key quyền tập trung; báo cáo xếp nó vào tầng chắc chắn, mức major (độ tin cậy 90), trích `architecture/structure#A4`, rule mà `dk:init` đã soạn từ probe. Một phát hiện chắc chắn khác trích `ui/in-house-components#I2` của repo (thiếu key dịch). Rule `#A5` và `#D1` của repo được trích ở tầng nghi vấn, cho code mà chính agent ghi là nằm ngoài diff (R1 quy định phát hiện như vậy phải bỏ, không liệt kê).
 - **Rule của kit** mang 4 blocker (`security/web#S2`, `#S3`, `#S4`, `coding/review-basics#C1`); verdict NO-GO.
 - `check_report.py --base <base>` báo OK (agent điều phối chạy lại); `git status` không đổi; khoảng 19,5 phút.
+
+### Probe ưu tiên graph trong `dk:init` (dev-kit 1.4.10)
+
+Bước dò của phần standards có dùng các index graph mà nó dựng không? Trước đây thì không: trên agy, các lần chạy `dk:init` trong ngày chỉ gọi 0–1 lệnh truy vấn graph mỗi lần, so với 2–20 lệnh grep/find, và lệnh duy nhất skill nêu tên, `codegraph callers HttpClient`, không tìm thấy gì (class của framework không có trong graph). Bản 1.4.10 nêu lệnh graph cụ thể cho từng mục dò. So sánh A/B trên cùng bản clone, agy 1.3.5 (Gemini 3.8 Flash), `dk:init standards` headless, index và baseline đã có sẵn; agent tự kiểm, chưa có người xác nhận:
+
+| Lần | Skill | Thời gian (s) | Token | Lệnh graph | grep/find | File / mục |
+|---|---|---|---|---|---|---|
+| A1 | 1.4.9 | 360 | 280.446 | 0 | 12 | 4 / 12 |
+| A2 | 1.4.9 | 507 | 348.517 | 0 | 17 | 6 / 22 |
+| B1 | 1.4.10 | 385 | 255.961 | 6 | 10 | 6 / 19 |
+| B3 | 1.4.10 | 354 | 298.904 | 8 | 9 | 6 / 19 |
+
+- Lần B thứ ba (B2) dừng sau câu hỏi đầu: agent viết câu hỏi dạng chữ thay vì dùng công cụ chọn, nên agy headless không có gì để tự bỏ qua. Không tính; đây là biến động của chế độ headless, không phải tác động của graph.
+- **Graph được dùng:** các lần B gọi `code-review-graph architecture`, `codegraph explore` cho cách gọi backend, phân quyền, cấu hình, class nền dùng chung và dữ liệu bệnh nhân, và `codegraph callers RbacService`; grep/find giảm khoảng một phần ba; cả hai lần đều liệt kê lệnh graph trong `init-report.md`.
+- **Tốc độ và chi phí:** B trung bình 370 s và 277 nghìn token, so với A 434 s và 314 nghìn; với 2 lần mỗi bên và A dao động từ 360 đến 507 s, kết luận là "không chậm hơn", chưa phải đã đo được là nhanh hơn.
+- **Rule:** hai bên ra phần lớn cùng các sự thật; B có thêm chi tiết chỉ graph mới thấy, như các service theo bệnh nhân kế thừa một service nền dùng chung. Cả bốn lần đều qua `check_standards.py`.
 
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 

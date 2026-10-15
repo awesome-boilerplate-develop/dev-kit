@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.4.10 (2026-10-15)
+- **`dk:init` probes with the graph first:** when step 5 built the indexes, the standards probe runs `codegraph sync` and `code-review-graph update -q`, then `code-review-graph architecture --detail-level minimal` for the areas of the code, then `codegraph explore "<topic>" --max-files 5` for backend calls, permission checks, configuration, shared base classes and personal data, using the caller counts it returns as evidence, and `codegraph callers`/`node` on symbols defined in the repo. grep and file reads cover only what the graph does not hold (linter configs, package imports, template tags). The graph commands run are listed in `init-report.md`.
+- **Removed a dead example:** the skill named `codegraph callers` on the HTTP client; `codegraph callers HttpClient` finds nothing, because framework classes are not in the graph.
+- **Measured** (A/B on one private repo, agy, headless `dk:init standards`, 2 complete runs a side, docs 06): graph queries 0 → 6–8, grep/find down about a third; 370 s and 277k tokens against 434 s and 314k, which is "not slower" given A's spread (360–507 s); B added details only the graph showed. One extra B run stopped after its first question (a headless-mode variation) and is not counted.
+
 ## 1.4.9 (2026-10-15)
 - **IDs follow the topic letter, and `check_standards.py` enforces it:** `## Design`/`## Implement` IDs are the topic's letter and a number (`A` architecture, `C` coding, `T` testing, `S` security, `U` ui including in-house component libraries, `P` api, `D` data, `O` ops, `R` process or review); a Review line that defines its own item uses `V` or the topic's letter. The agent decides an item's topic file when it first shows it. A date convention is coding, not data. The "own prefix for in-house libraries" allowance is gone. The kit's own standards already follow this.
 - **Placement examples:** environment, pipeline, deployment and dependency files go to `ops/`, translation files to `ui/`, exposed module contracts to `architecture/`.

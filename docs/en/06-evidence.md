@@ -256,6 +256,22 @@ Does a controller use what `dk:init` wrote? One run with agy 1.3.5 (Gemini 3.8 F
 - **Kit rules** carried the 4 blockers (`security/web#S2`, `#S3`, `#S4`, `coding/review-basics#C1`); verdict NO-GO.
 - `check_report.py --base <base>` printed OK (rerun by the parent); `git status` unchanged; ~19.5 minutes.
 
+### Graph-first probe in `dk:init` (dev-kit 1.4.10)
+
+Did the standards probe use the graph indexes it builds? Not before: on agy, the `dk:init` runs of the day issued 0–1 graph queries each against 2–20 grep/find commands, and the one command the skill named, `codegraph callers HttpClient`, finds nothing (framework classes are not in the graph). 1.4.10 names graph commands for each probe item. A/B on the same clone, agy 1.3.5 (Gemini 3.8 Flash), headless `dk:init standards`, indexes and baseline already built; agent-checked, not confirmed by a human:
+
+| Run | Skill | Time (s) | Tokens | Graph queries | grep/find | Files / items |
+|---|---|---|---|---|---|---|
+| A1 | 1.4.9 | 360 | 280,446 | 0 | 12 | 4 / 12 |
+| A2 | 1.4.9 | 507 | 348,517 | 0 | 17 | 6 / 22 |
+| B1 | 1.4.10 | 385 | 255,961 | 6 | 10 | 6 / 19 |
+| B3 | 1.4.10 | 354 | 298,904 | 8 | 9 | 6 / 19 |
+
+- A third B run (B2) stopped after the first question: the agent wrote it as text instead of using the choice tool, so headless agy had nothing to auto-skip. Not counted; a headless-mode variation, not a graph effect.
+- **Graph used:** B runs called `code-review-graph architecture`, `codegraph explore` on the backend calls, permissions, configuration, shared base classes and patient data, and `codegraph callers RbacService`; grep/find fell by about a third; both listed the graph commands in `init-report.md`.
+- **Speed and cost:** B averaged 370 s and 277k tokens against A's 434 s and 314k; with 2 runs a side and A varying from 360 to 507 s, this is "not slower", not a measured speed-up.
+- **Rules:** largely the same facts on both sides; B added details only the graph showed, such as patient-scoped services inheriting a shared base service. All four runs passed `check_standards.py`.
+
 
 ## 6.4 Findings that went into the design
 
