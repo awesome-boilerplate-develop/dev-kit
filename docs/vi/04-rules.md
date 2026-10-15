@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/04-rules.md source_commit=v1.4.4 review=human -->
+<!-- i18n: source=docs/en/04-rules.md source_commit=v1.4.5 review=human -->
 [English](../en/04-rules.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/04-rules.md).

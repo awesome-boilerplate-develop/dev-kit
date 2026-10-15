@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.4.5 (2026-10-15)
+- **Every `dk:init` question ends with choices plus Other:** at most 4 lettered choices, `A` being the recommended answer marked "(Recommended)" and spelled out in full, `B`–`D` real alternatives, and a last "Other: type your own answer" line; "default" or Enter means `A`. When the harness has a choice tool (Copilot `ask_user`, omp `ask`) the same choices go through it. No question ends with only "type default or a value".
+- **Checked** on a real Angular repo with Claude Code (headless, so the choices came as text): the commands/base-branch question, the graph-index question and the architecture group all ended with `A. (Recommended) …`, alternatives and `Other`. The choice-tool path was not exercised.
+
 ## 1.4.4 (2026-10-15)
 Fixes from running `dk:init` on 6 CLIs against one private repo (docs 06).
 - **Base branch:** `origin/HEAD` is compared with the branch recent pull requests merge into and the current upstream (last commit date, commits ahead); when they differ, step 4 asks a choice with that evidence. Three of six CLIs had picked a branch nobody merged into any more.

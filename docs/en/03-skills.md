@@ -21,7 +21,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 **Use when:** using dev-kit for the first time on a machine or a repo; to re-check the setup; or to re-run one part: `dk:init index` (for example in a new worktree), `dk:init baseline`, `dk:init standards [rules|review]`.
 
 **Principles:**
-- **Probe first, then ask one question at a time, in a fixed order.** Each question shows what the agent found, a default and short options; it waits for your answer before the next one. "default" and "skip" always work. It never asks what the code already answers.
+- **Probe first, then ask one question at a time, in a fixed order.** Each question shows what the agent found, then lettered choices: `A` is the recommended answer, marked "(Recommended)" and spelled out, `B`–`D` are real alternatives, and the last line is always "Other" for your own answer (through the CLI's choice tool when it has one, such as Copilot `ask_user` or omp `ask`). It waits for your answer before the next one. "default" and "skip" always work. It never asks what the code already answers.
 - A re-run only checks and fills in what is missing; it does not overwrite existing files.
 - Installing anything or changing anything outside the repo requires asking first.
 - `.dev-kit/` is personal: nothing it creates is committed, and it never edits a tracked file such as `.gitignore`.

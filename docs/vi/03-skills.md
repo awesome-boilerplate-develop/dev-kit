@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.4 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.5 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -24,7 +24,7 @@ Các ví dụ dưới đây là **minh họa, chưa chạy** trên repo của b�
 **Dùng khi:** dùng dev-kit lần đầu trên một máy hoặc một repo; để kiểm tra lại phần thiết lập; hoặc để chạy lại một phần: `dk:init index` (ví dụ trong một worktree mới), `dk:init baseline`, `dk:init standards [rules|review]`.
 
 **Nguyên tắc:**
-- **Probe trước, rồi hỏi từng câu một, theo thứ tự cố định.** Mỗi câu hỏi cho thấy những gì agent tìm thấy, một giá trị mặc định và vài lựa chọn ngắn; nó chờ câu trả lời của bạn rồi mới sang câu tiếp theo. "default" và "skip" luôn dùng được. Nó không bao giờ hỏi điều mà code đã trả lời.
+- **Probe trước, rồi hỏi từng câu một, theo thứ tự cố định.** Mỗi câu hỏi cho thấy những gì agent tìm thấy, rồi các lựa chọn đánh chữ: `A` là câu trả lời được khuyến nghị, ghi "(Recommended)" và viết đầy đủ nội dung, `B`–`D` là các phương án thật, dòng cuối luôn là "Other" để bạn tự gõ câu trả lời (qua công cụ chọn của CLI nếu có, như `ask_user` của Copilot hay `ask` của omp). Nó chờ câu trả lời của bạn rồi mới sang câu tiếp theo. "default" và "skip" luôn dùng được. Nó không bao giờ hỏi điều mà code đã trả lời.
 - Chạy lại chỉ kiểm tra và bổ sung phần còn thiếu; không ghi đè file đã có.
 - Cài bất cứ thứ gì hoặc đổi bất cứ thứ gì ngoài repo đều phải hỏi trước.
 - `.dev-kit/` là của riêng bạn: không thứ gì nó tạo ra bị commit, và nó không bao giờ sửa file đang được git theo dõi như `.gitignore`.
