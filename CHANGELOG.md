@@ -1,5 +1,11 @@
 # dev-kit changelog
 
+## 1.4.11 (2026-10-15)
+Fixes from an interactive `dk:init` run on omp against a React Native app.
+- **A choice form must be readable on its own:** the run's kit questions after the first two showed the agent's evaluation only as reasoning, and forms such as "Keep U2, turn off U1/U3/U4/U5" with no hint of what those IDs are. The skill now says: reasoning is not a reply (the list and evidence are written as a normal reply before every group, the last as much as the first); a choice that names item IDs says in a few words what each kept and each switched-off ID is, and the group's items go in the tool's question text too.
+- **Stack fit per item:** `security/web` is offered to any repo whose `applies_to` matches (`**/*`), so a React Native app got it. Each item now says whether it applies to the stack found in step 3, with the reason when it does not (server-side checks in a client app), and names the stack's equivalent of a platform term. In that run the agent judged S1–S3 not applicable and S5/S6 violated, so the file was useful; the name was the confusing part. The id `security/web` is kept (renaming it would break `standards.kit` in every initialized repo and the cited reports).
+- **Kit wording:** `security/web` S4 mentions "an app build" next to a web bundle, and S5 names unencrypted device storage such as `AsyncStorage` next to `localStorage`. No new requirement.
+
 ## 1.4.10 (2026-10-15)
 - **`dk:init` probes with the graph first:** when step 5 built the indexes, the standards probe runs `codegraph sync` and `code-review-graph update -q`, then `code-review-graph architecture --detail-level minimal` for the areas of the code, then `codegraph explore "<topic>" --max-files 5` for backend calls, permission checks, configuration, shared base classes and personal data, using the caller counts it returns as evidence, and `codegraph callers`/`node` on symbols defined in the repo. grep and file reads cover only what the graph does not hold (linter configs, package imports, template tags). The graph commands run are listed in `init-report.md`.
 - **Removed a dead example:** the skill named `codegraph callers` on the HTTP client; `codegraph callers HttpClient` finds nothing, because framework classes are not in the graph.

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.10 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=v1.4.11 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -43,7 +43,7 @@
 
 **分两遍的 standards**（设计：[09](../en/09-init-and-standards.md)，英文，9.6 节）。只为 agent 无法知道、或已被观察到会出错的内容写 rule；绝不涉及命名或风格。
 - **先探查：** linter 和编译器覆盖了什么；结构（层、数据如何获取、模块、对外暴露的契约、配置、权限 key），用 graph 查找；in-house 库（内部包、使用它们的文件数与使用框架控件的文件数对比、最近的文件用什么、它们的组件列表）。
-- **每个问题一组，像 brainstorm 一样：** 先详细列出该组的清单（每个条目：要求什么、为什么、这个仓库在哪里遇到、附 agent 运行过的命令得出的计数；kit 文件标明 `validated` 或 `experimental`），然后给出一行 **Recommended**，每一部分附一条理由。回答 “default” 即原样接受 Recommended，“skip” 什么都不采用，或者逐条回答。保留的内容都属于当前仓库；不再询问项目还是团队（目前一次只针对一个仓库）。像 “X 取代 Y” 这样没有使用证据的说法，会变成一个选择题。
+- **每个问题一组，像 brainstorm 一样：** 先详细列出该组的清单（每个条目：要求什么、为什么、这个仓库在哪里遇到、附 agent 运行过的命令得出的计数；每个条目说明是否适用于该技术栈，因为像 `security/web` 这样的 kit 文件是按 `applies_to` 提供的，与平台无关；kit 文件标明 `validated` 或 `experimental`），写成一条普通回复，而不是只出现在推理里；随后的选项会用几个字说明每个保留或关闭的条目是什么，只看表单就够选择；然后给出一行 **Recommended**，每一部分附一条理由。回答 “default” 即原样接受 Recommended，“skip” 什么都不采用，或者逐条回答。保留的内容都属于当前仓库；不再询问项目还是团队（目前一次只针对一个仓库）。像 “X 取代 Y” 这样没有使用证据的说法，会变成一个选择题。
 - **第 1 遍，写代码的 rule**（`## Design`/`## Implement`，供 story-runner、bug-fixer、code-refactor 使用）：
   1. **Architecture：** 探查结果就是 standards 清单（按原则 0，kit 中没有 architecture 文件）；相邻代码已经体现出来的内容不会被推荐；
   2. 每个含有适合该仓库的 Implement 条目的 kit 文件一组：`coding/review-basics`、`testing/basics`、`security/web`、`ui/forms-and-actions`；
