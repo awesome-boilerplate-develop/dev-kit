@@ -1,5 +1,13 @@
 # dev-kit changelog
 
+## 1.4.7 (2026-10-15)
+Fixes from an interactive `dk:init` run with agy (Gemini 3.8 Flash), driven through its real UI.
+- **The choice tool is only the last line of a question:** before calling it, the agent writes a message the user can read with the evidence, the group's list in detail, the drafted items of a read-back, the `CONSTRAINTS.md` explanation and the "how it fits this repo" part of a confirmation. In the run before the fix, every question was a bare form whose labels were the only information.
+- **"All items" is a choice, not a default:** recommended only when every item has repo evidence (before: every kit group recommended all items, including a server-side check in a front-end repo).
+- **Read-backs show what will be written:** every drafted repo item in full (ID, trigger, severity, file), kit files kept and items switched off; never "as above" without the list.
+- **Repo rule files** keep `status: experimental` and the `id` and item IDs shown in the read-back (before: `validated`, and a renamed file id).
+- **Checked** with an interactive rerun (19 questions, ~16 minutes): every form came after a message with the list and evidence; `security/web` recommended without S1 with the reason, and `config.yml` disabled `security/web#S1`; the read-back listed each file and item; the `CONSTRAINTS.md` question explained itself; a confirmation showed "66 files use luxon, 0 use moment"; files written as `experimental` with the read-back ids. The Write-in path was not exercised in the rerun.
+
 ## 1.4.6 (2026-10-15)
 - **Choice tools:** Antigravity's `ask_question` joins Copilot `ask_user` and omp `ask`. The "(Recommended)" choice goes first; "Other" is added only when the tool has no free-text line of its own (Antigravity adds "Write-in..."). A tool answer that comes back skipped or empty (headless runs auto-skip) means nobody can answer: take `A`, list it as an assumption, never ask again.
 - **Harness note (Antigravity):** questions use `ask_question`; interactive `agy -i` shows them as a numbered list with "Write-in..."; headless `agy -p` auto-skips them, so `dk:init` takes every default.
