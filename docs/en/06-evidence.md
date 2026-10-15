@@ -247,6 +247,15 @@ One run per CLI on a fresh worktree of a private Angular micro-frontend (~850 in
   - Codex, `dk:init standards review` from the earlier run's pass-1 state: the read-back was its own message, the agent waited, and after "ok" wrote the review checklist (`## Review`, `## Do not flag`, `## Severity`).
 - Item-ID stability and the PR-description warning were not rerun.
 
+### From `dk:init` to `dk:pre-pr-check` on the same repo (dev-kit 1.4.7)
+
+Does a controller use what `dk:init` wrote? One run with agy 1.3.5 (Gemini 3.8 Flash), headless, report-only, on a local clone of the private repo after an interactive `dk:init` (3 repo standards files, 5 kit files, `security/web#S1` off). The diff was a real unmerged feature branch, checked out detached (no commit made): 4 commits, 38 files, about 3,500 added lines. Agent-checked, not confirmed by a human.
+
+- **Loaded:** the report's Review setup listed the 5 kit files and the 3 repo files; depth four (patient data and config, rule C2); `detect-changes` ran (risk 0.55).
+- **A repo rule caught a real problem:** the branch hard-codes two permission strings in a model file instead of the central permission-key file; the report raised it as a certain major (confidence 90) citing `architecture/structure#A4`, the rule `dk:init` had drafted from the probe. Another certain finding cited the repo's `ui/in-house-components#I2` (translation keys missing). Repo rules `#A5` and `#D1` were cited in the suspect tier, for code the agent itself marked as outside the diff (R1 says such findings are dropped, not listed).
+- **Kit rules** carried the 4 blockers (`security/web#S2`, `#S3`, `#S4`, `coding/review-basics#C1`); verdict NO-GO.
+- `check_report.py --base <base>` printed OK (rerun by the parent); `git status` unchanged; ~19.5 minutes.
+
 
 ## 6.4 Findings that went into the design
 

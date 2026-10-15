@@ -250,6 +250,15 @@ Mỗi CLI chạy một lần trên một worktree mới của một micro-fronte
   - Codex, `dk:init standards review` từ trạng thái lượt 1 của lần chạy trước: câu đọc lại là một tin riêng, agent chờ, và sau "ok" thì ghi checklist review (`## Review`, `## Do not flag`, `## Severity`).
 - Chưa chạy lại để kiểm việc giữ ID mục và cảnh báo về mô tả PR.
 
+### Từ `dk:init` đến `dk:pre-pr-check` trên cùng một repo (dev-kit 1.4.7)
+
+Controller có dùng những gì `dk:init` đã ghi không? Một lần chạy với agy 1.3.5 (Gemini 3.8 Flash), headless, chế độ chỉ báo cáo, trên bản clone local của repo private, sau một lần `dk:init` tương tác (3 file standards của repo, 5 file kit, tắt `security/web#S1`). Diff là một nhánh feature thật chưa merge, checkout detached (không tạo commit): 4 commit, 38 file, khoảng 3.500 dòng thêm. Agent tự kiểm, chưa có người xác nhận.
+
+- **Đã nạp:** mục Review setup của báo cáo liệt kê 5 file kit và 3 file của repo; mức review bốn reviewer (dữ liệu bệnh nhân và config, rule C2); `detect-changes` đã chạy (risk 0,55).
+- **Rule của repo bắt được một vấn đề thật:** nhánh viết cứng hai chuỗi quyền trong một file model thay vì lấy từ file key quyền tập trung; báo cáo xếp nó vào tầng chắc chắn, mức major (độ tin cậy 90), trích `architecture/structure#A4`, rule mà `dk:init` đã soạn từ probe. Một phát hiện chắc chắn khác trích `ui/in-house-components#I2` của repo (thiếu key dịch). Rule `#A5` và `#D1` của repo được trích ở tầng nghi vấn, cho code mà chính agent ghi là nằm ngoài diff (R1 quy định phát hiện như vậy phải bỏ, không liệt kê).
+- **Rule của kit** mang 4 blocker (`security/web#S2`, `#S3`, `#S4`, `coding/review-basics#C1`); verdict NO-GO.
+- `check_report.py --base <base>` báo OK (agent điều phối chạy lại); `git status` không đổi; khoảng 19,5 phút.
+
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 
 | Phát hiện | Thay đổi trong dev-kit |
