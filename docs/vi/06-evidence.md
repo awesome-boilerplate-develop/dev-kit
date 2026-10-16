@@ -289,6 +289,18 @@ Chạy lại với 1.4.11 trên omp (GPT-6.1 Sol), `dk:init standards` trên b�
 - **Còn lại:** nhãn kiểu "Giữ S4, S5, S6; tắt S1, S2, S3" vẫn chỉ nêu ID; ý nghĩa nằm ở phần câu hỏi và dòng mô tả.
 - Lần chạy đầu của đợt này mất vì script driver của mình (kiểm tra ổn định trên dòng trạng thái, rồi một từ khóa trùng với lựa chọn "dừng" ở baseline đỏ), không phải do kit.
 
+### Thiết lập nhanh và các mục không đưa ra trên omp (dev-kit 1.6.0)
+
+`dk:init` đầy đủ, chế độ tương tác, trên omp (GPT-6.1 Sol) với bản clone mới của cùng app React Native, chọn thiết lập nhanh, mọi câu khác chọn phương án Recommended; agent tự kiểm, một lần chạy.
+
+| | Chi tiết (1.4.11, chỉ phần tiêu chuẩn) | Nhanh (1.6.0, init đầy đủ) |
+|---|---|---|
+| Số câu hỏi | 8 câu cho phần tiêu chuẩn | 5 câu tổng cộng: lệnh, index, nhanh hay chi tiết, baseline đỏ, một lần đọc lại |
+| Thời gian | ~12 phút cho phần tiêu chuẩn | ~15 phút cho cả init |
+
+- **Lần đọc lại duy nhất** liệt kê từng file kit kèm các mục được giữ và bằng chứng (C1–C5, S4–S6, U1–U3, U5), các mục bị tắt kèm lý do (T1–T4 vì không có test runner, U4 vì không có luồng ghi danh sách), S1–S3 là không đưa ra (không có handler server, không có UI kiểm quyền theo role, không có chỗ injection, kèm ghi chú rằng tìm không thấy không chứng minh repo an toàn), và ba kiểm tra chỉ dành cho review sẽ được ghi.
+- **Đã ghi sau khi chọn "ghi tất cả":** 3 file của repo trong `ops/` và `ui/`, `standards.disable` gồm S1–S3 và U4, `check_standards.py` OK, `init-report.md` ghi rõ dùng thiết lập nhanh và các dòng Recommended đã lấy, không tạo `CONSTRAINTS.md`, `git status` không đổi.
+
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 
 | Phát hiện | Thay đổi trong dev-kit |

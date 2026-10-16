@@ -286,6 +286,18 @@ Rerun with 1.4.11 on omp (GPT-6.1 Sol), `dk:init standards` on a fresh clone of 
 - **Left:** option labels such as "Keep S4, S5, S6; off S1, S2, S3" still name IDs only; the meaning is in the question text and the description.
 - The first attempt of the run was lost to my driver script (stability check on a status line, then a keyword that matched the "stop" choice at a red baseline), not to the kit.
 
+### Quick setup and not-offered items on omp (dev-kit 1.6.0)
+
+Full interactive `dk:init` on omp (GPT-6.1 Sol) on a fresh clone of the same React Native app, choosing quick setup, every other answer the Recommended one; agent-checked, one run.
+
+| | Detailed (1.4.11, standards only) | Quick (1.6.0, full init) |
+|---|---|---|
+| Questions | 8 for the standards | 5 in total: commands, indexes, quick or detailed, red baseline, one read-back |
+| Time | ~12 min for the standards | ~15 min for the whole init |
+
+- **The one read-back** listed each kit file with its kept items and evidence (C1–C5, S4–S6, U1–U3, U5), the switched-off items with their reasons (T1–T4 with no test runner, U4 with no list-writing flow), S1–S3 as not offered (no server handler, no role-based UI check, no injection sink, adding that a search finding nothing does not prove the repo safe), and the three review-only checks to be written.
+- **Written after "write all":** 3 repo files under `ops/` and `ui/`, `standards.disable` with S1–S3 and U4, `check_standards.py` OK, `init-report.md` naming quick setup and the Recommended lines taken, no `CONSTRAINTS.md`, `git status` unchanged.
+
 
 ## 6.4 Findings that went into the design
 
