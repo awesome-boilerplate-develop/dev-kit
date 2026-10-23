@@ -98,7 +98,7 @@ The lab measured 17 SWE Django tasks (Haiku): with and without an index both sol
 Use skill dk:init for this repo.
 ```
 
-The agent probes the repo first, then asks one question at a time, in order: commands and base branch, graph indexes, quick or detailed setup (quick takes the Recommended lines and asks once at the end), the baseline (only if it is red), the standards in two passes (rules for writing code, then the review checklist; each a list of groups and a loop for your own conventions), and the optional `CONSTRAINTS.md`. Each question shows its evidence and a Recommended line; reply "default", "skip" or your answer. It creates `.dev-kit/` (ignored by git, nothing to commit). To redo one part later: `dk:init index`, `dk:init baseline`, `dk:init standards [rules|review]`.
+The agent probes the repo first, then asks one question at a time, in order: commands and base branch, graph indexes, quick or detailed setup (quick takes the Recommended lines and asks once at the end, with a checklist where the Recommended items are already ticked and you add or remove), the baseline (only if it is red), the standards in two passes (rules for writing code, then the review checklist; each a list of groups and a loop for your own conventions), and the optional `CONSTRAINTS.md`. Each question shows its evidence and a Recommended line; reply "default", "skip" or your answer. It creates `.dev-kit/` (ignored by git, nothing to commit). To redo one part later: `dk:init index`, `dk:init baseline`, `dk:init standards [rules|review]`.
 
 **Starting `dk:init` on each CLI** (dev-kit 1.4.x, runs of 2026-10-15 on one private repo; add "answer in Vietnamese" or your language to the first message if you want):
 

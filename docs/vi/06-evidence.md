@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.6.0 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.7.0 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -300,6 +300,18 @@ Chạy lại với 1.4.11 trên omp (GPT-6.1 Sol), `dk:init standards` trên b�
 
 - **Lần đọc lại duy nhất** liệt kê từng file kit kèm các mục được giữ và bằng chứng (C1–C5, S4–S6, U1–U3, U5), các mục bị tắt kèm lý do (T1–T4 vì không có test runner, U4 vì không có luồng ghi danh sách), S1–S3 là không đưa ra (không có handler server, không có UI kiểm quyền theo role, không có chỗ injection, kèm ghi chú rằng tìm không thấy không chứng minh repo an toàn), và ba kiểm tra chỉ dành cho review sẽ được ghi.
 - **Đã ghi sau khi chọn "ghi tất cả":** 3 file của repo trong `ops/` và `ui/`, `standards.disable` gồm S1–S3 và U4, `check_standards.py` OK, `init-report.md` ghi rõ dùng thiết lập nhanh và các dòng Recommended đã lấy, không tạo `CONSTRAINTS.md`, `git status` không đổi.
+### Checklist tick sẵn và form tick trên omp (dev-kit 1.7.0)
+
+Hai lần chạy `dk:init standards` tương tác trên omp (Opus 5.5) với bản clone React Native đã xóa phần tiêu chuẩn, SKILL 1.7.0 chép đè lên bản 1.6.0 đã cài; agent tự kiểm, các lựa chọn do script driver bấm.
+
+| | Lần 1: ghi như đã tick (`A`) | Lần 2: đổi tick bằng form (`B`) |
+|---|---|---|
+| Số câu hỏi | 2 (nhanh hay chi tiết, đọc lại) | 7 (nhanh hay chi tiết, đọc lại, 4 form, xác nhận) |
+| Thời gian | ~7 phút | ~12 phút |
+| Kết quả | 4 file kit, tắt S1–S3 và U4 | như lần 1, thêm C5 tắt, `init-report.md` ghi là do người dùng đổi |
+
+- **Form:** nhãn ghi trạng thái bằng chữ (`bật · C1 …`, `tắt · S1 …`), mục giữ nguyên nằm cuối và được chọn sẵn làm Recommended; omp tick bằng `␣` và gửi bằng `⏎`.
+- **Chỗ hụt, đã sửa trong skill:** lần 1 gom S1–S3 vào ghi chú "không đưa ra" thay vì dòng `☐`; một dòng Do-not-flag được tick nhưng chưa có file khiến agent tự tạo `coding/baseline.md` sau khi đã duyệt. Sau khi đổi tick, agent nêu thay đổi ngay trong câu hỏi ("C5 đã tắt") thay vì hiện lại checklist; skill giờ chỉ yêu cầu hiện lại các dòng đã đổi.
 
 ## 6.4 Những phát hiện đã đưa vào thiết kế
 

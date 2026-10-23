@@ -298,6 +298,18 @@ Full interactive `dk:init` on omp (GPT-6.1 Sol) on a fresh clone of the same Rea
 - **The one read-back** listed each kit file with its kept items and evidence (C1–C5, S4–S6, U1–U3, U5), the switched-off items with their reasons (T1–T4 with no test runner, U4 with no list-writing flow), S1–S3 as not offered (no server handler, no role-based UI check, no injection sink, adding that a search finding nothing does not prove the repo safe), and the three review-only checks to be written.
 - **Written after "write all":** 3 repo files under `ops/` and `ui/`, `standards.disable` with S1–S3 and U4, `check_standards.py` OK, `init-report.md` naming quick setup and the Recommended lines taken, no `CONSTRAINTS.md`, `git status` unchanged.
 
+### Pre-ticked checklist and tick forms on omp (dev-kit 1.7.0)
+
+Two interactive `dk:init standards` runs on omp (Opus 5.5) on the React Native clone with its standards removed, the 1.7.0 skill copied over the installed 1.6.0; agent-checked, choices made by a driver script.
+
+| | Run 1: write as ticked (`A`) | Run 2: change ticks with forms (`B`) |
+|---|---|---|
+| Questions | 2 (quick or detailed, read-back) | 7 (quick or detailed, read-back, 4 forms, confirm) |
+| Time | ~7 min | ~12 min |
+| Result | 4 kit files, S1–S3 and U4 off | the same plus C5 off, named in `init-report.md` as changed by the user |
+
+- **Forms:** labels carried the state as a word (`bật · C1 …`, `tắt · S1 …`), the keep option came last and was pre-selected as Recommended; omp ticks with `␣` and submits with `⏎`.
+- **Gaps, fixed in the skill:** run 1 put S1–S3 in a not-offered note rather than `☐` lines; a ticked Do-not-flag line with no file made the agent create `coding/baseline.md` after the approval. After the change the agent named it in the question ("C5 đã tắt") instead of showing the checklist again; the skill now asks for the changed lines only.
 
 ## 6.4 Findings that went into the design
 
