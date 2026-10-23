@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/README.md source_commit=v1.7.0 review=machine -->
+<!-- i18n: source=docs/en/README.md source_commit=v1.7.1 review=machine -->
 [English](../en/README.md) | [Tiếng Việt](../vi/README.md) | 简体中文 | [日本語](../ja/README.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[README.md](../en/README.md)。
