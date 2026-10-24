@@ -11,7 +11,8 @@ Run from inside a repo: if the repo has .code-review-graph/, the Graph line must
 "detect-changes failed: <error>"); it must not say "no .code-review-graph/ index" (rule G1).
 A "certain" finding that cites no rule (an id that really exists in the kit/team/project standards, or a specific place in a spec; R1–R7 do not count)
 and is about a missing test or only points at a test file: Do not flag (R1) → move to suspect; keep it only if it clearly says the existing test is wrong.
-A rule id cited in the certain tier must exist in a standards file (rule T1, R7); an id that is not found FAILs.
+A rule id cited in the certain tier must exist in a standards file (rule T1, R7), and `file#ID` must name an item of that file; an id that is not found FAILs.
+The Certain findings, Suspect findings and Commands run sections must be present (an empty table is fine); every finding has a confidence 0–100.
 A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
@@ -32,19 +33,21 @@ root = pathlib.Path(subprocess.run(["git", "rev-parse", "--show-toplevel"], capt
 
 
 def standard_ids():
-    """Ids in the frontmatter of kit standards (dev-kit/standards), project standards (.dev-kit/standards) and team standards (standards.team)."""
+    """Ids in the frontmatter of kit standards (dev-kit/standards), project standards (.dev-kit/standards) and team standards (standards.team),
+    each with the item IDs its lines define ("- C1 When …")."""
     dirs = [pathlib.Path(__file__).resolve().parent.parent / "standards", root / ".dev-kit" / "standards"]
     cfg = root / ".dev-kit" / "config.yml"
     if cfg.is_file():
         m = re.search(r"^\s+team:\s*[\"']?([^\"'#\n]*?)[\"']?\s*(#.*)?$", cfg.read_text(encoding="utf-8"), re.M)
         if m and m.group(1).strip():
             dirs.append(root / os.path.expanduser(m.group(1).strip()))
-    ids = set()
+    ids = {}
     for d in dirs:
         for f in d.rglob("*.md") if d.is_dir() else []:
-            m = re.search(r"^id:\s*(\S+)", f.read_text(encoding="utf-8", errors="ignore"), re.M)
+            body = f.read_text(encoding="utf-8", errors="ignore")
+            m = re.search(r"^id:\s*(\S+)", body, re.M)
             if m:
-                ids.add(m.group(1))
+                ids.setdefault(m.group(1), set()).update(re.findall(r"^- ([A-Z]{1,3}\d+) ", body, re.M))
     return ids
 
 
@@ -97,6 +100,9 @@ else:
             problems.append(f"Review setup Diff {diff_line.group(1)}...{diff_line.group(2)} does not match the repo now "
                             f"({now[0][:12]}...{now[1][:12]}): review the current diff and update the report")
 
+for title in ("Certain findings", "Suspect findings", "Commands run"):
+    if not re.search(rf"^###? {title}", text, re.M):
+        problems.append(f"missing section '{title}' (keep the heading; an empty table is fine)")
 certain = rows(section("Certain findings"))
 suspect = rows(section("Suspect findings (do not block)") or section("Suspect findings"))
 test_gap = re.compile(r"\b(untested|no tests?|missing tests?|not tested|test coverage|thiếu test|chưa có test)\b", re.I)
@@ -116,20 +122,26 @@ for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
             problems.append(f"certain finding Status is not fixed / open / pushed back: {c}")
         if not any(ln for _, ln in re.findall(LOC, c[2] if len(c) > 2 else "")):
             problems.append(f"{tier} finding without a file:line location (rule R1): {c}")
+        v = conf(c)
+        if v is None:
+            problems.append(f"{tier} finding without confidence: {c}")
+        elif v > 100:
+            problems.append(f"{tier} finding with confidence {v} > 100: {c}")
 
 for c in certain:
     v = conf(c)
-    if v is None:
-        problems.append(f"certain finding without confidence: {c[2] if len(c) > 2 else c}")
-    elif v < 80:
+    if v is not None and v < 80:
         problems.append(f"certain finding with confidence {v} < 80 (move to suspect): {c[2]}")
     # "Has a rule" = a real standards id (T1) other than finding-quality, or a specific place in a spec; R1–R7 are conditions for raising a finding.
     rule = c[4] if len(c) > 4 else ""
     tokens = [t.strip("`'\"") for t in re.split(r"[\s,;()]+", rule)]
-    cited = [m.group(1) for t in tokens if (m := re.fullmatch(r"([\w-]+/[\w-]+)(?:#[\w-]+)?", t))]
-    for x in cited:
+    refs = [m.groups() for t in tokens if (m := re.fullmatch(r"([\w-]+/[\w-]+)(?:#([\w-]+))?", t))]
+    cited = [x for x, _ in refs]
+    for x, item in refs:
         if x not in known_ids:
             problems.append(f"rule id '{x}' not found in kit/team/project standards (rules T1, R7): {c[2]}")
+        elif item and item not in known_ids[x]:
+            problems.append(f"rule '{x}#{item}': {x} has no item {item} (rules T1, R7): {c[2]}")
     valid = [x for x in cited if x in known_ids and x != "review/finding-quality"]
     no_rule = not valid and not re.search(r"specs?/|\bspec\b.*(§|#|\d)", rule, re.I)
     files = [f for f, _ in re.findall(LOC, c[2] if len(c) > 2 else "")]

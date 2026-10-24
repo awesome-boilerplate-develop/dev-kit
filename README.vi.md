@@ -1,4 +1,4 @@
-<!-- i18n: source=README.md source_commit=v1.7.4 review=human -->
+<!-- i18n: source=README.md source_commit=v1.7.5 review=human -->
 [English](README.md) | Tiếng Việt | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([README.md](README.md)) là bản chuẩn.

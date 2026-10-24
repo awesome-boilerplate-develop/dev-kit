@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.7.4 review=human -->
+<!-- i18n: source=docs/en/06-evidence.md source_commit=v1.7.5 review=human -->
 [English](../en/06-evidence.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/06-evidence.md).
@@ -345,12 +345,14 @@ Hai lần chạy `dk:init standards` tương tác trên omp (Opus 5.5) với b�
 ## 6.5 Giới hạn của phép đo
 
 - **Ít lần lặp:** phần lớn tổ hợp chạy 1–3 lần. Chênh 1 bài chưa đủ để kết luận; chỉ dùng các chênh lệch lớn và lặp lại.
-- **Model:** chủ yếu Haiku 5.5. Sonnet 5.5 mới thử trên 5 bài SWE và 1 repo thật; Opus chưa thử ❓.
+- **Model:** chủ yếu Haiku 5.5. Sonnet 5.5: 5 bài SWE và các backtest trên repo thật. Opus 5.5: các thẻ pre-PR và backtest của 1.7.4, và `dk:init` trên omp; Fable 5.1: chỉ các thẻ pre-PR của 1.7.4. Ngoài Haiku và Sonnet, mỗi tổ hợp chạy một lần ❓.
 - **Không có người:**
   - Lab chạy headless: mọi câu hỏi và cổng duyệt đều được quyết định tự động.
   - Phần "hỏi đúng câu" của `grilling` và giá trị của cổng duyệt chưa được đo.
 - **Việc trong một phiên:** chưa có việc kéo dài nhiều phiên, và chưa thử khôi phục sau khi context bị nén.
-- **Repo:** app mẫu, Django, và một repo thật (Node monorepo, chạy trên bản copy).
+- **Repo:** app mẫu, Django, và các repo private chạy trên bản copy (một Node monorepo, một app Angular dùng cho backtest, một app React Native).
+- **Chấm bằng model:** báo cáo pre-PR và backtest do Sonnet 5.5 chấm; độ chính xác của tầng certain do agent kiểm, không phải người, và chỉ trên 0.8.4 (5/9; 2/6 khi bỏ các mục thiếu test), chưa đo lại trên bản hiện tại ❓.
+- **CI kiểm cấu trúc, không kiểm hành vi:** CI kiểm reference, file standards, version, bản dịch và test của chính report checker. Controller có chọn đúng độ sâu review, giữ đúng baseline hay đi hết luồng không thì chỉ được kiểm bằng các lần chạy lab và backtest, không phải ở mỗi thay đổi. "Verified" trong [harness/README.md](../../harness/README.md) nghĩa là kit load được và các bước chạy được trên CLI đó, không phải chất lượng đã đo.
 
 ## 6.6 Lịch sử chi tiết
 

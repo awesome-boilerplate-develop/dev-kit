@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.7.5 (2026-10-24)
+- **`check_report.py` closes four gaps** found by an external review, each reproduced as passing on 1.7.4: a report with no findings or Commands run section (a missing section counted as an empty table), a cited `file#ID` whose item does not exist (only the file id was checked), a suspect finding without a confidence, and a confidence above 100. The three sections must now be present (an empty table is fine), a cited item must be defined in its standards file, and every finding needs a confidence 0–100.
+- **Checked** against the 37 reports of the 1.7.4 lab and backtest runs (all four models, 29 `file#ID` citations): 36 still pass; the one that fails is the story-card report written by an agent that skipped `dk:pre-pr-check`, which really lacks the sections. `scripts/test_check_report.py`: 16 tests, 4 of them fail on 1.7.4.
+- **Evidence limits (6.5)** updated: which models ran where (Opus and Fable were tried in 1.7.4), the private repos used, grading by a model with certain-tier precision measured only on 0.8.4, and CI checking structure, not controller behavior.
+
 ## 1.7.4 (2026-10-24)
 - **`check_report.py` requires a location:** every finding, certain or suspect, must give `file:line` (rule R1: located). A finding with no file at all skipped the `--base` check, and one with a file but no line passed it whenever the file was in the diff.
 - **`check_report.py` reads a blocker's state from its Status cell only:** a blocker counted as fixed when "fixed" appeared anywhere in its row, so a Status of `unfixed` or a finding about a "fixed-size buffer" let a GO verdict pass.

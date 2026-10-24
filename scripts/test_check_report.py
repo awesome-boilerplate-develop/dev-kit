@@ -10,7 +10,12 @@ SCRIPT = pathlib.Path(__file__).resolve().parent / "check_report.py"
 
 
 def report(certain="", suspect="", verdict="GO", diff=""):
-    return f"""## Review setup (required)
+    return f"""## Commands run
+| Command | Result |
+|---|---|
+| make check | pass |
+
+## Review setup (required)
 {diff}
 - Depth: one — reason: small diff: 1 file, 3 lines
 - Graph: no .code-review-graph/ index
@@ -48,6 +53,27 @@ class CheckReport(unittest.TestCase):
     def test_file_without_extension_is_located(self):
         r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))
         self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_report_without_finding_sections_fails(self):
+        r = self.check(report().split("### Certain findings")[0])
+        self.assertIn("missing section 'Certain findings'", r.stdout)
+        self.assertIn("missing section 'Suspect findings'", r.stdout)
+
+    def test_unknown_item_of_a_real_standard_fails(self):
+        r = self.check(report("| major | 90 | src/pay.ts:12 | total is negative | coding/review-basics#C99 | open |"))
+        self.assertIn("coding/review-basics has no item C99", r.stdout)
+
+    def test_known_item_of_a_real_standard_passes(self):
+        r = self.check(report("| major | 90 | src/pay.ts:12 | error swallowed | coding/review-basics#C1 | open |"))
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_suspect_without_confidence_fails(self):
+        r = self.check(report(suspect="| minor | high | src/pay.ts:12 | x | — |"))
+        self.assertIn("suspect finding without confidence", r.stdout)
+
+    def test_confidence_above_100_fails(self):
+        r = self.check(report("| major | 999 | src/pay.ts:12 | x | — | open |"))
+        self.assertIn("confidence 999 > 100", r.stdout)
 
     def test_finding_without_any_file_fails(self):
         r = self.check(report(suspect="| major | 60 | payment logic | rounding differs | — |"))

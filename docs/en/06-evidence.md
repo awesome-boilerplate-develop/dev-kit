@@ -343,12 +343,14 @@ Two interactive `dk:init standards` runs on omp (Opus 5.5) on the React Native c
 ## 6.5 Limits of the measurement
 
 - **Few repetitions:** most combinations ran 1–3 times. A difference of 1 task is not enough to conclude; only large, repeated differences are used.
-- **Model:** mostly Haiku 5.5. Sonnet 5.5 was only tried on 5 SWE tasks and 1 real repo; Opus not tried ❓.
+- **Model:** mostly Haiku 5.5. Sonnet 5.5: 5 SWE tasks and the real-repo backtests. Opus 5.5: the 1.7.4 pre-PR cards and backtest, and `dk:init` on omp; Fable 5.1: the 1.7.4 pre-PR cards only. Outside Haiku and Sonnet, one run per combination ❓.
 - **No human:**
   - The lab runs headless: every question and approval gate is decided automatically.
   - The "asks the right question" part of `grilling` and the value of the approval gate are not measured.
 - **Single-session work:** no work spanning several sessions, and no test of recovery after the context is compacted.
-- **Repos:** the sample app, Django, and one real repo (a Node monorepo, run on a copy).
+- **Repos:** the sample app, Django, and private repos run on copies (a Node monorepo, an Angular app used for the backtests, a React Native app).
+- **Grading by a model:** pre-PR reports and backtests are graded by Sonnet 5.5; the precision of the certain tier was checked by an agent, not a human, and only on 0.8.4 (5/9; 2/6 without the missing-test items), not on the current version ❓.
+- **CI checks structure, not behavior:** CI checks references, standards files, versions, translations and the report checker's own tests. Whether a controller picks the right review depth, keeps the baseline or finishes its flow is only checked by lab and backtest runs, not on every change. "Verified" in [harness/README.md](../../harness/README.md) means the kit loads and its steps run on that CLI, not measured quality.
 
 ## 6.6 Detailed history
 
