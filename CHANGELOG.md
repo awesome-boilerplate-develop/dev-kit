@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.7.3 (2026-10-24)
+- **Tick forms show what a tick does:** each item's label starts with a colored icon and a word for the action, `🔴 Remove · S4 …` for an item that is on and `🟢 Add · S1 …` for one that is off, instead of its state (`on · S4 …`), which read as the opposite next to an empty checkbox. The `Keep this group as shown` option comes after every item, or first where the choice tool asks for the recommended option first (agy's `ask_question` does).
+- **Checked** on agy 1.4.6 (Gemini 3.8 Flash), this skill copied over the installed 1.7.2, `dk:init standards` (quick, forms) on the Angular clone, choices made by a driver script: labels read `🔴 Bỏ · C1 …` for items that are on and `🟢 Thêm · S1 …` for the one that is off, aligned in agy's form; unticking C1 gave one line `☐ C1 … (coding/review-basics)` before the write question; `standards.disable` gained C1, `check_standards.py` OK, `git status` unchanged; 8 questions, ~9 min.
+
 ## 1.7.2 (2026-10-23)
 - **Quick setup, after the tick forms:** the lines whose mark changed are shown again in a reply, one checklist line each with its new mark and file (`☐ C5 … (coding/review-basics)`), only those lines; a rerun on omp (Opus 5.5) showed only the sentence "C5 goes from on to off" and repeated an unchanged item, and a run with a first wording of this fix put "☐ C5 tắt" in parentheses in the question text, next to unchanged items.
 - **Quick setup has one read-back:** a gap noticed after the approved checklist is noted in `init-report.md` for a detailed run, not asked as a new item; in the same rerun the agent asked for a new color check after writing. The rerun confirmed the 1.7.0/1.7.1 fixes: S1–S3 as their own `☐` lines, `file#ID` on repeated IDs in the checklist and the form labels, the file named on the new Do-not-flag line, `check_standards.py` OK.
