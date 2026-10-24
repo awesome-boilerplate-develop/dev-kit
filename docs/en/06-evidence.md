@@ -142,6 +142,24 @@ Run in a separate git worktree, no commit, no push. The repo is a private Angula
   - On the 16 older reports, those that passed before still pass. The Graph-line check caught one more skipped `detect-changes` (a repeat run of PR D, 0.8.5), so 2/16 reports had this defect.
   - **Reading the results:** the agent exploits every loophole in a rule written in words (writing `R1` in the Rule column); machine checks must rely on things that are hard to game (file location, rule id format), not on wording.
 
+**Same backtest on three models (dev-kit 1.7.4):** the 6 PRs with the 8 bugs, PR A and PR B with the corrected diff, report-only, codegraph and CRG indexes built, one run per model, graded by Sonnet as before. The base branch is a local branch, not `main`.
+
+| | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
+|---|---|---|---|
+| PR C (the clearest bug) | **caught** (suspect, 70) | partial | **caught** (certain, 88) |
+| PR A (sort / `SortString`) | missed | **caught** (suspect, 50) | **caught** (suspect, 70) |
+| PR B (double submit) | partial | missed | missed |
+| PR D (3 form UI bugs) | 1 partial | missed | missed |
+| The two other bugs | missed | 1 partial | missed |
+| **Caught / partial, of 8** | 1 / 2 | 1 / 2 | 2 / 0 |
+| Cost for the 6 PRs | 0.72 USD | 5.46 USD | 16.73 USD |
+| Report passes `check_report --base` (Diff line matches the repo) | 6/6 | 6/6 | 6/6 |
+
+- **No model is clearly better at catching bugs:** Opus caught one bug more than the others at about 23× the cost of Haiku, and one run per model is within the run-to-run spread already seen (PR C repeated with Sonnet: caught 3/4 on 0.8.2, 1/4 on 0.8.4–0.8.5, the other runs partial).
+- **The confidence threshold did not cost a verdict:** of the 4 bugs caught, 3 were suspect (50–70) and 1 certain (88), and all 4 were rated major or minor, not blocker. Lowering the certain threshold to 70 would not have turned any verdict into NO-GO; the bugs that are reported but do not block are held back by severity, not by confidence.
+- PR D's three form bugs and one of the other two were missed by every model in every version: they need runtime behavior, not the diff.
+- Verdicts: GO on 17 of 18 reports (Sonnet: NO-GO on PR B, for other findings).
+
 ### Project rule: in-house controls (dev-kit 0.8.7, rule T1)
 
 Card "dialog form" (input, select, textarea, toggle, button), `dk:story-runner`, Sonnet, 2 runs per side:
