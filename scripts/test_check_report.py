@@ -45,6 +45,10 @@ class CheckReport(unittest.TestCase):
         r = self.check(report("| blocker | 90 | src/pay.ts:12 | total is negative when qty is 0 | — | fixed |"))
         self.assertEqual(r.returncode, 0, r.stdout)
 
+    def test_file_without_extension_is_located(self):
+        r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))
+        self.assertEqual(r.returncode, 0, r.stdout)
+
     def test_finding_without_any_file_fails(self):
         r = self.check(report(suspect="| major | 60 | payment logic | rounding differs | — |"))
         self.assertIn("without a file:line location", r.stdout)

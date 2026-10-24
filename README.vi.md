@@ -7,7 +7,7 @@
 
 [![Release](https://img.shields.io/github/v/release/awesome-boilerplate-develop/dev-kit)](https://github.com/awesome-boilerplate-develop/dev-kit/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![docs](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml/badge.svg)](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml)
 
-Các skill cho agent làm việc với thẻ kanban: story, bug, refactor, và bước kiểm tra trước khi bạn mở PR. Mọi rule mà các skill tuân theo chỉ được giữ lại nếu nó giúp ích trong một lab có đo lường.
+Các skill cho agent làm việc với thẻ kanban: story, bug, refactor, và bước kiểm tra trước khi bạn mở PR. Mọi rule mà các skill tuân theo đều được liệt kê cùng bằng chứng đứng sau nó; rule nào không giúp ích trong lab thì bị tắt.
 
 Chạy với **Claude Code** (CLI tham chiếu), **Codex**, **GitHub Copilot CLI**, **Antigravity**, **OpenCode** và **omp**.
 
@@ -128,16 +128,16 @@ Chi tiết theo từng CLI (nơi cài đặt, công cụ subagent, các lưu ý 
 ## Cách hoạt động
 
 - **Controller mỏng.** Mỗi controller là một skill ngắn, làm việc trực tiếp trong session. Các playbook dài hơn mà nó mượn (TDD, debugging, planning, review…) nằm trong `parts/` và chỉ được đọc khi một bước cần đến, nên không tốn context lúc bắt đầu session.
-- **Rule có bằng chứng.** [`rules/RULES.md`](rules/RULES.md) liệt kê từng rule, trạng thái bật/tắt và kết quả lab đứng sau nó. Một rule chỉ được bật nếu nó giúp ích trên ít nhất 5 tác vụ chưa từng thấy.
+- **Rule có bằng chứng.** [`rules/RULES.md`](rules/RULES.md) liệt kê từng rule, trạng thái bật/tắt và bằng chứng đứng sau nó. Các rule về luồng làm việc (F1, F2, C1, C2) được đo trong lab; các rule về review và đầu ra (B1, R1, S1, T1, O1) lấy từ thực hành review đã công bố và các lần audit; G1 đo ra trung tính và được giữ vì rẻ. Một rule thử nghiệm chỉ được bật nếu nó giúp ích trên ít nhất 5 tác vụ mà nó không được viết ra từ đó.
 - **Độ sâu review theo rủi ro.** `dk:pre-pr-check` chọn self-review, một reviewer hoặc bốn (standards, spec, security, tests) tùy theo kích thước và loại của diff.
-- **Báo cáo được máy kiểm tra.** [`scripts/check_report.py`](scripts/check_report.py) từ chối một báo cáo cho đến khi mọi finding (certain hay suspect) nằm trong code đã đổi, finding certain không phải nhận xét chung chung kiểu thiếu test, và chỉ trích dẫn những rule có thật. [`scripts/check_standards.py`](scripts/check_standards.py) kiểm các file standards mà `dk:init` ghi ra.
+- **Báo cáo được máy kiểm tra.** [`scripts/check_report.py`](scripts/check_report.py) từ chối một báo cáo cho đến khi mọi finding (certain hay suspect) ghi `file:line` nằm trong code đã đổi, finding certain không phải nhận xét chung chung kiểu thiếu test, chỉ trích dẫn những rule có thật, và báo cáo ghi rõ khoảng commit đã review. [`scripts/check_standards.py`](scripts/check_standards.py) kiểm các file standards mà `dk:init` ghi ra.
 - **Của riêng bạn, không bao giờ push.** Mọi thứ dev-kit ghi (config, spec, plan, báo cáo, tiêu chuẩn project của bạn) nằm trong `.dev-kit/`, thư mục này tự bị git bỏ qua; dev-kit không bao giờ sửa `.gitignore`, `CLAUDE.md`, `AGENTS.md` hay bất kỳ file nào đang được git theo dõi.
 - **Tiêu chuẩn theo lớp.** Tiêu chuẩn của kit, một thư mục dùng chung (`standards.team`, hiện điền tay; `dk:init` chỉ ghi vào repo), và tiêu chuẩn project của riêng bạn trong `.dev-kit/standards/`; mỗi reviewer chỉ nhận các chủ đề thuộc vai trò của mình.
 - **Công cụ graph (tùy chọn).** Với các index của [codegraph](https://github.com/colbymchenry/codegraph) và code-review-graph, controller tìm code, đo blast radius và chạy `detect-changes` trước khi review.
 
 ## Evidence
 
-- **Lab** (234 lần chạy, Haiku 5.5, một ứng dụng mẫu và 13 tác vụ Django của SWE-bench Verified): chất lượng code ngang với để model tự làm, với chi phí khoảng 2×. Phần chi thêm dành cho lớp review và các artifact, không làm code đúng hơn.
+- **Lab** (265 lần chạy, chủ yếu Haiku 5.5, một ứng dụng mẫu và 13 tác vụ Django của SWE-bench Verified): chất lượng code ngang với để model tự làm, với chi phí khoảng 2×. Phần chi thêm dành cho lớp review và các artifact, không làm code đúng hơn.
 - **Backtest trên bug thật** (một repository Angular riêng tư, Sonnet 5.5): việc buộc tuân thủ các bước review đã tăng mức dùng `detect-changes` từ 2/6 lên 6/6 PR; việc bắt được bug thật vẫn dao động mạnh giữa các lần chạy.
 - **Rule của project cho control UI nội bộ** đã thay đổi những gì agent viết ra (6 và 10 tag nội bộ khi có rule, 18 và 16 tag Material khi không có): chiến thắng rõ nhất, vì đó là kiến thức agent không thể tự tìm ra.
 

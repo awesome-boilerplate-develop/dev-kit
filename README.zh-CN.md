@@ -7,7 +7,7 @@
 
 [![Release](https://img.shields.io/github/v/release/awesome-boilerplate-develop/dev-kit)](https://github.com/awesome-boilerplate-develop/dev-kit/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![docs](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml/badge.svg)](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml)
 
-用于处理 kanban 卡片的 agent skill：story、bug、重构，以及开 PR 之前的检查。这些 skill 遵循的每一条 rule，都只有在测量过的 lab 中确实有帮助时才被保留。
+用于处理 kanban 卡片的 agent skill：story、bug、重构，以及开 PR 之前的检查。这些 skill 遵循的每一条 rule 都列出了背后的证据；在 lab 中没有帮助的 rule 会被关闭。
 
 适用于 **Claude Code**（参考）、**Codex**、**GitHub Copilot CLI**、**Antigravity**、**OpenCode** 和 **omp**。
 
@@ -128,16 +128,16 @@ Codex、Antigravity 和 omp 的命令已在 2026-10-15 的每次发布中实际�
 ## 工作方式
 
 - **精简的 controller。** 每个 controller 都是一个简短的 skill，直接在当前 session 中工作。它借用的较长 playbook（TDD、调试、规划、review……）放在 `parts/` 中，只有当某个步骤需要时才会读取，因此在 session 开始时不占用上下文。
-- **有证据的 rule。** [`rules/RULES.md`](rules/RULES.md) 列出每条 rule、它是否开启，以及背后的 lab 结果。只有当一条 rule 在至少 5 个它没见过的任务上起到了帮助，才会被打开。
+- **有证据的 rule。** [`rules/RULES.md`](rules/RULES.md) 列出每条 rule、它是否开启，以及背后的证据。工作流 rule（F1、F2、C1、C2）在 lab 中测量过；review 和输出 rule（B1、R1、S1、T1、O1）来自公开的 review 实践和审查；G1 测得的效果中性，因为成本低而保留。实验性 rule 只有在至少 5 个不是它的来源的任务上起到帮助，才会被打开。
 - **按风险决定 review 深度。** `dk:pre-pr-check` 会根据 diff 的大小和类型，选择 self-review、一个 reviewer 或四个 reviewer（标准、spec、安全、测试）。
-- **机器检查的报告。** [`scripts/check_report.py`](scripts/check_report.py) 会拒绝一份报告，直到其中每个 finding（certain 或 suspect）都位于被修改的代码中、certain finding 不是泛泛的“缺少测试”之类的评语，并且只引用存在的 rule。[`scripts/check_standards.py`](scripts/check_standards.py) 检查 `dk:init` 写入的 standards 文件。
+- **机器检查的报告。** [`scripts/check_report.py`](scripts/check_report.py) 会拒绝一份报告，直到其中每个 finding（certain 或 suspect）都给出被修改代码中的 `file:line`、certain finding 不是泛泛的“缺少测试”之类的评语、只引用存在的 rule，并且报告写明所 review 的提交范围。[`scripts/check_standards.py`](scripts/check_standards.py) 检查 `dk:init` 写入的 standards 文件。
 - **个人使用，从不推送。** dev-kit 写入的所有内容（配置、specs、plans、reports、你的项目标准）都放在 `.dev-kit/` 中，它会在 git 中自我忽略；dev-kit 从不修改 `.gitignore`、`CLAUDE.md`、`AGENTS.md` 或任何其他被跟踪的文件。
 - **分层的标准。** kit 标准、一个共享文件夹（`standards.team`，目前需手动设置；`dk:init` 只写入当前仓库），以及位于 `.dev-kit/standards/` 的你自己的项目标准；每个 reviewer 只会收到与其角色相关的主题。
 - **可选的 graph 工具。** 有了 [codegraph](https://github.com/colbymchenry/codegraph) 和 code-review-graph 索引，controller 会用它们来查找代码、衡量 blast radius，并在 review 之前运行 `detect-changes`。
 
 ## 证据
 
-- **Lab**（234 次运行，Haiku 5.5，一个示例应用和 13 个 SWE-bench Verified 的 Django 任务）：代码质量与让模型单独工作相当，成本约为其 2×。额外的开销买到的是 review 层和 artifact，而不是更正确的代码。
+- **Lab**（265 次运行，主要是 Haiku 5.5，一个示例应用和 13 个 SWE-bench Verified 的 Django 任务）：代码质量与让模型单独工作相当，成本约为其 2×。额外的开销买到的是 review 层和 artifact，而不是更正确的代码。
 - **真实 bug 的 backtest**（一个私有 Angular 仓库，Sonnet 5.5）：强制执行 review 步骤后，`detect-changes` 的使用从 2/6 个 PR 提高到 6/6 个 PR；抓到真正 bug 的能力在不同运行之间仍然差异很大。
 - **内部 UI 控件的项目 rule** 改变了 agent 写出的内容（有这条 rule 时为 6 和 10 个内部标签，没有时为 18 和 16 个 Material 标签）：这是最明显的收益，因为这是 agent 自己无法找到的知识。
 

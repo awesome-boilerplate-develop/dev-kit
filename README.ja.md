@@ -7,7 +7,7 @@
 
 [![Release](https://img.shields.io/github/v/release/awesome-boilerplate-develop/dev-kit)](https://github.com/awesome-boilerplate-develop/dev-kit/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![docs](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml/badge.svg)](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml)
 
-かんばんカードの作業（ストーリー、バグ、リファクタリング、PR を開く前のチェック）のための agent skill セットです。skill が従う rule は、測定した lab で効果があったものだけを残しています。
+かんばんカードの作業（ストーリー、バグ、リファクタリング、PR を開く前のチェック）のための agent skill セットです。skill が従う各 rule には根拠を添えて一覧にしており、lab で効果がなかった rule は off にしています。
 
 **Claude Code**（リファレンス）、**Codex**、**GitHub Copilot CLI**、**Antigravity**、**OpenCode**、**omp** で動作します。
 
@@ -128,16 +128,16 @@ CLI ごとの詳細（インストール先、subagent ツール、既知の注�
 ## 仕組み
 
 - **薄い controller。** 各 controller は、セッション内で直接作業する短い skill です。controller が借りる長めの playbook（TDD、デバッグ、計画、レビューなど）は `parts/` にあり、ステップで必要になったときだけ読み込まれるため、セッション開始時にコンテキストを消費しません。
-- **根拠のある rule。** [`rules/RULES.md`](rules/RULES.md) に各 rule、その on/off の状態、根拠となる lab の結果を載せています。rule は、未知のタスク 5 件以上で効果があった場合にだけ on にします。
+- **根拠のある rule。** [`rules/RULES.md`](rules/RULES.md) に各 rule、その on/off の状態、根拠を載せています。ワークフローの rule（F1、F2、C1、C2）は lab で測定しました。レビューと出力の rule（B1、R1、S1、T1、O1）は公開されているレビューの実践と監査に基づいています。G1 は測定結果が中立でしたが、コストが低いため残しています。実験的な rule は、その rule の元になっていないタスク 5 件以上で効果があった場合にだけ on にします。
 - **リスクに応じたレビューの深さ。** `dk:pre-pr-check` は、diff の大きさと種類から、self-review、レビュアー 1 人、または 4 人（standards、spec、セキュリティ、テスト）のいずれかを選びます。
-- **機械でチェックするレポート。** [`scripts/check_report.py`](scripts/check_report.py) は、すべての finding（certain でも suspect でも）が変更されたコード内にあり、certain の finding が一般的な「テスト不足」の指摘ではなく、存在する rule だけを引用するまで、レポートを受け付けません。[`scripts/check_standards.py`](scripts/check_standards.py) は `dk:init` が書く standards ファイルを確認します。
+- **機械でチェックするレポート。** [`scripts/check_report.py`](scripts/check_report.py) は、すべての finding（certain でも suspect でも）が変更されたコード内の `file:line` を示し、certain の finding が一般的な「テスト不足」の指摘ではなく、存在する rule だけを引用し、レポートがレビューしたコミット範囲を記すまで、レポートを受け付けません。[`scripts/check_standards.py`](scripts/check_standards.py) は `dk:init` が書く standards ファイルを確認します。
 - **個人用で、push されない。** dev-kit が書くもの（config、specs、plans、reports、あなたのプロジェクトの standards）はすべて `.dev-kit/` に置かれ、このフォルダは git から自分自身を無視します。dev-kit は `.gitignore`、`CLAUDE.md`、`AGENTS.md` など、追跡されているファイルを一切編集しません。
 - **階層化された standards。** kit の standards、共有フォルダ（`standards.team`。現時点では手動で設定し、`dk:init` はリポジトリにだけ書き込みます）、`.dev-kit/standards/` にあなた自身のプロジェクトの standards。各レビュアーは自分の役割に合うトピックだけを受け取ります。
 - **グラフツール（任意）。** [codegraph](https://github.com/colbymchenry/codegraph) と code-review-graph のインデックスがあれば、controller はコードを探し、blast radius を測り、レビュー前に `detect-changes` を実行します。
 
 ## 測定したこと
 
-- **Lab**（234 回の実行、Haiku 5.5、サンプルアプリと SWE-bench Verified の Django タスク 13 件）: コード品質はモデルに単独で作業させた場合と同等で、コストは約 2 倍です。追加のコストはレビュー層と artifact に使われ、コードがより正しくなるわけではありません。
+- **Lab**（265 回の実行、主に Haiku 5.5、サンプルアプリと SWE-bench Verified の Django タスク 13 件）: コード品質はモデルに単独で作業させた場合と同等で、コストは約 2 倍です。追加のコストはレビュー層と artifact に使われ、コードがより正しくなるわけではありません。
 - **実際のバグに対する backtest**（非公開の Angular リポジトリ、Sonnet 5.5）: レビューのステップを強制すると、`detect-changes` の利用が 2/6 から 6/6 の PR に増えました。実際のバグを捕捉できるかは、実行ごとに大きくばらつきます。
 - **社内 UI コントロールのプロジェクト rule** がエージェントの書くコードを変えました（rule があると社内タグ 6 件と 10 件、rule がないと Material タグ 18 件と 16 件）: エージェントが自力では知り得ない知識なので、最も明確な成果です。
 

@@ -4,7 +4,7 @@ English | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | [�
 
 [![Release](https://img.shields.io/github/v/release/awesome-boilerplate-develop/dev-kit)](https://github.com/awesome-boilerplate-develop/dev-kit/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![docs](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml/badge.svg)](https://github.com/awesome-boilerplate-develop/dev-kit/actions/workflows/docs.yml)
 
-Agent skills for kanban-card work: stories, bugs, refactors, and a check before you open a PR. Every rule the skills follow was kept only if it helped in a measured lab.
+Agent skills for kanban-card work: stories, bugs, refactors, and a check before you open a PR. Every rule the skills follow is listed with the evidence behind it; rules that did not help in the lab are switched off.
 
 Works with **Claude Code** (reference), **Codex**, **GitHub Copilot CLI**, **Antigravity**, **OpenCode** and **omp**.
 
@@ -125,16 +125,16 @@ Per-CLI details (where the install lives, the subagent tool, known caveats): [`h
 ## How it works
 
 - **Thin controllers.** Each controller is a short skill that works directly in the session. The longer playbooks it borrows (TDD, debugging, planning, review…) live in `parts/` and are read only when a step needs them, so they cost no context at session start.
-- **Rules with evidence.** [`rules/RULES.md`](rules/RULES.md) lists every rule, whether it is on, and the lab result behind it. A rule is turned on only if it helped on at least five tasks it had not seen.
+- **Rules with evidence.** [`rules/RULES.md`](rules/RULES.md) lists every rule, whether it is on, and the evidence behind it. The workflow rules (F1, F2, C1, C2) were measured in the lab; the review and output rules (B1, R1, S1, T1, O1) come from published review practice and audits; G1 measured neutral and stays because it is cheap. An experimental rule is turned on only if it helps on at least five tasks it was not written from.
 - **Review depth by risk.** `dk:pre-pr-check` picks self-review, one reviewer or four (standards, spec, security, tests) from the size and kind of the diff.
-- **Machine-checked reports.** [`scripts/check_report.py`](scripts/check_report.py) rejects a report until every finding (certain or suspect) sits in the changed code, a certain one is not a generic missing-test remark, and it cites only rules that exist. [`scripts/check_standards.py`](scripts/check_standards.py) checks the standards files `dk:init` writes.
+- **Machine-checked reports.** [`scripts/check_report.py`](scripts/check_report.py) rejects a report until every finding (certain or suspect) gives a `file:line` in the changed code, a certain one is not a generic missing-test remark, it cites only rules that exist, and the report names the commit range it reviewed. [`scripts/check_standards.py`](scripts/check_standards.py) checks the standards files `dk:init` writes.
 - **Personal, never pushed.** Everything dev-kit writes (config, specs, plans, reports, your project standards) lives in `.dev-kit/`, which ignores itself in git; dev-kit never edits `.gitignore`, `CLAUDE.md`, `AGENTS.md` or any other tracked file.
 - **Layered standards.** Kit standards, a shared folder (`standards.team`, set by hand for now; `dk:init` writes only to the repo), and your own project standards in `.dev-kit/standards/`; each reviewer gets only the topics of its role.
 - **Optional graph tools.** With [codegraph](https://github.com/colbymchenry/codegraph) and code-review-graph indexes, controllers locate code, measure blast radius and run `detect-changes` before review.
 
 ## Evidence
 
-- **Lab** (234 runs, Haiku 5.5, a sample app and 13 SWE-bench Verified Django tasks): code quality on par with the model working alone, at about 2× the cost. The extra spend buys the review layer and the artifacts, not more correct code.
+- **Lab** (265 runs, mostly Haiku 5.5, a sample app and 13 SWE-bench Verified Django tasks): code quality on par with the model working alone, at about 2× the cost. The extra spend buys the review layer and the artifacts, not more correct code.
 - **Backtests on real bugs** (a private Angular repository, Sonnet 5.5): enforcing the review steps raised `detect-changes` use from 2/6 to 6/6 PRs; catching the actual bug still varies a lot between runs.
 - **A project rule for in-house UI controls** changed what the agent wrote (6 and 10 in-house tags with the rule, 18 and 16 Material tags without): the clearest win, because it is knowledge the agent cannot find by itself.
 

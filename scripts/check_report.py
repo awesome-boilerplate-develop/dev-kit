@@ -103,7 +103,7 @@ test_gap = re.compile(r"\b(untested|no tests?|missing tests?|not tested|test cov
 test_file = re.compile(r"[._](spec|test)s?\.\w+$|(^|/)(tests?|__tests__|spec)/|(^|/)test_[^/]+\.py$")
 broken_test = re.compile(r"\bpass(es|ed)?\s+(vacuously|even|regardless|always|when|without)|\bstill pass|\bvacuous|always (passes|green)"
                          r"|never fails|never asserts?|(does not|doesn't|do not) assert|asserts? nothing|accepts any", re.I)
-LOC = r"([\w./@-]+\.[A-Za-z]{1,5})(?::(\d+))?"
+LOC = r"([\w./@-]+\.[A-Za-z]{1,5}|[\w./@-]*[A-Za-z][\w./@-]*(?=:\d))(?::(\d+))?"  # path with an extension, or any path:line (Makefile:12)
 known_ids = standard_ids()
 
 for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):

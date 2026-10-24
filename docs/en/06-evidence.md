@@ -126,7 +126,7 @@ Run in a separate git worktree, no commit, no push. The repo is a private Angula
 
 | PR | Bug | 0.8.2 (wide diff) | 0.8.4 (wide diff) | 0.8.7 (correct diff) |
 |---|---|---|---|---|
-| PR A | A sort request sent UI column names in `SortString`, which the backend rejects | missed | missed | **caught**, at the suspect tier (score 70) |
+| PR A | A sort request sent UI column names in the sort parameter, which the backend rejects | missed | missed | **caught**, at the suspect tier (score 70) |
 | PR B | Double submit: pressing Submit several times while a request is in flight | partial | missed | missed |
 
 - **"Certain" tier (self-checked by an agent, not confirmed by a human):**
@@ -147,7 +147,7 @@ Run in a separate git worktree, no commit, no push. The repo is a private Angula
 | | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
 |---|---|---|---|
 | PR C (the clearest bug) | **caught** (suspect, 70) | partial | **caught** (certain, 88) |
-| PR A (sort / `SortString`) | missed | **caught** (suspect, 50) | **caught** (suspect, 70) |
+| PR A (sort) | missed | **caught** (suspect, 50) | **caught** (suspect, 70) |
 | PR B (double submit) | partial | missed | missed |
 | PR D (3 form UI bugs) | 1 partial | missed | missed |
 | The two other bugs | missed | 1 partial | missed |
@@ -195,7 +195,7 @@ Card "dialog form" (input, select, textarea, toggle, button), `dk:story-runner`,
 
 | | Claude Code (Sonnet 5.5) | Codex 0.160.1 (the account's default model) |
 |---|---|---|
-| Sort bug (`SortString`) | partial (4 earlier runs, 0.8.7–0.8.10: caught) | caught, at the suspect tier |
+| Sort bug | partial (4 earlier runs, 0.8.7–0.8.10: caught) | caught, at the suspect tier |
 | `detect-changes` | ran (risk 0.85, 17 test gaps) | ran (risk 0.85, 17 test gaps) |
 | Review depth | four reviewers | four reviewers: 4 `spawn_agent` calls with `fork_turns: "none"` (seen in the session rollout) |
 | `check_report` | passed | passed |
@@ -233,7 +233,7 @@ Fresh git worktrees of three private repositories, Claude Code with Sonnet 5.5, 
 One run of `dk:init standards` on repo B (fresh worktree, `.dev-kit/` from an earlier run with the standards removed), Claude Code with Sonnet 5.5, one answer per turn with `--resume`; mostly "default", one custom convention, "no" to end each loop. Single run, agent-checked, not confirmed by a human.
 
 - **Pass 1:** 9 questions: architecture (7 items from the probe, such as the federated module contract, the permission-key file and its key pattern, values in every environment file, keys in both translation files), the 4 kit files (`security/web` recommended without S1 and S3, `ui/forms-and-actions` without U5, each with a reason), in-house libraries (5 packages but only 2 importing files, against 30+ own components: Recommended "no rule"), 2 loop turns, 1 read-back.
-- **The agent checked the user's own convention against the code:** "open add/edit dialogs through `common-dialog`" met 3 files using it and 54 using the dialog service directly; it wrote the rule as said and flagged the gap at the read-back.
+- **The agent checked the user's own convention against the code:** "open add/edit dialogs through the shared dialog component" met 3 files using it and 54 using the dialog service directly; it wrote the rule as said and flagged the gap at the read-back.
 - **Pass 2:** 5 questions: severity, review-only checks, Do not flag (compiler flags, `.editorconfig`, Sonar in CI), 1 loop turn, 1 read-back. Items went under `## Review`, `## Do not flag` and `## Severity` of the same two project files; `git status` unchanged.
 - **Cost:** 0.60 USD for 15 turns (pass 1 + pass 2 + the `CONSTRAINTS.md` question).
 - **Deviations, fixed in 1.4.0 and rerun on pass 2:** "default" ended the loops (now only "no" or "skip" does; rerun: the loop asked again after "default"); review-only checks restated pass-1 rules, for example translation keys and environment values (now excluded; rerun: the agent left them out and said why); a placement rule that neighbouring code already shows was recommended (now kept out of Recommended, not rerun).
@@ -286,7 +286,7 @@ Did the standards probe use the graph indexes it builds? Not before: on agy, the
 | B3 | 1.4.10 | 354 | 298,904 | 8 | 9 | 6 / 19 |
 
 - A third B run (B2) stopped after the first question: the agent wrote it as text instead of using the choice tool, so headless agy had nothing to auto-skip. Not counted; a headless-mode variation, not a graph effect.
-- **Graph used:** B runs called `code-review-graph architecture`, `codegraph explore` on the backend calls, permissions, configuration, shared base classes and patient data, and `codegraph callers RbacService`; grep/find fell by about a third; both listed the graph commands in `init-report.md`.
+- **Graph used:** B runs called `code-review-graph architecture`, `codegraph explore` on the backend calls, permissions, configuration, shared base classes and patient data, and `codegraph callers` on the permission service; grep/find fell by about a third; both listed the graph commands in `init-report.md`.
 - **Speed and cost:** B averaged 370 s and 277k tokens against A's 434 s and 314k; with 2 runs a side and A varying from 360 to 507 s, this is "not slower", not a measured speed-up.
 - **Rules:** largely the same facts on both sides; B added details only the graph showed, such as patient-scoped services inheriting a shared base service. All four runs passed `check_standards.py`.
 

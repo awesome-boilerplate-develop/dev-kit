@@ -14,7 +14,7 @@ Prepare, never run controller logic. Re-running only checks and fills gaps; neve
 **How to ask: probe first, then one question at a time, in order.** Before each question, find out what you can from the code, the graph and the files, and show that evidence with the question. Ask **one question per message**, in the order of the steps below, each with a default and short options, and wait for the answer before moving on. Number them ("Question 3 — commands"). "default" and "skip" are always valid answers. Never ask what the code already answers, and never batch questions. Ask only the questions the steps name: never ask permission to run a step or to continue (the baseline runs without asking; after an answer, go straight to the next step). If nobody can answer (headless run), take the defaults and list them as assumptions in the report.
 
 **Every question ends with choices plus Other.** After the evidence, list lettered choices, at most 4:
-- `A` is the recommended answer, marked "(Recommended)" and spelled out in full, so the user sees exactly what it does (for example "A. (Recommended) base `master-p2b`, test `npm run test-headless`, build `npm run build`, no lint");
+- `A` is the recommended answer, marked "(Recommended)" and spelled out in full, so the user sees exactly what it does (for example "A. (Recommended) base `release-2`, test `npm run test-headless`, build `npm run build`, no lint");
 - `B`, `C`, `D` are the real alternatives (another branch, "skip", "stop"); no filler choices;
 - the last line is always "Other: type your own answer" (a change, a value, item IDs, free text).
 

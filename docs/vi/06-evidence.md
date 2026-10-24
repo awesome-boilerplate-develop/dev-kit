@@ -129,7 +129,7 @@ Chạy trong một git worktree riêng, không commit, không push. Repo là m�
 
 | PR | Bug | 0.8.2 (diff rộng) | 0.8.4 (diff rộng) | 0.8.7 (diff đúng) |
 |---|---|---|---|---|
-| PR A | Một request sort gửi tên cột UI vào `SortString`, backend từ chối | trượt | trượt | **bắt được**, ở tầng suspect (điểm 70) |
+| PR A | Một request sort gửi tên cột UI vào tham số sort, backend từ chối | trượt | trượt | **bắt được**, ở tầng suspect (điểm 70) |
 | PR B | Double submit: bấm Submit nhiều lần khi request đang chạy | một phần | trượt | trượt |
 
 - **Tầng "certain" (agent tự kiểm, chưa có người xác nhận):**
@@ -144,6 +144,24 @@ Chạy trong một git worktree riêng, không commit, không push. Repo là m�
   - 0.8.10 (chỉ id tiêu chuẩn `topic/name#X` hoặc một spec mới được tính là rule), chạy lại PR A: agent nhận FAIL, chuyển các mục thiếu test xuống suspect, và chạy `check_report` 4 lần cho tới khi đạt. Tầng certain còn 1 mục minor (một khối xử lý lỗi lặp lại); bug sort vẫn bắt được ở tầng suspect (70); 0.75 USD.
   - Trên 16 báo cáo cũ, các báo cáo vốn đạt vẫn đạt. Kiểm tra dòng Graph bắt thêm một lần bỏ qua `detect-changes` (một lần chạy lặp PR D, 0.8.5), tức 2/16 báo cáo có lỗi này.
   - **Đọc kết quả:** agent khai thác mọi kẽ hở của một rule viết bằng lời (ghi `R1` vào cột Rule); kiểm tra bằng máy phải dựa trên thứ khó lách (vị trí file, định dạng id của rule), không dựa trên câu chữ.
+
+**Cùng backtest đó trên ba model (dev-kit 1.7.4):** 6 PR với 8 bug, PR A và PR B dùng diff đã sửa, chế độ chỉ báo cáo, đã dựng index codegraph và CRG, mỗi model chạy một lần, Sonnet chấm như trước. Nhánh gốc là một nhánh local, không phải `main`.
+
+| | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
+|---|---|---|---|
+| PR C (bug rõ nhất) | **bắt được** (suspect, 70) | một phần | **bắt được** (certain, 88) |
+| PR A (sort) | trượt | **bắt được** (suspect, 50) | **bắt được** (suspect, 70) |
+| PR B (double submit) | một phần | trượt | trượt |
+| PR D (3 bug UI của form) | 1 một phần | trượt | trượt |
+| Hai bug còn lại | trượt | 1 một phần | trượt |
+| **Bắt được / một phần, trên 8** | 1 / 2 | 1 / 2 | 2 / 0 |
+| Chi phí cho 6 PR | 0.72 USD | 5.46 USD | 16.73 USD |
+| Báo cáo qua `check_report --base` (dòng Diff khớp repo) | 6/6 | 6/6 | 6/6 |
+
+- **Không model nào bắt bug tốt hơn rõ rệt:** Opus bắt hơn một bug với chi phí khoảng 23× Haiku, và một lần chạy mỗi model vẫn nằm trong độ dao động đã thấy giữa các lần chạy (PR C lặp lại với Sonnet: bắt được 3/4 ở 0.8.2, 1/4 ở 0.8.4–0.8.5, các lần còn lại một phần).
+- **Ngưỡng confidence không làm mất verdict nào:** trong 4 bug bắt được, 3 ở tầng suspect (50–70) và 1 ở certain (88), và cả 4 đều được xếp major hoặc minor, không phải blocker. Hạ ngưỡng certain xuống 70 cũng không biến verdict nào thành NO-GO; các bug được báo mà không chặn bị giữ lại bởi severity, không phải bởi confidence.
+- Ba bug form của PR D và một trong hai bug còn lại bị mọi model ở mọi phiên bản bỏ sót: chúng cần biết hành vi lúc chạy, không phải diff.
+- Verdict: GO trên 17/18 báo cáo (Sonnet: NO-GO trên PR B, vì các finding khác).
 
 ### Rule của dự án: control nội bộ (dev-kit 0.8.7, rule T1)
 
@@ -180,7 +198,7 @@ Ticket "dialog form" (input, select, textarea, toggle, button), `dk:story-runner
 
 | | Claude Code (Sonnet 5.5) | Codex 0.160.1 (model mặc định của tài khoản) |
 |---|---|---|
-| Bug sort (`SortString`) | một phần (4 lần chạy trước, 0.8.7–0.8.10: bắt được) | bắt được, ở tầng suspect |
+| Bug sort | một phần (4 lần chạy trước, 0.8.7–0.8.10: bắt được) | bắt được, ở tầng suspect |
 | `detect-changes` | chạy (risk 0.85, 17 test gap) | chạy (risk 0.85, 17 test gap) |
 | Độ sâu review | bốn reviewer | bốn reviewer: 4 lần gọi `spawn_agent` với `fork_turns: "none"` (xem trong rollout của phiên) |
 | `check_report` | đạt | đạt |
@@ -218,7 +236,7 @@ Git worktree mới của ba repository private, Claude Code với Sonnet 5.5, m�
 Một lần chạy `dk:init standards` trên repo B (worktree mới, `.dev-kit/` từ lần chạy trước với phần tiêu chuẩn đã xóa), Claude Code với Sonnet 5.5, mỗi lượt một câu trả lời với `--resume`; phần lớn là "default", một quy ước riêng, "no" để kết thúc mỗi vòng lặp. Một lần chạy duy nhất, do agent tự kiểm, chưa được người xác nhận.
 
 - **Lượt 1:** 9 câu hỏi: architecture (7 mục từ probe, như contract module federated, file permission key và pattern của key, giá trị trong mọi file environment, key trong cả hai file dịch), 4 file kit (`security/web` được khuyến nghị bỏ S1 và S3, `ui/forms-and-actions` bỏ U5, mỗi cái kèm lý do), thư viện nội bộ (5 package nhưng chỉ 2 file import, so với 30+ component riêng: Recommended là "không có rule"), 2 lượt của vòng lặp, 1 lần đọc lại.
-- **Agent đã kiểm quy ước riêng của người dùng với code:** "mở dialog thêm/sửa qua `common-dialog`" gặp 3 file dùng nó và 54 file dùng thẳng dialog service; nó viết rule đúng như được nói và nêu khoảng chênh ở bước đọc lại.
+- **Agent đã kiểm quy ước riêng của người dùng với code:** "mở dialog thêm/sửa qua component dialog dùng chung" gặp 3 file dùng nó và 54 file dùng thẳng dialog service; nó viết rule đúng như được nói và nêu khoảng chênh ở bước đọc lại.
 - **Lượt 2:** 5 câu hỏi: severity, các kiểm tra chỉ dành cho review, Do not flag (cờ compiler, `.editorconfig`, Sonar trong CI), 1 lượt của vòng lặp, 1 lần đọc lại. Các mục được đặt dưới `## Review`, `## Do not flag` và `## Severity` của cùng hai file dự án; `git status` không đổi.
 - **Chi phí:** 0.60 USD cho 15 lượt (lượt 1 + lượt 2 + câu hỏi `CONSTRAINTS.md`).
 - **Sai lệch, đã sửa ở 1.4.0 và chạy lại ở lượt 2:** "default" kết thúc các vòng lặp (giờ chỉ "no" hoặc "skip" mới kết thúc; chạy lại: vòng lặp hỏi lại sau "default"); các kiểm tra chỉ dành cho review nhắc lại rule của lượt 1, ví dụ key dịch và giá trị environment (giờ đã loại ra; chạy lại: agent bỏ chúng và nói lý do); một rule về vị trí đặt code mà code lân cận đã cho thấy lại được khuyến nghị (giờ không đưa vào Recommended, chưa chạy lại).
@@ -271,7 +289,7 @@ Bước dò của phần standards có dùng các index graph mà nó dựng kh�
 | B3 | 1.4.10 | 354 | 298.904 | 8 | 9 | 6 / 19 |
 
 - Lần B thứ ba (B2) dừng sau câu hỏi đầu: agent viết câu hỏi dạng chữ thay vì dùng công cụ chọn, nên agy headless không có gì để tự bỏ qua. Không tính; đây là biến động của chế độ headless, không phải tác động của graph.
-- **Graph được dùng:** các lần B gọi `code-review-graph architecture`, `codegraph explore` cho cách gọi backend, phân quyền, cấu hình, class nền dùng chung và dữ liệu bệnh nhân, và `codegraph callers RbacService`; grep/find giảm khoảng một phần ba; cả hai lần đều liệt kê lệnh graph trong `init-report.md`.
+- **Graph được dùng:** các lần B gọi `code-review-graph architecture`, `codegraph explore` cho cách gọi backend, phân quyền, cấu hình, class nền dùng chung và dữ liệu bệnh nhân, và `codegraph callers` trên service phân quyền; grep/find giảm khoảng một phần ba; cả hai lần đều liệt kê lệnh graph trong `init-report.md`.
 - **Tốc độ và chi phí:** B trung bình 370 s và 277 nghìn token, so với A 434 s và 314 nghìn; với 2 lần mỗi bên và A dao động từ 360 đến 507 s, kết luận là "không chậm hơn", chưa phải đã đo được là nhanh hơn.
 - **Rule:** hai bên ra phần lớn cùng các sự thật; B có thêm chi tiết chỉ graph mới thấy, như các service theo bệnh nhân kế thừa một service nền dùng chung. Cả bốn lần đều qua `check_standards.py`.
 
