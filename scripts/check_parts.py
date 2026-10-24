@@ -18,7 +18,7 @@ for f in pack.rglob("*.md"):
         if not (f.parent / link).exists():
             bad.append(f"{f.relative_to(pack)}: broken link {link}")
 shared = ("**Commands.**", "**Graph (rule G1).**", "**Standards (rule T1).**", "**Outputs** (rule O1).")
-controllers = [f for f in sorted((pack / "skills").glob("*/SKILL.md")) if f.parent.name != "init"]
+controllers = [f for f in sorted((pack / "skills").glob("*/SKILL.md")) if f.parent.name not in ("init", "brainstorm")]
 for start in shared:
     found = {f.parent.name: next((l for l in f.read_text().splitlines() if l.startswith(start)), None) for f in controllers}
     usual = max(set(found.values()), key=list(found.values()).count)

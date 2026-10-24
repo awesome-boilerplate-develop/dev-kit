@@ -188,3 +188,24 @@ file:line の表と、下書きの PR 本文が付く。
 | `dk:test-engineer` | カバレッジ、エッジケース、エラーパス。テストが本当に正しい rule を確認しているか | agent-skills |
 
 pre-pr-check が 4 reviewers のレベルを選んだときにだけ起動されます。ペルソナが別のペルソナを呼び出すことはありません。
+
+---
+
+## 3.7 `dk:brainstorm`
+
+**使うとき:** アイデアはあるがまだ明確なカードがなく、コードを書く前に方針を比べて設計を決めたいとき。controller ではありません。コードもコミットも report も書きません。
+
+**ステップ:**
+1. **アイデアが触れる範囲を確認**（ファイル、ドキュメント、最近のコミット）。独立した複数のサブシステムにまたがるアイデアは分割し、1 つずつ扱います。
+2. `grilling` part で**明確化**（新しい用語があれば `domain-modeling` も）。
+3. トレードオフ付きで **2〜3 の方針を提案**し、推奨を先頭に置きます。選ぶのはあなたです。
+4. **設計をセクションごとに提示**し、各セクションの確認を得てから次へ進みます。
+5. `templates/spec.md` に沿って **spec を書く** `.dev-kit/specs/<feature>.md`、`Status: draft`。選んだ方針と却下した方針は Decisions に記録します。
+6. spec を**セルフレビュー**（プレースホルダー、矛盾、スコープ、曖昧さ）し、そのあとあなたがファイルをレビューします。承認されると `Status: agreed` になり、`dk:story-runner` の実行を提案します。
+
+`dk:story-runner` は `agreed` 済みの spec をそのまま使い、rule C1 に進みます。Superpowers の `brainstorming` を改変したものです（[UPSTREAM.md](../../UPSTREAM.md)）。
+
+```mermaid
+flowchart LR
+    A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
+```

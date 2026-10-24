@@ -13,8 +13,8 @@ dev-kit/
 ├── .agents/plugins/marketplace.json # marketplace "dev-kit" for codex plugin marketplace add
 ├── .antigravity-plugin/plugin.json  # Antigravity (agy) manifest
 ├── .version-bump.json      # manifests that must share one version (scripts/bump_version.py)
-├── skills/                 # 5 registered skills: init + 4 controllers
-│   ├── init/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
+├── skills/                 # 6 registered skills: init, brainstorm + 4 controllers
+│   ├── init/ brainstorm/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
 ├── parts/                  # 16 sub-skills copied from upstream: NOT registered as skills
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
@@ -58,8 +58,8 @@ flowchart LR
 
 | Part | Source | Used by |
 |---|---|---|
-| `grilling` | Matt | story-runner (ambiguous ticket) |
-| `domain-modeling` | Matt | story-runner (new terminology) |
+| `grilling` | Matt | story-runner (ambiguous ticket), brainstorm |
+| `domain-modeling` | Matt | story-runner (new terminology), brainstorm |
 | `codebase-design` | Matt | code-refactor (unclear boundaries) |
 | `code-review` | Matt | pre-pr-check (every review level) |
 | `pr` | Matt | pre-pr-check (PR body) |
@@ -87,7 +87,7 @@ The persona agents `dk:security-auditor` and `dk:test-engineer` (agent-skills) a
 | `.dev-kit/init-report.md` | `dk:init` | What exists, what was created, what is missing, commands run and their results |
 | `.dev-kit/baseline.md` | `dk:init` (when the baseline is red and you accept it) | List of tests that already fail; controllers compare against this list (rule B1) |
 | `.dev-kit/standards/` | you | Your project standards (rule T1); team standards can live in a shared folder set in `standards.team` |
-| `.dev-kit/specs/<feature>.md` | story-runner | Per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, **Decisions** |
+| `.dev-kit/specs/<feature>.md` | story-runner, brainstorm | Per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, **Decisions** |
 | `.dev-kit/plans/` | story-runner/code-refactor (large work) | Plan per `writing-plans` |
 | `.dev-kit/reports/<name>.md` | every controller | Report per `templates/report.md`: what changed, why, tests, commands run, review table, open questions |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets |

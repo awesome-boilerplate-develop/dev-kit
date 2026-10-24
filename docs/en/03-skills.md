@@ -185,3 +185,24 @@ It comes with a file:line table and a drafted PR body.
 | `dk:test-engineer` | Coverage, edge cases, error paths; whether tests really check the right rule | agent-skills |
 
 They are spawned only when pre-pr-check picks the 4-reviewer level. A persona does not call another persona.
+
+---
+
+## 3.7 `dk:brainstorm`
+
+**Use when:** you have an idea but not yet a clear card, and want to compare approaches and agree on a design before any code. It is not a controller: it writes no code, makes no commit and no report.
+
+**Steps:**
+1. **Look at what the idea touches** (files, docs, recent commits). An idea that spans several independent subsystems is split; one at a time.
+2. **Clarify** with the `grilling` part (and `domain-modeling` for new terms).
+3. **Propose 2–3 approaches** with trade-offs, the recommended one first; you choose.
+4. **Present the design section by section**, each confirmed before the next.
+5. **Write the spec** `.dev-kit/specs/<feature>.md` per `templates/spec.md`, `Status: draft`; the chosen approach and the rejected ones go into Decisions.
+6. **Self-review** the spec (placeholders, contradictions, scope, ambiguity), then you review the file; on approval it becomes `Status: agreed` and it offers `dk:story-runner`.
+
+`dk:story-runner` uses a spec that is already `agreed` and goes straight to rule C1. Adapted from Superpowers' `brainstorming` ([UPSTREAM.md](../../UPSTREAM.md)).
+
+```mermaid
+flowchart LR
+    A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
+```

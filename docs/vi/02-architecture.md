@@ -16,8 +16,8 @@ dev-kit/
 ├── .agents/plugins/marketplace.json # marketplace "dev-kit" for codex plugin marketplace add
 ├── .antigravity-plugin/plugin.json  # Antigravity (agy) manifest
 ├── .version-bump.json      # manifests that must share one version (scripts/bump_version.py)
-├── skills/                 # 5 registered skills: init + 4 controllers
-│   ├── init/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
+├── skills/                 # 6 registered skills: init, brainstorm + 4 controllers
+│   ├── init/ brainstorm/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
 ├── parts/                  # 16 sub-skills copied from upstream: NOT registered as skills
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)

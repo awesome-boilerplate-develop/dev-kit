@@ -16,6 +16,7 @@
 | Skill | 使う場面 |
 |---|---|
 | `dk:init` | リポジトリでの初回: ツールを確認し、`.dev-kit/config.yml` を書き、テストの baseline を記録する |
+| `dk:brainstorm` | まだ明確なカードのないアイデア: 方針を比べ、`dk:story-runner` 用の spec を決める。コードは書かない |
 | `dk:story-runner` | 機能/ストーリーのカード: 確認、spec、テスト付きの実装、そのあと `dk:pre-pr-check` |
 | `dk:bug-fixer` | バグのカード（パフォーマンスの回帰を含む）: 根本原因、回帰テスト、修正 |
 | `dk:code-refactor` | 技術的負債のカード: 振る舞いを変えずに再構成する |

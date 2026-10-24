@@ -4,11 +4,12 @@ English | [Tiếng Việt](../vi/01-overview.md) | [简体中文](../zh-CN/01-ov
 
 ## 1.1 What dev-kit is
 
-dev-kit is a Claude Code plugin with **5 skills**:
+dev-kit is a Claude Code plugin with **6 skills**:
 
 | Skill | Role |
 |---|---|
 | `dk:init` | Set up the environment for a machine and a repo |
+| `dk:brainstorm` | Turn an idea into an agreed spec, before any code |
 | `dk:story-runner` | Do a story/feature card from start to finish |
 | `dk:bug-fixer` | Fix a bug card, with a test that prevents recurrence |
 | `dk:code-refactor` | Restructure without changing behavior |

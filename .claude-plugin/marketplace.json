@@ -7,7 +7,7 @@
     {
       "name": "dk",
       "source": "./",
-      "description": "4 kanban-card controllers + init, merged from Superpowers, Matt Pocock's skills and agent-skills"
+      "description": "4 kanban-card controllers + init and brainstorm, merged from Superpowers, Matt Pocock's skills and agent-skills"
     }
   ]
 }

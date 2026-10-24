@@ -188,3 +188,24 @@ Kèm theo là bảng file:line và nội dung PR đã soạn.
 | `dk:test-engineer` | Độ phủ, edge case, đường lỗi; test có thật sự kiểm tra đúng rule hay không | agent-skills |
 
 Chúng chỉ được sinh ra khi pre-pr-check chọn mức 4 reviewer. Một persona không gọi persona khác.
+
+---
+
+## 3.7 `dk:brainstorm`
+
+**Dùng khi:** bạn có một ý tưởng nhưng chưa có card rõ ràng, muốn so sánh các hướng làm và chốt thiết kế trước khi code. Đây không phải controller: nó không viết code, không commit, không viết report.
+
+**Các bước:**
+1. **Xem ý tưởng đụng tới đâu** (file, docs, commit gần đây). Ý tưởng trải trên nhiều subsystem độc lập thì được tách ra; làm từng cái một.
+2. **Làm rõ** bằng part `grilling` (thêm `domain-modeling` nếu có thuật ngữ mới).
+3. **Đề xuất 2–3 hướng làm** kèm trade-off, hướng được khuyến nghị đứng đầu; bạn chọn.
+4. **Trình bày thiết kế theo từng phần**, mỗi phần được xác nhận rồi mới sang phần sau.
+5. **Viết spec** `.dev-kit/specs/<feature>.md` theo `templates/spec.md`, `Status: draft`; hướng được chọn và các hướng bị loại ghi vào Decisions.
+6. **Tự review** spec (placeholder, mâu thuẫn, phạm vi, chỗ mơ hồ), rồi bạn review file; khi bạn duyệt nó chuyển thành `Status: agreed` và đề nghị chạy `dk:story-runner`.
+
+`dk:story-runner` dùng luôn spec đã `agreed` và đi thẳng tới rule C1. Chuyển thể từ `brainstorming` của Superpowers ([UPSTREAM.md](../../UPSTREAM.md)).
+
+```mermaid
+flowchart LR
+    A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
+```

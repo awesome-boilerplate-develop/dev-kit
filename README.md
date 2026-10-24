@@ -13,6 +13,7 @@ Works with **Claude Code** (reference), **Codex**, **GitHub Copilot CLI**, **Ant
 | Skill | Use it for |
 |---|---|
 | `dk:init` | First run in a repo: check tools, write `.dev-kit/config.yml`, record a test baseline |
+| `dk:brainstorm` | An idea before there is a clear card: compare approaches, agree a spec for `dk:story-runner`; no code |
 | `dk:story-runner` | A feature or story card: clarify, spec, implement with tests, then `dk:pre-pr-check` |
 | `dk:bug-fixer` | A bug card, including performance regressions: root cause, regression test, fix |
 | `dk:code-refactor` | A tech-debt card: restructure without changing behavior |

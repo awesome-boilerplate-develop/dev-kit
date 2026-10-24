@@ -25,7 +25,7 @@ claude plugin install dk@dev-kit
 
 Inside a session: `/plugin marketplace add awesome-boilerplate-develop/dev-kit`, then `/plugin install dk@dev-kit`. To try a local checkout without installing (for example while changing the kit): `claude --plugin-dir /path/to/dev-kit`.
 
-Check that it loaded: in a session, ask the agent to list the skills that start with `dk:`. You must see all 5: `dk:init`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
+Check that it loaded: in a session, ask the agent to list the skills that start with `dk:`. You must see all 6: `dk:init`, `dk:brainstorm`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
 
 **Other CLIs** (installed from the public repo on 2026-10-14; details and caveats are in each file under `harness/`):
 

@@ -5,6 +5,8 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 
 # story-runner
 
+## Before you start
+
 **Harness.** Written for Claude Code, which replaces the plugin-root variable below with the dev-kit folder. If you see `${CLAUDE_PLUGIN_ROOT}` literally, your harness did not replace it: the dev-kit folder is two levels above this SKILL.md after resolving symlinks (the folder that contains `rules/RULES.md`). Read every `${CLAUDE_PLUGIN_ROOT}/…` below as a path in that folder, and first read `harness/<your harness>.md` there (`codex`, `copilot`, `opencode`, `antigravity`, `omp`): it maps `dk:<skill>`, subagents and the review agents to your tools.
 
 **Parts.** Steps name *parts*: playbooks at `${CLAUDE_PLUGIN_ROOT}/parts/<name>/SKILL.md` (absolute path). Read a part only when a step names it; relative paths inside a part resolve against that part's folder, so `../../rules/…` inside a part means `${CLAUDE_PLUGIN_ROOT}/rules/…`. Parts are not skills.
@@ -17,9 +19,25 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 
 **Standards (rule T1).** Load the standards that apply: kit files listed in `.dev-kit/config.yml` → `standards.kit` (each `<id>` is `${CLAUDE_PLUGIN_ROOT}/standards/<id>.md`), every `*.md` under the team folder `standards.team` and under `.dev-kit/standards/`; skip ids in `standards.disable`, and skip files whose `applies_to` matches none of the files you will touch. On conflict: project > team > kit. While planning apply `## Design`; while writing code apply `## Implement`. List the standards you applied in the report. An id in `standards.kit` or `standards.disable` that matches no file (a renamed or removed kit file) is named under the standards in the report, not skipped silently. No config or no files → skip.
 
+## Output
+
 **Outputs** (rule O1). Everything this skill writes goes under `.dev-kit/`. Finish with `.dev-kit/reports/<short-name>.md` filled from `${CLAUDE_PLUGIN_ROOT}/templates/report.md`; keep it short, it is for a human reader. Severities use the dev-kit scale `blocker` / `major` / `minor` (rule S1). Run subagents in the foreground and wait for them in this turn; never schedule wakeups, loops or background waits (rule F2). End the final reply with: what was done, the verdict, and the report path.
 
-1. If the card is ambiguous, Read part `grilling` and resolve the questions with the user, one at a time. If the story introduces new domain terms, also Read part `domain-modeling`. When no one can answer (headless run), choose the most reasonable option and mark it as an assumption.
-2. Write the spec to `.dev-kit/specs/<feature>.md` from `${CLAUDE_PLUGIN_ROOT}/templates/spec.md` (goal, rules, interface, acceptance criteria, out of scope, **Decisions**: each question, the answer, decided by user or "assumption").
-3. Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for large work): small work → implement here, test first, commit per behaviour. Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`, `finishing-a-development-branch` (merge back locally, no push/PR).
-4. Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.
+## Steps
+
+### 1. Clarify
+- If `.dev-kit/specs/<feature>.md` already has `Status: agreed` (written by `dk:brainstorm`), use it and go to step 3.
+- If the card is ambiguous, Read part `grilling` and resolve the questions with the user, one at a time.
+- If the story introduces new domain terms, also Read part `domain-modeling`.
+- When no one can answer (headless run), choose the most reasonable option and mark it as an assumption.
+
+### 2. Spec
+Write the spec to `.dev-kit/specs/<feature>.md` from `${CLAUDE_PLUGIN_ROOT}/templates/spec.md` (goal, rules, interface, acceptance criteria, out of scope, **Decisions**: each question, the answer, decided by user or "assumption").
+
+### 3. Implement
+Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for large work):
+- small work → implement here, test first, commit per behaviour.
+- Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`, `finishing-a-development-branch` (merge back locally, no push/PR).
+
+### 4. Pre-PR check
+Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.

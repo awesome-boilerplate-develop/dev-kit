@@ -188,3 +188,24 @@ flowchart TD
 | `dk:test-engineer` | 覆盖率、边界情况、错误路径；测试是否真正检查了正确的 rule | agent-skills |
 
 只有当 pre-pr-check 选择 4 个 reviewer 的级别时，才会启动它们。一个 persona 不会调用另一个 persona。
+
+---
+
+## 3.7 `dk:brainstorm`
+
+**适用于：** 你有一个想法但还没有清晰的卡片，想在写代码之前比较方案并确定设计。它不是 controller：不写代码、不提交 commit、不写 report。
+
+**步骤：**
+1. **查看想法涉及的范围**（文件、文档、最近的 commit）。跨越多个独立子系统的想法会被拆开，一次处理一个。
+2. 用 `grilling` part **澄清**（有新术语时再加 `domain-modeling`）。
+3. **提出 2–3 个方案**并说明取舍，推荐的方案排在最前；由你选择。
+4. **逐节展示设计**，每一节确认后再进入下一节。
+5. 按 `templates/spec.md` **写 spec** `.dev-kit/specs/<feature>.md`，`Status: draft`；选中的方案和被否决的方案写入 Decisions。
+6. **自查** spec（占位符、矛盾、范围、歧义），然后由你审阅文件；批准后变为 `Status: agreed`，并建议运行 `dk:story-runner`。
+
+`dk:story-runner` 直接使用已经 `agreed` 的 spec，跳到 rule C1。改编自 Superpowers 的 `brainstorming`（[UPSTREAM.md](../../UPSTREAM.md)）。
+
+```mermaid
+flowchart LR
+    A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
+```
