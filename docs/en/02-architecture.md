@@ -71,7 +71,7 @@ flowchart LR
 | `writing-plans` | Superpowers | story-runner, code-refactor (large work) |
 | `using-git-worktrees` | Superpowers | large work; referenced by SDD and writing-plans |
 | `subagent-driven-development` | Superpowers | large work |
-| `requesting-code-review` | Superpowers | SDD needs the `code-reviewer.md` file in it |
+| `requesting-code-review` | Superpowers | SDD needs the `agents/code-reviewer.md` file in it |
 | `finishing-a-development-branch` | Superpowers | large work (merge the branch back, clean up the worktree) |
 | `constraint-driven-development` | agent-skills | init (creates `.dev-kit/CONSTRAINTS.md`, optional) |
 

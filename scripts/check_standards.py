@@ -1,6 +1,6 @@
 """Machine-check standards files (templates/standard.md format) after dk:init writes them.
 Usage: python3 check_standards.py [<dir or file> ...] [--no-files]
-Default target: .dev-kit/standards under the repo root. Run from inside the repo: each applies_to glob must match at
+Default target: .dev-kit/standards under the repo root (missing or empty: OK, only kit standards kept). Run from inside the repo: each applies_to glob must match at
 least one tracked file (skip with --no-files, for the kit's own standards).
 Checks: frontmatter keys; topic is one of the template's topics (plus review) and equals its folder; id == <topic>/<file name>; scope and status values; only the
 sections Design, Implement, Review, Do not flag, Severity, each at most once; every Design/Implement item starts with
@@ -27,6 +27,9 @@ targets = [a for a in args if a != "--no-files"]
 root = pathlib.Path(subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() or ".")
 if not targets:
     targets = [str(root / ".dev-kit" / "standards")]
+    if not list(pathlib.Path(targets[0]).rglob("*.md")):  # dk:init kept only kit files: no repo standards to check
+        print("OK: no repo standards files (kit standards only)")
+        sys.exit(0)
 tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True, cwd=root).stdout.splitlines() if check_files else []
 
 

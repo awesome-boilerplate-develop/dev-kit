@@ -74,7 +74,7 @@ flowchart LR
 | `writing-plans` | Superpowers | story-runner, code-refactor (việc lớn) |
 | `using-git-worktrees` | Superpowers | việc lớn; SDD và writing-plans trỏ tới |
 | `subagent-driven-development` | Superpowers | việc lớn |
-| `requesting-code-review` | Superpowers | SDD cần file `code-reviewer.md` trong này |
+| `requesting-code-review` | Superpowers | SDD cần file `agents/code-reviewer.md` trong này |
 | `finishing-a-development-branch` | Superpowers | việc lớn (merge lại nhánh, dọn worktree) |
 | `constraint-driven-development` | agent-skills | init (tạo `.dev-kit/CONSTRAINTS.md`, tùy chọn) |
 

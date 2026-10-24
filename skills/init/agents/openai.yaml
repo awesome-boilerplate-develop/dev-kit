@@ -1,0 +1,3 @@
+interface:
+  display_name: "dk:init"
+  short_description: "Set up dev-kit for this machine and repo"

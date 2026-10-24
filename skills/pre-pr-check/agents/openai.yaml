@@ -1,0 +1,3 @@
+interface:
+  display_name: "dk:pre-pr-check"
+  short_description: "Checks and risk-based review before a PR"

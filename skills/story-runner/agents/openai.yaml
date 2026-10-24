@@ -1,0 +1,3 @@
+interface:
+  display_name: "dk:story-runner"
+  short_description: "Deliver a feature card: spec, tests, review"

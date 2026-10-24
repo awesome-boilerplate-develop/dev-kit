@@ -1,0 +1,3 @@
+interface:
+  display_name: "dk:bug-fixer"
+  short_description: "Root-cause a bug, regression test, fix"

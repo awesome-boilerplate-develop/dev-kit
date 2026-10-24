@@ -1,0 +1,3 @@
+interface:
+  display_name: "dk:code-refactor"
+  short_description: "Restructure code without changing behavior"

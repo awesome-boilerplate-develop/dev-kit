@@ -1,6 +1,6 @@
 """Check for dangling references in a copied pack. Usage: python3 scripts/check_parts.py <plugin path>
 - `parts/<x>/SKILL.md` and "dev-kit part `x`" must point to a part that exists.
-- Relative Markdown links inside parts must exist.
+- Relative Markdown links must exist (with or without a leading ./).
 - The paragraphs the controllers share (Commands, Graph, Standards, Outputs) must be identical in every controller."""
 import pathlib
 import re
@@ -14,7 +14,7 @@ for f in pack.rglob("*.md"):
     for name in set(re.findall(r"parts/([a-z-]+)/SKILL\.md", text)) | set(re.findall(r"dev-kit part `([a-z-]+)`", text)):
         if name not in parts:
             bad.append(f"{f.relative_to(pack)}: part does not exist `{name}`")
-    for link in re.findall(r"\]\((\.{1,2}/[^)#\s]+)", text):
+    for link in re.findall(r"\]\((?![a-z][a-z0-9+.-]*:|/)([^)#\s]+)", text):  # every relative link, with or without ./
         if not (f.parent / link).exists():
             bad.append(f"{f.relative_to(pack)}: broken link {link}")
 shared = ("**Commands.**", "**Graph (rule G1).**", "**Standards (rule T1).**", "**Outputs** (rule O1).")
