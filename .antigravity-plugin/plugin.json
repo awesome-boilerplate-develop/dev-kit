@@ -1,8 +1,8 @@
 {
   "name": "dk",
   "displayName": "dev-kit",
-  "version": "1.8.1",
-  "description": "dev-kit: 4 kanban-card controllers (story-runner, bug-fixer, code-refactor, pre-pr-check) + init and brainstorm, merged from Superpowers, Matt Pocock's skills and agent-skills; every rule backed by lab evidence.",
+  "version": "1.9.0",
+  "description": "dev-kit: 4 kanban-card controllers (story-runner, bug-fixer, code-refactor, pre-pr-check) + init, brainstorm and ticket (Jira / Azure DevOps intake), merged from Superpowers, Matt Pocock's skills and agent-skills; every rule backed by lab evidence.",
   "category": "Developer Tools",
   "keywords": [
     "skills",

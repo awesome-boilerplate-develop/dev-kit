@@ -17,6 +17,7 @@
 |---|---|
 | `dk:init` | 在仓库中首次运行：检查工具、写入 `.dev-kit/config.yml`、记录测试 baseline |
 | `dk:brainstorm` | 还没有清晰卡片的想法：比较方案，为 `dk:story-runner` 确定 spec；不写代码 |
+| `dk:ticket` | Jira Cloud 或 Azure DevOps 的 ticket：连同图片、链接、附件和评论拉取到 `.dev-kit/tickets/`，作为上面各 skill 的输入，并给出下一步要用的 skill；只读，不做分析 |
 | `dk:story-runner` | 功能或 story 卡片：澄清、写 spec、带测试地实现，然后运行 `dk:pre-pr-check` |
 | `dk:bug-fixer` | bug 卡片，包括性能回归：找出根因、写回归测试、修复 |
 | `dk:code-refactor` | 技术债卡片：在不改变行为的前提下重构 |
