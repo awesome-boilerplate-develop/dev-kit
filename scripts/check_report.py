@@ -1,12 +1,18 @@
 """Machine-check a pre-pr-check report against rules R1/C2.
 Usage: python3 check_report.py <report.md> [--base <branch>]
-With --base (run inside a repo): every finding, certain or suspect, must point to a file in the diff, and at least one
-line must be inside or next to (±5 lines) the changed code; otherwise it is pre-existing code, which R1 says not to flag → drop it.
+Every finding, certain or suspect, must give a file:line location (rule R1: located). Rows follow the template:
+certain = Severity | Conf. | file:line | Finding | Rule | Status, suspect = the same without Status;
+Severity is blocker / major / minor (rule S1), Status is fixed / open / pushed back.
+With --base (run inside a repo): the Review setup Diff line must name the merge base and HEAD the report was written for
+(`<merge-base sha>...<HEAD sha>`, short SHAs allowed), and they must match the repo now; commits after it that change only
+.dev-kit/ (the kit's own output, such as the report) are allowed. Every finding must point to a file in the diff, and at least one
+cited line must be inside or next to (±5 lines) the changed code; otherwise it is pre-existing code, which R1 says not to flag → drop it.
 Run from inside a repo: if the repo has .code-review-graph/, the Graph line must have a detect-changes summary (or
 "detect-changes failed: <error>"); it must not say "no .code-review-graph/ index" (rule G1).
 A "certain" finding that cites no rule (an id that really exists in the kit/team/project standards, or a specific place in a spec; R1–R7 do not count)
 and is about a missing test or only points at a test file: Do not flag (R1) → move to suspect; keep it only if it clearly says the existing test is wrong.
 A rule id cited in the certain tier must exist in a standards file (rule T1, R7); an id that is not found FAILs.
+A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
 import pathlib
@@ -67,7 +73,7 @@ setup = section("Review setup (required)") or section("Review setup")
 if not setup:
     problems.append("missing section 'Review setup'")
 else:
-    for key in ("Depth:", "Graph:", "Standards applied:"):
+    for key in ("Depth:", "Graph:", "Standards applied:") + (("Diff:",) if base else ()):
         if key not in setup:
             problems.append(f"Review setup lacks '{key}'")
     # Reports may be written in the user's language: keep non-English alternatives (Vietnamese) in these patterns.
@@ -79,6 +85,17 @@ else:
             problems.append("Review setup says 'no .code-review-graph/ index' but the repo has one: run detect-changes (rule G1)")
         elif not re.search(r"risk|detect-changes", graph.group(1), re.I):
             problems.append("Graph line lacks the detect-changes summary although .code-review-graph/ exists (rule G1)")
+    diff_line = re.search(r"Diff:\s*`?([0-9a-f]{7,40})\.\.\.([0-9a-f]{7,40})", setup)
+    if base and "Diff:" in setup:
+        sha = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
+        now = (sha("merge-base", base, "HEAD"), sha("rev-parse", "HEAD"))
+        if not diff_line:
+            problems.append("Review setup Diff line is not '<merge-base sha>...<HEAD sha>'")
+        elif not (now[0].startswith(diff_line.group(1)) and (now[1].startswith(diff_line.group(2)) or (
+                subprocess.run(["git", "merge-base", "--is-ancestor", diff_line.group(2), "HEAD"]).returncode == 0
+                and all(f.startswith(".dev-kit/") for f in sha("diff", "--name-only", diff_line.group(2), "HEAD").splitlines())))):
+            problems.append(f"Review setup Diff {diff_line.group(1)}...{diff_line.group(2)} does not match the repo now "
+                            f"({now[0][:12]}...{now[1][:12]}): review the current diff and update the report")
 
 certain = rows(section("Certain findings"))
 suspect = rows(section("Suspect findings (do not block)") or section("Suspect findings"))
@@ -88,6 +105,17 @@ broken_test = re.compile(r"\bpass(es|ed)?\s+(vacuously|even|regardless|always|wh
                          r"|never fails|never asserts?|(does not|doesn't|do not) assert|asserts? nothing|accepts any", re.I)
 LOC = r"([\w./@-]+\.[A-Za-z]{1,5})(?::(\d+))?"
 known_ids = standard_ids()
+
+for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
+    for c in rows_:
+        if len(c) != cols:
+            problems.append(f"{tier} finding row has {len(c)} cells, the template has {cols}: {c}")
+        if c[0].strip("*` ").lower() not in ("blocker", "major", "minor"):
+            problems.append(f"{tier} finding severity '{c[0]}' is not blocker / major / minor (rule S1): {c}")
+        if tier == "certain" and len(c) == cols and not (re.match(r"(fixed|open|pushed back)\b", c[5], re.I)):
+            problems.append(f"certain finding Status is not fixed / open / pushed back: {c}")
+        if not any(ln for _, ln in re.findall(LOC, c[2] if len(c) > 2 else "")):
+            problems.append(f"{tier} finding without a file:line location (rule R1): {c}")
 
 for c in certain:
     v = conf(c)
@@ -133,21 +161,19 @@ if base:
     for tier, rows_ in (("certain", certain), ("suspect", suspect)):
         for c in rows_:
             loc = c[2] if len(c) > 2 else ""
-            refs = re.findall(LOC, loc)
+            refs = [(f, ln) for f, ln in re.findall(LOC, loc) if ln]
             if not refs:
-                continue
+                continue  # already reported as without a location
             ok = False
             for f, ln in refs:
                 files = [k for k in changed if k == f or k.endswith("/" + f) or f.endswith(k)]
                 for k in files:
-                    if not ln:
-                        ok = True
-                    elif any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
+                    if any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
                         ok = True
             if not ok:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
-blockers = [c for c in certain if c and c[0].lower().startswith("blocker") and "fixed" not in " ".join(c).lower()]
+blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and re.match(r"fixed\b", c[5], re.I))]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
 if not verdict:
     problems.append("missing 'Verdict: GO | NO-GO'")

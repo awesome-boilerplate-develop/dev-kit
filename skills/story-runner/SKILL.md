@@ -22,4 +22,4 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 1. If the card is ambiguous, Read part `grilling` and resolve the questions with the user, one at a time. If the story introduces new domain terms, also Read part `domain-modeling`. When no one can answer (headless run), choose the most reasonable option and mark it as an assumption.
 2. Write the spec to `.dev-kit/specs/<feature>.md` from `${CLAUDE_PLUGIN_ROOT}/templates/spec.md` (goal, rules, interface, acceptance criteria, out of scope, **Decisions**: each question, the answer, decided by user or "assumption").
 3. Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for large work): small work → implement here, test first, commit per behaviour. Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`, `finishing-a-development-branch` (merge back locally, no push/PR).
-4. Run skill `dk:pre-pr-check`.
+4. Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.

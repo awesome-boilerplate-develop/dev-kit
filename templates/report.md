@@ -15,6 +15,7 @@
 | <check command> | <pass/fail, counts> |
 
 ## Review setup (required)
+- Diff: <merge-base sha>...<HEAD sha> (the range reviewed)
 - Depth: <self | one | four> — reason: <the C2 trigger or "small diff: N files, M lines">
 - Graph: <detect-changes summary: risk, test gaps, untested functions> | "detect-changes failed: <error>" | "no .code-review-graph/ index"
 - Standards applied: <ids, e.g. review/finding-quality> | none

@@ -6,9 +6,10 @@
 python3 scripts/check_parts.py .       # references between controllers and parts
 python3 scripts/bump_version.py --check # every manifest carries the same version
 python3 scripts/check_i18n.py           # translations against their English source
+python3 scripts/test_check_report.py    # report checker cases
 ```
 
-CI runs the same three commands on every pull request.
+CI runs the same commands on every pull request.
 
 - **Behavior changes** (controllers, parts, rules) need a `CHANGELOG.md` entry and, for a rule, evidence in `rules/RULES.md`. Edits to a copied part are recorded in `UPSTREAM.md`.
 - **Version:** change it only with `python3 scripts/bump_version.py <x.y.z>`.
