@@ -25,7 +25,7 @@ claude plugin install dk@dev-kit
 
 Inside a session: `/plugin marketplace add awesome-boilerplate-develop/dev-kit`, then `/plugin install dk@dev-kit`. To try a local checkout without installing (for example while changing the kit): `claude --plugin-dir /path/to/dev-kit`.
 
-Check that it loaded: in a session, ask the agent to list the skills that start with `dk:`. You must see all 6: `dk:init`, `dk:brainstorm`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
+Check that it loaded: in a session, ask the agent to list the skills that start with `dk:`. You must see all 7: `dk:init`, `dk:brainstorm`, `dk:ticket`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
 
 **Other CLIs** (installed from the public repo on 2026-10-14; details and caveats are in each file under `harness/`):
 
@@ -137,6 +137,19 @@ Use skill dk:bug-fixer for this card:
 - `.dev-kit/reports/pr-body.md`: the drafted PR body;
 - `.dev-kit/specs/` (story): especially the **Decisions** section, to see what the agent settled;
 - commits on the current branch. dev-kit does not push and does not open a PR.
+
+### Tickets from Jira or Azure DevOps (`dk:ticket`)
+
+Give `dk:ticket` a ticket link (`https://<site>.atlassian.net/browse/PROJ-42`, `https://dev.azure.com/<org>/<project>/_workitems/edit/1234`) or ask for "my open bugs". It writes `.dev-kit/tickets/<KEY>/ticket.md`, offers a translation, and names the skill to run next, for example `/dk:story-runner .dev-kit/tickets/1200/ticket.md`. The controllers do not change: the file is the card you hand them.
+
+Sign in once per site or organisation, in your own terminal (the agent never sees the token):
+
+| Board | How |
+|---|---|
+| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`: email and an API token from id.atlassian.com (Security, API tokens), stored in `~/.dev-kit/credentials.json` (mode 600). Or set `JIRA_EMAIL` and `JIRA_API_TOKEN` |
+| Azure DevOps | `az login` (add `--tenant <tenant>` for a work account); the Azure CLI refreshes the token itself. Without the Azure CLI: `ticket.py login azure --org <org>` with a PAT of scope Work Items (Read), or `AZURE_DEVOPS_EXT_PAT` |
+
+Two accounts on the same site: `--profile <name>` at login and `ticket.profile: <name>` in the repo's `.dev-kit/config.yml`. `ticket.py check` tells which account a repo uses.
 
 ## 5.9 Keeping a trial log
 

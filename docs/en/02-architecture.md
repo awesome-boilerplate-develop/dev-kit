@@ -13,8 +13,8 @@ dev-kit/
 ├── .agents/plugins/marketplace.json # marketplace "dev-kit" for codex plugin marketplace add
 ├── .antigravity-plugin/plugin.json  # Antigravity (agy) manifest
 ├── .version-bump.json      # manifests that must share one version (scripts/bump_version.py)
-├── skills/                 # 6 registered skills: init, brainstorm + 4 controllers
-│   ├── init/ brainstorm/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
+├── skills/                 # 7 registered skills: init, brainstorm, ticket + 4 controllers
+│   ├── init/ brainstorm/ ticket/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
 ├── parts/                  # 16 sub-skills copied from upstream: NOT registered as skills
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
@@ -88,6 +88,8 @@ The persona agents `dk:security-auditor` and `dk:test-engineer` (agent-skills) a
 | `.dev-kit/baseline.md` | `dk:init` (when the baseline is red and you accept it) | List of tests that already fail; controllers compare against this list (rule B1) |
 | `.dev-kit/standards/` | you | Your project standards (rule T1); team standards can live in a shared folder set in `standards.team` |
 | `.dev-kit/specs/<feature>.md` | story-runner, brainstorm | Per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, **Decisions** |
+| `.dev-kit/tickets/<KEY>/ticket.md` | ticket | The ticket as the board shows it: header, sections in form order, links, attachments, comments, with `images/` and `attachments/`; a task under a story is written into the story's file. `ticket.<lang>.md` is an optional translation |
+| `.dev-kit/tickets/index-<date>.md` | ticket (filter) | The tickets a JQL/WIQL filter found, with the dk skill to run next |
 | `.dev-kit/plans/` | story-runner/code-refactor (large work) | Plan per `writing-plans` |
 | `.dev-kit/reports/<name>.md` | every controller | Report per `templates/report.md`: what changed, why, tests, commands run, review table, open questions |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets |
@@ -112,6 +114,10 @@ tracker: none        # not used in 0.6.0
 graph:
   codegraph: false   # true when .codegraph/ exists (rule G1)
   crg: false         # true when .code-review-graph/ exists (rule G1)
+ticket:             # written by dk:ticket on first use
+  provider: jira     # or azure
+  site: acme.atlassian.net   # azure: org + project
+  types: { Bug: bug-fixer }  # optional: ticket type -> dk skill
 ```
 
 Source template: `templates/config.yml`. If the file exists, controllers use `commands.check` (or `commands.test` if there is no check) and `base_branch`. If there is no file, controllers use `make check` (if the repo has it) or the test command in the repo's docs, and treat the base branch as `main`.

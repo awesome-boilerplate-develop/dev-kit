@@ -209,3 +209,21 @@ Chúng chỉ được sinh ra khi pre-pr-check chọn mức 4 reviewer. Một pe
 flowchart LR
     A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
 ```
+
+---
+
+## 3.8 `dk:ticket`
+
+**Dùng khi:** bạn có một ticket trên Jira Cloud hoặc Azure DevOps và muốn đưa nó vào repo làm card cho một controller, hoặc muốn kéo một loạt "bug của tôi đang mở". Đây không phải controller: nó chỉ đọc board và ghi vào `.dev-kit/tickets/`; không triage, không sửa code, và không skill nào có sẵn phải đổi vì nó.
+
+**Các bước:**
+1. **Cấu hình board:** link đầy đủ thì kéo ngay; sau đó, nếu `.dev-kit/config.yml` chưa có phần `ticket:`, nó ghi phần này theo link và báo cho bạn.
+2. **Credentials:** `scripts/ticket.py check`; Jira dùng API token bạn lưu bằng `ticket.py login jira` trong terminal của bạn, Azure DevOps dùng `az login` (hoặc PAT).
+3. **Kéo** theo link hoặc key, hoặc **truy vấn** bằng JQL / WIQL viết từ lời bạn. Mỗi ticket giữ đúng những gì board hiển thị: các phần theo thứ tự của form thật (layout Azure DevOps được đọc, vì mỗi tổ chức tùy biến form), ảnh đúng vị trí, link (ticket liên quan, PR, commit), file đính kèm và comment theo thứ tự của board. Task hoặc Sub-task nằm dưới một story được ghi vào file của story, sau nội dung của story, có mục riêng và danh sách ticket con của story.
+4. **Dịch** khi bạn muốn (`ticket.<lang>.md`, bản gốc vẫn là bản chuẩn; ticket đổi thì bản dịch bị đánh dấu cũ).
+5. **Skill tiếp theo:** Bug → `dk:bug-fixer`, story → `dk:story-runner` (hoặc `dk:brainstorm` khi còn quá sơ sài), tech debt → `dk:code-refactor`, còn lại thì hỏi; `ticket.types` ghi đè. Với một ticket, nó đề nghị chạy luôn với file đó làm card.
+
+```mermaid
+flowchart LR
+    A["Link / key / filter"] --> B["check credentials"] --> C["ticket.py fetch | query"] --> D[".dev-kit/tickets/KEY/ticket.md"] --> E["translate? (optional)"] --> F["next: dk:bug-fixer | story-runner | ..."]
+```

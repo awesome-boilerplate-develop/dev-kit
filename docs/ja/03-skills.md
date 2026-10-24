@@ -209,3 +209,21 @@ pre-pr-check が 4 reviewers のレベルを選んだときにだけ起動され
 flowchart LR
     A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
 ```
+
+---
+
+## 3.8 `dk:ticket`
+
+**使うとき:** Jira Cloud や Azure DevOps にあるチケットを controller のカードとしてリポジトリに取り込みたいとき、または「自分の未完了バグ」をまとめて取り込みたいとき。controller ではありません。ボードを読んで `.dev-kit/tickets/` に書くだけで、トリアージもコード変更もせず、既存のスキルは何も変わりません。
+
+**ステップ:**
+1. **ボード設定:** 完全なリンクならすぐ取り込みます。その後 `.dev-kit/config.yml` に `ticket:` セクションがなければ、リンクから作って書き、そのことを伝えます。
+2. **認証情報:** `scripts/ticket.py check`。Jira は自分のターミナルで `ticket.py login jira` により保存した API トークン、Azure DevOps は `az login`(または PAT)を使います。
+3. リンクやキーで**取り込む**か、依頼内容から書いた JQL / WIQL で**検索**します。各チケットはボードの表示どおりに保たれます: 実際のフォーム順のセクション(組織ごとにフォームをカスタマイズするため Azure DevOps のレイアウトを読みます)、元の位置の画像、リンク(関連アイテム、PR、コミット)、添付、ボードの順のコメント。ストーリー配下の Task や Sub-task はストーリーのファイルに書かれ、ストーリー本文のあとに専用のセクションとストーリーの子アイテム一覧が付きます。
+4. 必要なら**翻訳**(`ticket.<lang>.md`。原文が正本で、チケットが変わると翻訳は古いと表示されます)。
+5. **次のスキル:** Bug → `dk:bug-fixer`、ストーリー → `dk:story-runner`(内容が薄いときは `dk:brainstorm`)、技術的負債 → `dk:code-refactor`、それ以外は質問します。`ticket.types` で上書きできます。チケットが 1 件なら、そのファイルをカードとしてすぐ実行するか尋ねます。
+
+```mermaid
+flowchart LR
+    A["Link / key / filter"] --> B["check credentials"] --> C["ticket.py fetch | query"] --> D[".dev-kit/tickets/KEY/ticket.md"] --> E["translate? (optional)"] --> F["next: dk:bug-fixer | story-runner | ..."]
+```

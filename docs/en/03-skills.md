@@ -206,3 +206,22 @@ They are spawned only when pre-pr-check picks the 4-reviewer level. A persona do
 flowchart LR
     A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
 ```
+
+---
+
+## 3.8 `dk:ticket`
+
+**Use when:** you have a ticket on Jira Cloud or Azure DevOps and want it in the repo as the card for a controller, or want "my open bugs" pulled at once. It is not a controller: it only reads the board and writes `.dev-kit/tickets/`; it does not triage or change code, and no existing skill changes because of it.
+
+**Steps:**
+1. **Board settings:** on first use, the `ticket:` section of `.dev-kit/config.yml` is derived from the link you gave and confirmed with you.
+2. **Credentials:** `scripts/ticket.py check`; Jira uses an API token you store with `ticket.py login jira` in your own terminal, Azure DevOps uses `az login` (or a PAT).
+3. **Fetch** by link or key, or **query** with JQL / WIQL written from your words. Each ticket keeps what the board shows: the sections in the order of the real form (the Azure DevOps layout is read, since organisations customise it), images where they appear, links (related items, PRs, commits), attachments and comments in the board's order. A Task or Sub-task under a story is written into the story's file, after the story's own content, with a section of its own and the story's children.
+4. **Translation** on request (`ticket.<lang>.md`, the original stays the source of truth; a changed ticket marks it stale).
+5. **Next skill:** Bug → `dk:bug-fixer`, story → `dk:story-runner` (or `dk:brainstorm` when it is too thin), tech debt → `dk:code-refactor`, otherwise it asks; `ticket.types` overrides. For one ticket it offers to run it with the file as the card.
+
+```mermaid
+flowchart LR
+    A["Link / key / filter"] --> B["check credentials"] --> C["ticket.py fetch | query"] --> D[".dev-kit/tickets/KEY/ticket.md"] --> E["translate? (optional)"] --> F["next: dk:bug-fixer | story-runner | ..."]
+```
+
