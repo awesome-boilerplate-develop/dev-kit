@@ -28,6 +28,7 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 **Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
 
 ### 1. Checks and a lowered bar
+- `git diff --shortstat main...HEAD` is empty (on `main` itself, or the work is already merged) → stop: nothing to review, so no review, no report and no verdict; say so in the final reply.
 - The review and report cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD. Never stash, commit or discard them; go on, and name them on the Tree line of Review setup (the checks ran with them).
 - Run the check command now; keep the output as Evidence. A check that fails outside the baseline, or cannot run, goes in Commands run as `FAIL: …` or `NOT RUN: …`. It is not a finding (R6 drops what CI catches): it makes the verdict NO-GO on its own.
 - Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.

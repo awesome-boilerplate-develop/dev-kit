@@ -114,7 +114,7 @@ flowchart LR
 2. **Viết spec** `.dev-kit/specs/<feature>.md` theo `templates/spec.md`: mục tiêu, quy tắc, interface, tiêu chí chấp nhận, ngoài phạm vi, và một mục **Decisions** (câu hỏi, câu trả lời, ai quyết định hoặc "assumption").
 3. **Theo rule C1:**
    - **Việc nhỏ:** làm ngay trong session, test trước, mỗi hành vi một commit.
-   - **Việc lớn** (hơn 3 task hoặc nhiều module): dùng các part theo thứ tự: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, dừng trước bước finishing của SDD. Bước 4 chạy `dk:pre-pr-check` trong worktree, trên feature branch, trước khi merge; chỉ khi GO thì `finishing-a-development-branch` mới merge về branch bạn đang làm (không push/PR).
+   - **Việc lớn** (hơn 3 task hoặc nhiều module): dùng các part theo thứ tự: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, dừng trước bước finishing của SDD. Bước 4 chạy `dk:pre-pr-check` trong worktree, trên feature branch, trước khi merge; chỉ khi GO thì `finishing-a-development-branch` mới đưa ra các lựa chọn (merge, PR, giữ branch) để bạn chọn; khi không có ai trả lời thì giữ nguyên branch.
 4. **Chạy `dk:pre-pr-check`.**
 
 ```mermaid
@@ -157,7 +157,7 @@ flowchart TD
 **Chế độ report-only:** nếu yêu cầu nói "do not change code", nó không sửa file nào và bỏ qua bước 4.
 
 **Các bước:**
-1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Review xét HEAD; thay đổi chưa commit được giữ nguyên và ghi tên trong report, và nó hỏi bạn trước khi sửa gì trong lúc còn các thay đổi đó. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
+1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Diff rỗng (đang ở chính base branch, hoặc đã merge rồi) thì dừng: không có gì để review, không có verdict. Review xét HEAD; thay đổi chưa commit được giữ nguyên và ghi tên trong report, và nó hỏi bạn trước khi sửa gì trong lúc còn các thay đổi đó. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
 2. **Chọn mức review theo rule C2:**
 
    | Mức | Khi nào | Làm gì |

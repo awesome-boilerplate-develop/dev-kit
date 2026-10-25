@@ -13,9 +13,12 @@ A "certain" finding that cites no rule (an id that really exists in the kit/team
 and is about a missing test or only points at a test file: Do not flag (R1) → move to suspect; keep it only if it clearly says the existing test is wrong.
 A rule id cited in the certain tier must exist in a standards file (rule T1, R7), and `file#ID` must name an item of that file; an id that is not found FAILs.
 The Certain findings, Suspect findings and Commands run sections must be present (an empty table is fine); every finding has a confidence 0–100.
-A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO. So does a Commands run
-row whose Result starts with FAIL or NOT RUN (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy): a failing required check
-gates on its own, findings or not.
+Section headings may carry extra text ("### Certain findings (1)"); a table's header row is the row above its |---| line.
+A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO. Commands run lists at least one
+check. A row fails when its Result starts with FAIL or NOT RUN (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy), or names
+a failure count or a non-zero exit anywhere ("12 passed, 3 failed", "exit 1") without saying it is the baseline / known failures.
+A failing row needs Verdict NO-GO: a failing required check gates on its own, findings or not.
+With --base, an empty diff (HEAD is the merge base) FAILs: nothing was reviewed, so there is no verdict to give.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
 import pathlib
@@ -55,14 +58,16 @@ def standard_ids():
 
 
 def section(title):
-    m = re.search(rf"^###? {re.escape(title)}\s*\n(.*?)(?=^###? |\Z)", text, re.S | re.M)
+    m = re.search(rf"^###? {re.escape(title)}[^\n]*\n(.*?)(?=^###? |\Z)", text, re.S | re.M)
     return m.group(1) if m else None
 
 
 def rows(block):
     out = []
-    for line in (block or "").splitlines():
-        if line.startswith("|") and not re.match(r"^\|\s*-", line) and "Severity" not in line:
+    lines = (block or "").splitlines()
+    for i, line in enumerate(lines):
+        header = i + 1 < len(lines) and re.match(r"^\|\s*:?-", lines[i + 1])
+        if line.startswith("|") and not re.match(r"^\|\s*:?-", line) and not header:
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if any(cells) and cells[0] not in ("—", "-", "none", ""):
                 out.append(cells)
@@ -94,6 +99,8 @@ else:
     if base and "Diff:" in setup:
         sha = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
         now = (sha("merge-base", base, "HEAD"), sha("rev-parse", "HEAD"))
+        if now[0] == now[1]:
+            problems.append(f"nothing between {base} and HEAD: an empty diff has no review and no verdict (already merged, or on {base} itself?)")
         if not diff_line:
             problems.append("Review setup Diff line is not '<merge-base sha>...<HEAD sha>'")
         elif not (now[0].startswith(diff_line.group(1)) and (now[1].startswith(diff_line.group(2)) or (
@@ -188,7 +195,19 @@ if base:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
 blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and re.match(r"fixed\b", c[5], re.I))]
-failed = [c[0] for c in rows(section("Commands run")) if len(c) > 1 and re.match(r"[\W_]*(fail|not run|thất bại|lỗi|không chạy|chưa chạy)", c[1], re.I)]
+commands = rows(section("Commands run"))
+if section("Commands run") is not None and not commands:
+    problems.append("Commands run lists no check: run the check command and record its result")
+
+
+def failing(result):
+    if re.match(r"[\W_]*(fail|not run|thất bại|lỗi|không chạy|chưa chạy)", result, re.I):
+        return True
+    return not re.search(r"baseline|known", result, re.I) and bool(re.search(
+        r"\b[1-9]\d*\s+(failed|failing|failures?|errors?)\b|\bexit(\s+code)?\s*[:=]?\s*[1-9]", result, re.I))
+
+
+failed = [c[0] for c in commands if len(c) > 1 and failing(c[1])]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
 if not verdict:
     problems.append("missing 'Verdict: GO | NO-GO'")

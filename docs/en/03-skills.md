@@ -112,7 +112,7 @@ flowchart LR
 3. **Follow rule C1:**
    - **Small work:** do it right in the session, tests first, one commit per behavior.
    - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, stopping before SDD's own finishing step.
-4. **Run `dk:pre-pr-check`.** For large work it runs in the worktree, on the feature branch, before anything is merged; only on GO does `finishing-a-development-branch` merge back into the branch you are working on (no push/PR).
+4. **Run `dk:pre-pr-check`.** For large work it runs in the worktree, on the feature branch, before anything is merged; only on GO does `finishing-a-development-branch` offer its options (merge, PR, keep the branch) and you choose; with nobody to answer, the branch is kept.
 
 ```mermaid
 flowchart TD
@@ -154,7 +154,7 @@ flowchart TD
 **Report-only mode:** if the request says "do not change code", it edits no file and skips step 4.
 
 **Steps:**
-1. **Run the check commands right now** and keep the output as Evidence. The review covers HEAD; uncommitted changes are left alone and named in the report, and it asks you before fixing anything while they are there. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
+1. **Run the check commands right now** and keep the output as Evidence. An empty diff (on the base branch itself, or already merged) stops the run: nothing to review, no verdict. The review covers HEAD; uncommitted changes are left alone and named in the report, and it asks you before fixing anything while they are there. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
 2. **Pick the review level per rule C2:**
 
    | Level | When | What it does |

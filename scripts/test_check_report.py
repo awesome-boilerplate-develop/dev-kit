@@ -56,8 +56,21 @@ class CheckReport(unittest.TestCase):
             r = self.check(report(result=result))
             self.assertIn("required check failed or did not run but verdict is GO", r.stdout, result)
             self.assertEqual(self.check(report(verdict="NO-GO", result=result)).returncode, 0, result)
-        for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi"):
+        for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi", "none: no skips added", "12 passed, 0 failed"):
             self.assertEqual(self.check(report(result=result)).returncode, 0, result)
+
+    def test_gate_holds_against_layout_tricks(self):
+        open_blocker = "| blocker | 90 | src/pay.ts:12 | Severity: total is negative when qty is 0 | — | open |"
+        self.assertIn("open certain blocker but verdict is GO", self.check(report(open_blocker)).stdout)
+        counted = report("| blocker | 90 | src/pay.ts:12 | total is negative | — | open |").replace(
+            "### Certain findings", "### Certain findings (1)")
+        self.assertIn("open certain blocker but verdict is GO", self.check(counted).stdout)
+        step = report(result="FAIL: build").replace("## Commands run", "## Commands run (step 1)")
+        self.assertIn("did not run but verdict is GO", self.check(step).stdout)
+        for result in ("12 passed, 3 failed", "exit 1", "PASS: 12 passed, 3 failed", "PASS (exit code 2)"):
+            self.assertIn("did not run but verdict is GO", self.check(report(result=result)).stdout, result)
+        empty = report().replace("| make check | PASS: 12 tests |\n", "")
+        self.assertIn("Commands run lists no check", self.check(empty).stdout)
 
     def test_file_without_extension_is_located(self):
         r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))
@@ -145,6 +158,11 @@ class CheckReport(unittest.TestCase):
             git("commit", "-qam", "after the review")
             stale = self.run_check(report(suspect="| minor | 60 | pay.ts:30 | x | — |", diff=diff), d, "--base", "main")
             self.assertIn("does not match the repo now", stale.stdout)
+            git("checkout", "-q", "main")
+            git("merge", "-q", "feature")
+            merged = self.run_check(report(diff=f"- Diff: {git('rev-parse', 'HEAD')[:7]}...{git('rev-parse', 'HEAD')[:7]}"),
+                                    d, "--base", "main")
+            self.assertIn("empty diff has no review", merged.stdout)
 
 
 if __name__ == "__main__":

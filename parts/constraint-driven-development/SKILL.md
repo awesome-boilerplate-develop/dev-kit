@@ -141,6 +141,8 @@ Do not add a line to `AGENTS.md` or `CLAUDE.md`: those files are tracked and sha
 
 ### Step 4: Install what each dimension needs
 
+**In dev-kit:** install nothing and edit no tracked file yourself (`package.json`, lockfiles, CI, hooks, agent settings; rule O1). For each dimension that needs a tool, name the tool, its install command and the script line below, and ask the user; on no, put the dimension under "Measured, not yet enforced" or drop it. The commands in Step 5's table are upstream's lifecycle; in dev-kit, `dk:pre-pr-check` step 1 runs the checks.
+
 Picking a dimension means installing something. Don't leave the user with a number and no mechanism, and don't invent your own checker when a de facto one exists — these tools are listed because their rule formats and thresholds are what everything else in the ecosystem targets, so the team's existing config keeps working.
 
 | Dimension | Tool | Install | Run | Gate on |

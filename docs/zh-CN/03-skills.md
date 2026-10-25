@@ -114,7 +114,7 @@ flowchart LR
 2. **写 spec** `.dev-kit/specs/<feature>.md`，按 `templates/spec.md`：目标、rule、接口、验收标准、范围之外，以及一个 **Decisions** 部分（问题、答案、谁决定，或 “assumption”）。
 3. **遵循 rule C1：**
    - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit。
-   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development`，在 SDD 自己的 finishing 步骤之前停下。第 4 步的 `dk:pre-pr-check` 在 worktree 中的 feature 分支上、合并之前运行；只有 GO 时 `finishing-a-development-branch` 才合并回你正在工作的分支（不 push/不开 PR）。
+   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development`，在 SDD 自己的 finishing 步骤之前停下。第 4 步的 `dk:pre-pr-check` 在 worktree 中的 feature 分支上、合并之前运行；只有 GO 时 `finishing-a-development-branch` 才给出选项（合并、PR、保留分支）由你选择；无人回答时保留分支。
 4. **运行 `dk:pre-pr-check`。**
 
 ```mermaid
@@ -157,7 +157,7 @@ flowchart TD
 **Report-only 模式：** 如果请求里说“不要修改代码”，它不会编辑任何文件，并跳过第 4 步。
 
 **步骤：**
-1. **立即运行检查命令**，并把输出保留为 Evidence。review 针对 HEAD；未提交的修改保持不动并在 report 中列出，存在这些修改时，修复之前会先询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
+1. **立即运行检查命令**，并把输出保留为 Evidence。diff 为空（就在 base 分支上，或已合并）则停止：没有可 review 的内容，也没有 verdict。review 针对 HEAD；未提交的修改保持不动并在 report 中列出，存在这些修改时，修复之前会先询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
 2. **按 rule C2 选择 review 级别：**
 
    | 级别 | 何时 | 做什么 |

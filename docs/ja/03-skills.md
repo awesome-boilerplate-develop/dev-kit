@@ -114,7 +114,7 @@ flowchart LR
 2. **spec を書く** `.dev-kit/specs/<feature>.md`、`templates/spec.md` に沿って: 目的、rule、インターフェース、受け入れ基準、スコープ外、そして **Decisions** セクション（質問、回答、決めた人または「assumption」）。
 3. **rule C1 に従う:**
    - **小さな作業:** セッション内でそのまま行う。テストを先に書き、振る舞いごとに 1 コミット。
-   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`。SDD 自身の finishing の手前で止める。ステップ 4 の `dk:pre-pr-check` は worktree 内の feature ブランチでマージ前に実行し、GO のときだけ `finishing-a-development-branch` が作業中のブランチにマージして戻す（push/PR はしない）。
+   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`。SDD 自身の finishing の手前で止める。ステップ 4 の `dk:pre-pr-check` は worktree 内の feature ブランチでマージ前に実行し、GO のときだけ `finishing-a-development-branch` が選択肢（マージ、PR、ブランチを残す）を示し、あなたが選ぶ。答える人がいなければブランチを残す。
 4. **`dk:pre-pr-check` を実行する。**
 
 ```mermaid
@@ -157,7 +157,7 @@ flowchart TD
 **Report-only モード:** リクエストに「コードを変更しない」とあれば、ファイルを編集せず、ステップ 4 を省略する。
 
 **ステップ:**
-1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。review は HEAD を対象にする。未コミットの変更には手を触れず report に名前を記し、それが残っている間は修正の前にあなたに確認する。baseline 外で失敗した check、または実行できなかった check は、それだけで verdict を NO-GO にする。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
+1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。diff が空（base ブランチそのもの、またはマージ済み）なら停止する: review する対象がなく、verdict もない。review は HEAD を対象にする。未コミットの変更には手を触れず report に名前を記し、それが残っている間は修正の前にあなたに確認する。baseline 外で失敗した check、または実行できなかった check は、それだけで verdict を NO-GO にする。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
 2. **rule C2 に従ってレビューのレベルを選ぶ:**
 
    | レベル | 場面 | 内容 |

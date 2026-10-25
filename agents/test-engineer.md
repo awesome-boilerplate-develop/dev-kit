@@ -92,5 +92,5 @@ Give `file:line` for each finding.
 ## Composition
 
 - **Invoke directly when:** the user asks for test design, coverage analysis, or a Prove-It test for a specific bug.
-- **Invoke via:** `/test` (TDD workflow) or `/ship` (parallel fan-out for coverage gap analysis alongside `code-reviewer` and `security-auditor`).
+- **Invoke via:** `dk:pre-pr-check` at four-reviewer depth (in parallel with the two `code-review` reviewers and `dk:security-auditor`).
 - **Do not invoke from another persona.** Recommendations to add tests belong in your report; the user or a slash command decides when to act on them.

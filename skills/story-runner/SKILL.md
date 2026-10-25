@@ -41,4 +41,4 @@ Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for larg
 
 ### 4. Pre-PR check
 Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.
-- Large work: run it in the worktree, on the feature branch, before anything is merged. Then copy its report (and `pr-body.md`) to `.dev-kit/reports/` of the main checkout. On GO, part `finishing-a-development-branch` (merge back locally, no push/PR); on NO-GO, leave the branch unmerged and say so.
+- Large work: run it in the worktree, on the feature branch, before anything is merged. Then copy its report (and `pr-body.md`) to `.dev-kit/reports/` of the main checkout. On GO, part `finishing-a-development-branch`: present its options, the choice is the user's; with no one to answer, keep the branch (its option 3) and name it. On NO-GO, leave the branch unmerged and say so.
