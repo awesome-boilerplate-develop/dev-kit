@@ -1,6 +1,6 @@
 ---
 name: ticket
-description: Pull kanban tickets (Jira Cloud issues, Azure DevOps work items) into Markdown with their images, links, attachments and comments, as input for the dk controllers. Use when the user gives a ticket link or key, or asks to fetch their tickets ("lấy ticket/task/bug về", "fetch PROJ-42", "my open bugs"). Read-only, no analysis; ends by naming the dk skill to run next.
+description: Pull kanban tickets (Jira Cloud issues, Azure DevOps work items) into Markdown with their images, links, attachments and comments, as input for the dk controllers. Use when the user gives a ticket link or key, or asks to fetch their tickets or a filter of them. Read-only, no analysis; ends by naming the dk skill to run next.
 ---
 
 # ticket
@@ -39,9 +39,16 @@ description: Pull kanban tickets (Jira Cloud issues, Azure DevOps work items) in
   No settings and no link (a bare key or a filter) → ask for one ticket link first.
 
 ### 2. Credentials
-Run `ticket.py check <link>` (or `ticket.py check` with settings). On `error:` (exit 1), show the message and stop until the user has fixed it:
-- Jira: the user runs `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ticket.py login jira --site <site>` **in their own terminal** (it asks for the email and an API token from id.atlassian.com, input hidden, and stores it in `~/.dev-kit/credentials.json`). Environment variables `JIRA_EMAIL` + `JIRA_API_TOKEN` also work.
-- Azure DevOps: `az login` (with `--tenant <tenant>` for a work account), which the user can run here as `! az login --tenant <tenant>`; or a PAT with scope Work Items (Read) through `ticket.py login azure --org <org>` in their own terminal, or `AZURE_DEVOPS_EXT_PAT`.
+Run `ticket.py check <link>` (or `ticket.py check` with settings). On `error:` (exit 1), stop and guide the user in numbered steps, with the full links and the exact command (the script's own path, filled in):
+- Jira:
+  1. Create an API token at https://id.atlassian.com/manage-profile/security/api-tokens (Create API token, copy it).
+  2. In their own terminal, not in this chat, run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ticket.py login jira --site <site>`; it asks for the Jira email and the token (input hidden) and stores them in `~/.dev-kit/credentials.json`.
+  3. Say "done" here.
+  Environment variables `JIRA_EMAIL` + `JIRA_API_TOKEN` also work.
+- Azure DevOps:
+  1. With the Azure CLI installed, run `! az login` here (`! az login --tenant <tenant>` for a work account) and sign in in the browser.
+  2. Say "done" here.
+  Without az: create a PAT with scope Work Items (Read) at `https://dev.azure.com/<org>/_usersSettings/tokens`, then run `ticket.py login azure --org <org>` in their own terminal; or set `AZURE_DEVOPS_EXT_PAT`.
 Do not retry in a loop; one check after the user says it is done.
 
 ### 3. Fetch

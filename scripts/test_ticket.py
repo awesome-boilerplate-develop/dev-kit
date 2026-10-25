@@ -122,7 +122,7 @@ class Credentials(unittest.TestCase):
         self.assertEqual(ticket.jira_auth("a.atlassian.net", None, env).header, ticket.basic("env", "t"))
         self.assertEqual(ticket.jira_auth("a.atlassian.net", None, {}).header, ticket.basic("file", "k"))
         self.assertEqual(ticket.jira_auth("a.atlassian.net", "work", {}).header, ticket.basic("profile", "k"))
-        with self.assertRaisesRegex(ticket.Fail, "login jira --site b.atlassian.net"):
+        with self.assertRaisesRegex(ticket.Fail, "id.atlassian.com/manage-profile/security/api-tokens.*login jira --site b.atlassian.net"):
             ticket.jira_auth("b.atlassian.net", None, {})
 
     def test_ado_pat_before_az(self):

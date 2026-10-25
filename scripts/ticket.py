@@ -387,13 +387,17 @@ def az_token(tenant=None):
     return "Bearer " + token
 
 
+JIRA_TOKENS = "https://id.atlassian.com/manage-profile/security/api-tokens"
+
+
 def jira_auth(site, profile, env):
     login = f"{script_cmd()} login jira --site {site}" + (f" --profile {profile}" if profile else "")
     if env.get("JIRA_EMAIL") and env.get("JIRA_API_TOKEN"):
         return Auth(basic(env["JIRA_EMAIL"], env["JIRA_API_TOKEN"]), hint="check JIRA_EMAIL / JIRA_API_TOKEN")
     entry = load_credentials().get(f"jira:{profile or site}")
     if not entry:
-        raise Fail(f"no Jira credential for {profile or site}: run in your terminal: {login}")
+        raise Fail(f"no Jira credential for {profile or site}: create an API token at {JIRA_TOKENS}, "
+                   f"then run in your terminal: {login}")
     return Auth(basic(entry["email"], entry["key"]), hint=f"the token may have expired: run {login}")
 
 
@@ -974,11 +978,12 @@ def cmd_login(args, cfg, env):
             if provider == "jira":
                 site = site.replace("https://", "").strip("/")
                 email = input(f"Email for {site}: ").strip()
-                key = getpass.getpass("API token (input hidden; create one at id.atlassian.com, Security, API tokens): ")
+                key = getpass.getpass(f"API token (input hidden; create one at {JIRA_TOKENS}): ")
                 who = Jira(site, Auth(basic(email, key))).whoami()
                 path = save_credential(f"jira:{profile or site}", {"type": "api_key", "email": email, "key": key})
             else:
-                key = getpass.getpass(f"Personal access token for {org} (input hidden; scope Work Items: Read): ")
+                key = getpass.getpass(f"Personal access token for {org} (input hidden; scope Work Items: Read; create one at "
+                                      f"https://dev.azure.com/{org}/_usersSettings/tokens): ")
                 who = Ado(org, "", Auth(basic("", key))).whoami()
                 path = save_credential(f"azure:{profile or org}", {"type": "pat", "key": key})
         except getpass.GetPassWarning:

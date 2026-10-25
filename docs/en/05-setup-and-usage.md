@@ -146,8 +146,8 @@ Sign in once per site or organisation, in your own terminal (the agent never see
 
 | Board | How |
 |---|---|
-| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`: email and an API token from id.atlassian.com (Security, API tokens), stored in `~/.dev-kit/credentials.json` (mode 600). Or set `JIRA_EMAIL` and `JIRA_API_TOKEN` |
-| Azure DevOps | `az login` (add `--tenant <tenant>` for a work account); the Azure CLI refreshes the token itself. Without the Azure CLI: `ticket.py login azure --org <org>` with a PAT of scope Work Items (Read), or `AZURE_DEVOPS_EXT_PAT` |
+| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`: email and an API token from https://id.atlassian.com/manage-profile/security/api-tokens, stored in `~/.dev-kit/credentials.json` (mode 600). Or set `JIRA_EMAIL` and `JIRA_API_TOKEN` |
+| Azure DevOps | `az login` (add `--tenant <tenant>` for a work account); the Azure CLI refreshes the token itself. Without the Azure CLI: `ticket.py login azure --org <org>` with a PAT of scope Work Items (Read) from `https://dev.azure.com/<org>/_usersSettings/tokens`, or `AZURE_DEVOPS_EXT_PAT` |
 
 Two accounts on the same site: `--profile <name>` at login and `ticket.profile: <name>` in the repo's `.dev-kit/config.yml`. `ticket.py check` tells which account a repo uses.
 

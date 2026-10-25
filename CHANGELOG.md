@@ -1,5 +1,9 @@
 # dev-kit changelog
 
+## 1.9.1 (2026-10-25)
+- **`dk:ticket` login guidance:** when no credential is found the skill now guides the user in numbered steps with the full links: the Atlassian API token page, the Azure DevOps PAT page, the exact `login` command for their own terminal, then "done". The script's error and the `login` prompts print the same links.
+- **Description:** the example phrases (one of them Vietnamese) are dropped, like the other skills' descriptions; the skill is matched by meaning.
+
 ## 1.9.0 (2026-10-24)
 - **New skill `dk:ticket`:** pulls a Jira Cloud issue or Azure DevOps work item into `.dev-kit/tickets/<KEY>/ticket.md` with its images (`images/`), links (related items, PRs, commits), attachments (`attachments/`, up to 25 MB) and comments, as the card for a controller; by link, key, or a JQL / WIQL filter (`index-<date>.md`). Read-only, no analysis. It ends by naming the skill to run next (Bug → `bug-fixer`, story → `story-runner` or `brainstorm` when thin, tech debt → `code-refactor`, `ticket.types` overrides) and offers to run it. Optional translation `ticket.<lang>.md`, marked stale when the ticket changes. No existing skill, part, rule or template changed: the controllers take the file as they take any card.
 - **Faithful to the board:** sections follow the real form layout (the Azure DevOps process layout is read; a guessed default form lost a Bug's Description with 4 images in the spike), comments keep the board's order, images stay where they are, HTML becomes Markdown with tables, lists and bold kept. A field the form hides (Repro steps left after Bug → Task) is not copied; an attachment that copies an inline image is not listed twice.
