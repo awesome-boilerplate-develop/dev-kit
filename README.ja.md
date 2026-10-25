@@ -17,6 +17,7 @@
 |---|---|
 | `dk:init` | リポジトリでの初回: ツールを確認し、`.dev-kit/config.yml` を書き、テストの baseline を記録する |
 | `dk:brainstorm` | まだ明確なカードのないアイデア: 方針を比べ、`dk:story-runner` 用の spec を決める。コードは書かない |
+| `dk:ticket` | Jira Cloud / Azure DevOps のチケット: 画像・リンク・添付・コメントごと `.dev-kit/tickets/` に取り込み、上のスキルの入力にして、次に使うスキルを示す。読み取り専用で分析はしない |
 | `dk:story-runner` | 機能/ストーリーのカード: 確認、spec、テスト付きの実装、そのあと `dk:pre-pr-check` |
 | `dk:bug-fixer` | バグのカード（パフォーマンスの回帰を含む）: 根本原因、回帰テスト、修正 |
 | `dk:code-refactor` | 技術的負債のカード: 振る舞いを変えずに再構成する |

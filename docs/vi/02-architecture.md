@@ -16,8 +16,8 @@ dev-kit/
 ├── .agents/plugins/marketplace.json # marketplace "dev-kit" for codex plugin marketplace add
 ├── .antigravity-plugin/plugin.json  # Antigravity (agy) manifest
 ├── .version-bump.json      # manifests that must share one version (scripts/bump_version.py)
-├── skills/                 # 6 registered skills: init, brainstorm + 4 controllers
-│   ├── init/ brainstorm/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
+├── skills/                 # 7 registered skills: init, brainstorm, ticket + 4 controllers
+│   ├── init/ brainstorm/ ticket/ story-runner/ bug-fixer/ code-refactor/ pre-pr-check/
 ├── parts/                  # 16 sub-skills copied from upstream: NOT registered as skills
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
@@ -115,6 +115,10 @@ tracker: none        # not used in 0.6.0
 graph:
   codegraph: false   # true when .codegraph/ exists (rule G1)
   crg: false         # true when .code-review-graph/ exists (rule G1)
+ticket:             # written by dk:ticket on first use
+  provider: jira     # or azure
+  site: acme.atlassian.net   # azure: org + project
+  types: { Bug: bug-fixer }  # optional: ticket type -> dk skill
 ```
 
 Mẫu gốc: `templates/config.yml`. Nếu file tồn tại, controller dùng `commands.check` (không có thì `commands.test`) và `base_branch`. Nếu không có file, controller dùng `make check` (nếu repo có) hoặc lệnh test ghi trong tài liệu của repo, và coi nhánh gốc là `main`.

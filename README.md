@@ -14,6 +14,7 @@ Works with **Claude Code** (reference), **Codex**, **GitHub Copilot CLI**, **Ant
 |---|---|
 | `dk:init` | First run in a repo: check tools, write `.dev-kit/config.yml`, record a test baseline |
 | `dk:brainstorm` | An idea before there is a clear card: compare approaches, agree a spec for `dk:story-runner`; no code |
+| `dk:ticket` | A Jira Cloud or Azure DevOps ticket: pull it with its images, links, attachments and comments into `.dev-kit/tickets/` as input for the skills above, then name the one to run next; read-only, no analysis |
 | `dk:story-runner` | A feature or story card: clarify, spec, implement with tests, then `dk:pre-pr-check` |
 | `dk:bug-fixer` | A bug card, including performance regressions: root cause, regression test, fix |
 | `dk:code-refactor` | A tech-debt card: restructure without changing behavior |

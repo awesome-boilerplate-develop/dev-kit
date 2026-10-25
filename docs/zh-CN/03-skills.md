@@ -209,3 +209,21 @@ flowchart TD
 flowchart LR
     A["Context"] --> B["grilling"] --> C["2–3 approaches"] --> D["Design by section"] --> E["Spec (draft)"] --> F["Self-review + your review"] --> G["Status: agreed → dk:story-runner"]
 ```
+
+---
+
+## 3.8 `dk:ticket`
+
+**适用于：** 你在 Jira Cloud 或 Azure DevOps 上有一个 ticket，想把它放进仓库作为 controller 的卡片，或者想一次拉取"我未关闭的 bug"。它不是 controller：只读取看板并写入 `.dev-kit/tickets/`；不做 triage、不改代码，现有的 skill 也不会因它而改变。
+
+**步骤：**
+1. **看板设置：** 完整链接直接拉取；之后如果 `.dev-kit/config.yml` 还没有 `ticket:` 部分，就按链接写入并告诉你。
+2. **凭据：** `scripts/ticket.py check`；Jira 使用你在自己终端里用 `ticket.py login jira` 保存的 API token，Azure DevOps 使用 `az login`（或 PAT）。
+3. 按链接或 key **拉取**，或用根据你的话写出的 JQL / WIQL **查询**。每个 ticket 保留看板显示的内容：按真实表单顺序排列的各部分（会读取 Azure DevOps 的表单布局，因为各组织会自定义表单）、原位置的图片、链接（相关条目、PR、commit）、附件，以及按看板顺序的评论。story 下的 Task 或 Sub-task 会写进 story 的文件：在 story 内容之后有自己的一节，并附上 story 的子项。
+4. 按需**翻译**（`ticket.<lang>.md`，原文仍是准据；ticket 变化后译文会被标记为过期）。
+5. **下一个 skill：** Bug → `dk:bug-fixer`，story → `dk:story-runner`（太简略时先 `dk:brainstorm`），技术债 → `dk:code-refactor`，其他情况会询问；`ticket.types` 可覆盖。单个 ticket 时，它会提议以该文件作为卡片直接运行。
+
+```mermaid
+flowchart LR
+    A["Link / key / filter"] --> B["check credentials"] --> C["ticket.py fetch | query"] --> D[".dev-kit/tickets/KEY/ticket.md"] --> E["translate? (optional)"] --> F["next: dk:bug-fixer | story-runner | ..."]
+```

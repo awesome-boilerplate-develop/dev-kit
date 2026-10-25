@@ -17,6 +17,7 @@ Chạy với **Claude Code** (CLI tham chiếu), **Codex**, **GitHub Copilot CLI
 |---|---|
 | `dk:init` | Lần đầu chạy trong một repo: kiểm tra công cụ, ghi `.dev-kit/config.yml`, ghi lại test baseline |
 | `dk:brainstorm` | Một ý tưởng chưa có card rõ ràng: so sánh các hướng làm, chốt spec cho `dk:story-runner`; không code |
+| `dk:ticket` | Một ticket Jira Cloud hoặc Azure DevOps: kéo về `.dev-kit/tickets/` kèm ảnh, link, file đính kèm và comment làm input cho các skill trên, rồi gợi ý skill chạy tiếp; chỉ đọc, không phân tích |
 | `dk:story-runner` | Thẻ feature hoặc story: làm rõ yêu cầu, viết spec, triển khai kèm test, rồi chạy `dk:pre-pr-check` |
 | `dk:bug-fixer` | Thẻ bug, kể cả hồi quy hiệu năng: tìm nguyên nhân gốc, viết regression test, sửa lỗi |
 | `dk:code-refactor` | Thẻ nợ kỹ thuật: tái cấu trúc mà không đổi hành vi |
