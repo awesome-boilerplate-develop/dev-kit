@@ -114,7 +114,7 @@ flowchart LR
 2. **spec を書く** `.dev-kit/specs/<feature>.md`、`templates/spec.md` に沿って: 目的、rule、インターフェース、受け入れ基準、スコープ外、そして **Decisions** セクション（質問、回答、決めた人または「assumption」）。
 3. **rule C1 に従う:**
    - **小さな作業:** セッション内でそのまま行う。テストを先に書き、振る舞いごとに 1 コミット。
-   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch`（作業中のブランチにマージして戻す。push/PR はしない）。
+   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`。SDD 自身の finishing の手前で止める。ステップ 4 の `dk:pre-pr-check` は worktree 内の feature ブランチでマージ前に実行し、GO のときだけ `finishing-a-development-branch` が作業中のブランチにマージして戻す（push/PR はしない）。
 4. **`dk:pre-pr-check` を実行する。**
 
 ```mermaid
@@ -123,9 +123,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **例（説明用）:** チケット「顧客がチェックアウトで割引コードを入力する」。

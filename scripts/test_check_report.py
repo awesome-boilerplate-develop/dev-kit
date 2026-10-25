@@ -9,11 +9,11 @@ import unittest
 SCRIPT = pathlib.Path(__file__).resolve().parent / "check_report.py"
 
 
-def report(certain="", suspect="", verdict="GO", diff=""):
+def report(certain="", suspect="", verdict="GO", diff="", result="PASS: 12 tests"):
     return f"""## Commands run
 | Command | Result |
 |---|---|
-| make check | pass |
+| make check | {result} |
 
 ## Review setup (required)
 {diff}
@@ -49,6 +49,13 @@ class CheckReport(unittest.TestCase):
     def test_located_fixed_blocker_with_go_passes(self):
         r = self.check(report("| blocker | 90 | src/pay.ts:12 | total is negative when qty is 0 | — | fixed |"))
         self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_failing_check_needs_no_go(self):
+        for result in ("FAIL: compiler error, exit 1", "**FAIL** 1 new failing test", "NOT RUN: restore failed"):
+            r = self.check(report(result=result))
+            self.assertIn("required check failed or did not run but verdict is GO", r.stdout, result)
+            self.assertEqual(self.check(report(verdict="NO-GO", result=result)).returncode, 0, result)
+        self.assertEqual(self.check(report(result="PASS: 40 tests, 2 known baseline failures")).returncode, 0)
 
     def test_file_without_extension_is_located(self):
         r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))

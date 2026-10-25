@@ -114,7 +114,7 @@ flowchart LR
 2. **Viết spec** `.dev-kit/specs/<feature>.md` theo `templates/spec.md`: mục tiêu, quy tắc, interface, tiêu chí chấp nhận, ngoài phạm vi, và một mục **Decisions** (câu hỏi, câu trả lời, ai quyết định hoặc "assumption").
 3. **Theo rule C1:**
    - **Việc nhỏ:** làm ngay trong session, test trước, mỗi hành vi một commit.
-   - **Việc lớn** (hơn 3 task hoặc nhiều module): dùng các part theo thứ tự: `writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch` (merge về branch bạn đang làm; không push/PR).
+   - **Việc lớn** (hơn 3 task hoặc nhiều module): dùng các part theo thứ tự: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, dừng trước bước finishing của SDD. Bước 4 chạy `dk:pre-pr-check` trong worktree, trên feature branch, trước khi merge; chỉ khi GO thì `finishing-a-development-branch` mới merge về branch bạn đang làm (không push/PR).
 4. **Chạy `dk:pre-pr-check`.**
 
 ```mermaid
@@ -123,9 +123,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **Ví dụ (minh họa):** ticket "Khách hàng nhập mã giảm giá khi thanh toán".
@@ -156,7 +157,7 @@ flowchart TD
 **Chế độ report-only:** nếu yêu cầu nói "do not change code", nó không sửa file nào và bỏ qua bước 4.
 
 **Các bước:**
-1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
+1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Checks, review và report cùng xét HEAD, nên thay đổi chưa commit làm lượt chạy dừng lại để hỏi bạn. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
 2. **Chọn mức review theo rule C2:**
 
    | Mức | Khi nào | Làm gì |
@@ -166,8 +167,8 @@ flowchart TD
    | 4 reviewer | Bạn yêu cầu, hoặc diff đụng tới auth/quyền, secret, dữ liệu cá nhân, migration, config/env | Song song: 2 reviewer `code-review` (mỗi người một trục), `dk:security-auditor`, `dk:test-engineer` |
 
    Mỗi reviewer nhận phạm vi diff và nội dung spec/issue, và trả về `file:line | blocker/major/minor | lý do`.
-3. **Gộp kết quả** vào một bảng theo thang blocker/major/minor. Nếu còn blocker nào mở thì `Verdict: NO-GO`; ngược lại là `GO`.
-4. **Nếu có blocker:** đọc part `receiving-code-review`, sửa kèm bằng chứng (hoặc phản biện kèm lý do), rồi quay lại bước 1. Tối đa 2 vòng.
+3. **Gộp kết quả** vào một bảng theo thang blocker/major/minor. Nếu còn blocker nào mở, hoặc có check fail, thì `Verdict: NO-GO`; ngược lại là `GO`.
+4. **Nếu có blocker:** đọc part `receiving-code-review`, sửa kèm bằng chứng (hoặc phản biện kèm lý do), commit từng bản sửa, rồi quay lại bước 1. Tối đa 2 vòng.
 5. **Báo cáo kèm bảng finding.** Trừ khi ở chế độ report-only, ghi `.dev-kit/reports/pr-body.md` theo part `pr` (Summary / Evidence / Merge Danger), trong đó Evidence là output của bước 1.
 
 **Ví dụ (minh họa):** một branch "hoàn tiền một phần" đụng tới quyền và dữ liệu cá nhân nên chạy 4 reviewer. Kết quả là NO-GO với các blocker sau:

@@ -38,4 +38,4 @@ Rule C1 (G1: playbook §5 rename preview lists every edit site; check dead code 
 - large work → the SDD parts as in story-runner.
 
 ### 4. Pre-PR check
-Run skill `dk:pre-pr-check`.
+Run skill `dk:pre-pr-check`; for large work, in the worktree before merging, as in story-runner step 4.

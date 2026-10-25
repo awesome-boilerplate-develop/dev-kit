@@ -111,8 +111,8 @@ flowchart LR
 2. **Write the spec** `.dev-kit/specs/<feature>.md` per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, and a **Decisions** section (question, answer, who decided or "assumption").
 3. **Follow rule C1:**
    - **Small work:** do it right in the session, tests first, one commit per behavior.
-   - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch` (merge back into the branch you are working on; no push/PR).
-4. **Run `dk:pre-pr-check`.**
+   - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, stopping before SDD's own finishing step.
+4. **Run `dk:pre-pr-check`.** For large work it runs in the worktree, on the feature branch, before anything is merged; only on GO does `finishing-a-development-branch` merge back into the branch you are working on (no push/PR).
 
 ```mermaid
 flowchart TD
@@ -120,9 +120,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **Example (illustration):** ticket "A customer enters a discount code at checkout".
@@ -153,7 +154,7 @@ flowchart TD
 **Report-only mode:** if the request says "do not change code", it edits no file and skips step 4.
 
 **Steps:**
-1. **Run the check commands right now** and keep the output as Evidence. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
+1. **Run the check commands right now** and keep the output as Evidence. Checks, review and report cover HEAD, so uncommitted changes stop the run with a question to you. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
 2. **Pick the review level per rule C2:**
 
    | Level | When | What it does |
@@ -163,8 +164,8 @@ flowchart TD
    | 4 reviewers | You ask for it, or the diff touches auth/permissions, secrets, personal data, migrations, config/env | In parallel: 2 `code-review` reviewers (one axis each), `dk:security-auditor`, `dk:test-engineer` |
 
    Each reviewer receives the diff range and the spec/issue text, and returns `file:line | blocker/major/minor | reason`.
-3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, `Verdict: NO-GO`; otherwise `GO`.
-4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), and go back to step 1. At most 2 rounds.
+3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, or a check failed, `Verdict: NO-GO`; otherwise `GO`.
+4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), commit each fix, and go back to step 1. At most 2 rounds.
 5. **Report with the findings table.** Unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
 
 **Example (illustration):** a "partial refund" branch touches permissions and personal data, so it runs 4 reviewers. The result is NO-GO with these blockers:

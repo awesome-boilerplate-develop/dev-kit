@@ -483,6 +483,7 @@ class Item:
 
 class Board:
     name = ""
+    hosts = ()  # the board's own hosts: the only ones its token is sent to
 
     def __init__(self, auth):
         self.auth = auth
@@ -499,6 +500,13 @@ class Board:
             except Unauthorized as e2:
                 raise Fail(f"{e2}: {self.auth.hint}") from None
 
+    def download(self, url):
+        """Bytes of an image or attachment. A URL in the ticket content may point anywhere: no token outside the board."""
+        u = urllib.parse.urlparse(url)
+        if u.scheme == "https" and u.netloc.lower() in self.hosts:
+            return self.get(url, raw=True)
+        return request(url, None, raw=True)
+
 
 class Ado(Board):
     name = "Azure DevOps"
@@ -506,6 +514,7 @@ class Ado(Board):
     def __init__(self, org, project, auth):
         super().__init__(auth)
         self.org, self.project = org, project
+        self.hosts = ("dev.azure.com", f"{org.lower()}.visualstudio.com")
         self.root = f"https://dev.azure.com/{urllib.parse.quote(org)}"
         self.base = f"{self.root}/{urllib.parse.quote(project)}/_apis/wit"
         self.forms = {}
@@ -565,7 +574,15 @@ class Ado(Board):
                   "url": r["url"], "ids": {r["url"].rsplit("/", 1)[-1].lower(),
                                            r["attributes"].get("name", "").rsplit(".", 1)[0].lower()}}
                  for r in rels if r["rel"] == "AttachedFile"]
-        comments = self.get(f"{self.base}/workItems/{key}/comments?order=desc&api-version=7.1-preview.4")
+        # renderedText: a Markdown comment comes as HTML too. Comments come in pages, linked by a continuation token.
+        comments, token = [], ""
+        while True:
+            page = self.get(f"{self.base}/workItems/{key}/comments?order=desc&$expand=renderedText&api-version=7.1-preview.4"
+                            + (f"&continuationToken={urllib.parse.quote(token)}" if token else ""))
+            comments += page.get("comments", [])
+            token = page.get("continuationToken")
+            if not token:
+                break
         p = info.get(parent, {}) if parent else {}
         return Item(
             key=str(w["id"]), display=f"#{w['id']}", url=self.link(w["id"]), type=wtype,
@@ -580,7 +597,7 @@ class Ado(Board):
             sections=[(label, f.get(k)) for k, label in form if f.get(k)],
             links=links, attachments=files,
             comments=[((c.get("createdBy") or {}).get("displayName", "?"), c.get("createdDate", "")[:16].replace("T", " "),
-                       c.get("renderedText") or c.get("text") or "") for c in comments.get("comments", [])],
+                       c.get("renderedText") or c.get("text") or "") for c in comments],
             comment_order="newest first",
             parent=parent and {"key": parent, "display": f"#{parent}", "type": p.get("System.WorkItemType", ""),
                                "title": p.get("System.Title", ""), "url": self.link(parent)},
@@ -624,6 +641,7 @@ class Jira(Board):
     def __init__(self, site, auth, ac_field=None):
         super().__init__(auth)
         self.site, self.ac_field = site, ac_field
+        self.hosts = (site.lower(),)
         self.root = f"https://{site}"
 
     def item(self, key):
@@ -649,10 +667,17 @@ class Jira(Board):
                           "", "", ""))
         files = [{"name": a.get("filename", "file"), "size": a.get("size") or 0, "url": a.get("content"),
                   "ids": {str(a.get("id"))}} for a in f.get("attachment") or []]
-        rendered = {c.get("id"): c for c in ((rf.get("comment") or {}).get("comments") or [])}
+        rendered = {c.get("id"): c.get("body") for c in ((rf.get("comment") or {}).get("comments") or [])}
+        raw = list((f.get("comment") or {}).get("comments") or [])
+        while len(raw) < ((f.get("comment") or {}).get("total") or 0):  # the issue carries only the first page
+            page = self.get(f"{self.root}/rest/api/3/issue/{urllib.parse.quote(key)}/comment?startAt={len(raw)}"
+                            "&maxResults=100&orderBy=created&expand=renderedBody").get("comments") or []
+            if not page:
+                break
+            raw += page
+            rendered.update({c.get("id"): c.get("renderedBody") for c in page})
         comments = [((c.get("author") or {}).get("displayName", "?"), str(c.get("created", ""))[:16].replace("T", " "),
-                     (rendered.get(c.get("id")) or {}).get("body") or "")
-                    for c in (f.get("comment") or {}).get("comments") or []]
+                     rendered.get(c.get("id")) or "") for c in raw]
         sprint = f.get(next((k for k, n in names.items() if n == "Sprint"), ""), None)
         sprint = ", ".join(s.get("name", "") for s in sprint) if isinstance(sprint, list) else None
         p = f.get("parent")
@@ -673,14 +698,25 @@ class Jira(Board):
                           "title": (p.get("fields") or {}).get("summary", "")},
             task_like=bool(itype.get("subtask")), raw=i)
 
+    def search(self, jql, fields, limit=None):
+        """Issues of a JQL search, page by page (each page hands the next one's token), at most `limit`."""
+        issues, token = [], None
+        while limit is None or len(issues) < limit:
+            data = self.get(f"{self.root}/rest/api/3/search/jql?jql={urllib.parse.quote(jql)}"
+                            f"&maxResults={100 if limit is None else limit - len(issues)}&fields={fields}"
+                            + (f"&nextPageToken={urllib.parse.quote(token)}" if token else ""))
+            issues += data.get("issues", [])
+            token = data.get("nextPageToken")
+            if not token or not data.get("issues"):
+                break
+        return issues
+
     def children(self, item):
-        jql = urllib.parse.quote(f"parent = {item.key} ORDER BY created ASC")
-        data = self.get(f"{self.root}/rest/api/3/search/jql?jql={jql}&maxResults=100"
-                        "&fields=summary,status,issuetype,assignee")
+        issues = self.search(f"parent = {item.key} ORDER BY created ASC", "summary,status,issuetype,assignee")
         return [(c["key"], f"[{c['key']}]({self.root}/browse/{c['key']})",
                  (c["fields"].get("issuetype") or {}).get("name", ""), c["fields"].get("summary", ""),
                  (c["fields"].get("status") or {}).get("name", ""), (c["fields"].get("assignee") or {}).get("displayName", ""))
-                for c in data.get("issues", [])]
+                for c in issues]
 
     def image_ids(self, src):
         return set(re.findall(r"/(?:attachment|thumbnail)/(?:content/)?(\d+)", src))
@@ -691,8 +727,7 @@ class Jira(Board):
         return f"{self.root}/rest/api/3/attachment/content/{m.group(1)}" if m else src
 
     def query(self, q, limit):
-        data = self.get(f"{self.root}/rest/api/3/search/jql?jql={urllib.parse.quote(q)}&maxResults={limit}&fields=key")
-        return [i["key"] for i in data.get("issues", [])][:limit]
+        return [i["key"] for i in self.search(q, "key", limit)][:limit]
 
     def whoami(self):
         return self.get(f"{self.root}/rest/api/3/myself").get("displayName", "?")
@@ -747,15 +782,25 @@ class Doc:
         return out
 
     def unique(self, name):
-        taken = {n for _, n in self.attachments}
+        taken = {n.lower() for _, n in self.attachments}  # Spec.pdf and spec.pdf are one file on macOS and Windows
         stem, dot, ext = name.rpartition(".")
         n, cand = 1, name
-        while cand in taken:
+        while cand.lower() in taken:
             n += 1
             cand = f"{stem}-{n}.{ext}" if dot else f"{name}-{n}"
         return cand
 
     def write(self, folder, text):
+        # Download and check everything before the old copy is removed: a failed refresh leaves it whole.
+        images = []
+        for n, src in enumerate(self.images, 1):
+            data = self.board.download(src)
+            ext = next((e for magic, e in IMAGE_TYPES if data.startswith(magic)), None)
+            if not ext:
+                raise Fail(f"image {n} of {folder.name} is not an image (a sign-in page?): {src.split('?')[0]}")
+            images.append((data, ext))
+            text = text.replace(f"__ext{n}__", ext)
+        files = [(name, self.board.download(url)) for url, name in self.attachments]
         folder.mkdir(parents=True, exist_ok=True)
         for sub in ("images", "attachments"):
             d = folder / sub
@@ -763,17 +808,12 @@ class Doc:
                 for old in d.iterdir():
                     old.unlink()
                 d.rmdir()
-        for n, src in enumerate(self.images, 1):
-            data = self.board.get(src, raw=True)
-            ext = next((e for magic, e in IMAGE_TYPES if data.startswith(magic)), None)
-            if not ext:
-                raise Fail(f"image {n} of {folder.name} is not an image (a sign-in page?): {src.split('?')[0]}")
+        for n, (data, ext) in enumerate(images, 1):
             (folder / "images").mkdir(exist_ok=True)
             (folder / "images" / f"{n}.{ext}").write_bytes(data)
-            text = text.replace(f"__ext{n}__", ext)
-        for url, name in self.attachments:
+        for name, data in files:
             (folder / "attachments").mkdir(exist_ok=True)
-            (folder / "attachments" / name).write_bytes(self.board.get(url, raw=True))
+            (folder / "attachments" / name).write_bytes(data)
         text = re.sub(r"(\n---\n)(\n---\n)+", r"\1", text)
         text = re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
         (folder / "ticket.md").write_text(text, encoding="utf-8")

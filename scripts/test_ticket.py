@@ -286,6 +286,19 @@ class AdoFetch(unittest.TestCase):
         self.assertIn("| [#100](100/ticket.md) | Bug | Drug name issues | Active | dk:bug-fixer |", index)
         self.assertEqual(self.fake.calls[0][1], {"query": "SELECT 1"})
 
+    def test_comments_rendered_and_every_page(self):
+        pages = {"": {"comments": [{"createdDate": "2026-10-03T00:00:00Z", "renderedText": "<ol><li>first</li></ol>",
+                                    "text": "1. first"}], "continuationToken": "p2"},
+                 "p2": {"comments": [{"createdDate": "2026-09-01T00:00:00Z", "renderedText": "<p>page two</p>"}]}}
+        self.fake.routes.insert(0, (r"/workItems/100/comments\?(?:.*continuationToken=(\w+))?",
+                                    lambda m: pages[m.group(1) or ""]))
+        path, *_, n_com, _, _ = ticket.fetch(self.board, "100", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertEqual(n_com, 2)
+        self.assertIn("1. first", text)
+        self.assertIn("page two", text)
+        self.assertTrue(all("$expand=renderedText" in u for u, _ in self.fake.calls if "/comments" in u))
+
 
 def jira_routes():
     site = "https://acme.atlassian.net"
@@ -327,7 +340,8 @@ class JiraFetch(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
         self.out = pathlib.Path(self.dir.name)
-        self.patch = mock.patch.object(ticket, "request", Fake(jira_routes()))
+        self.fake = Fake(jira_routes())
+        self.patch = mock.patch.object(ticket, "request", self.fake)
         self.patch.start()
         self.board = ticket.Jira("acme.atlassian.net", ticket.Auth("Basic x"), "customfield_100")
 
@@ -359,6 +373,30 @@ class JiraFetch(unittest.TestCase):
         self.assertIn("### Description\n\nDo the FE part", text)
         self.assertIn("| [PROJ-3](https://acme.atlassian.net/browse/PROJ-3) (in this file) | Sub-task | FE | To Do |", text)
 
+    def test_comments_beyond_the_first_page(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))  # the issue route's answer
+        issue["fields"]["comment"]["total"] = 3  # two of three comments come with the issue
+        self.fake.routes.insert(0, (r"/issue/PROJ-1/comment\?startAt=2", {"comments": [
+            {"id": "3", "author": {"displayName": "Di"}, "created": "2026-01-03T10:00:00.000+0000", "renderedBody": "<p>third</p>"}]}))
+        path, *_, n_com, _, _ = ticket.fetch(self.board, "PROJ-1", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertEqual(n_com, 3)
+        self.assertLess(text.index("second"), text.index("third"))
+
+    def test_query_follows_next_page_token(self):
+        pages = {"": {"issues": [{"key": "A-1"}], "nextPageToken": "t2"}, "t2": {"issues": [{"key": "A-2"}, {"key": "A-3"}]}}
+        self.fake.routes.insert(0, (r"/search/jql\?jql=project.*?(?:nextPageToken=(\w+))?$", lambda m: pages[m.group(1) or ""]))
+        self.assertEqual(self.board.query("project = A", 2), ["A-1", "A-2"])
+        self.assertEqual(self.board.query("project = A", 10), ["A-1", "A-2", "A-3"])
+
+    def test_failed_refresh_keeps_the_old_copy(self):
+        path, *_ = ticket.fetch(self.board, "PROJ-1", self.out)
+        before = {f: f.read_bytes() for f in path.parent.rglob("*") if f.is_file()}
+        self.fake.routes.insert(0, (r"/attachment/content/10002", lambda m: (_ for _ in ()).throw(ticket.Fail("timeout"))))
+        with self.assertRaisesRegex(ticket.Fail, "timeout"):
+            ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual({f: f.read_bytes() for f in path.parent.rglob("*") if f.is_file()}, before)
+
 
 class Plumbing(unittest.TestCase):
     def test_next_skill(self):
@@ -385,6 +423,24 @@ class Plumbing(unittest.TestCase):
             self.assertEqual(calls, ["old", "new"])
             with self.assertRaisesRegex(ticket.Fail, "run login"):
                 ticket.Board(ticket.Auth("old", hint="run login")).get("u")
+
+    def test_token_only_to_the_board_hosts(self):
+        calls = []
+        with mock.patch.object(ticket, "request", lambda url, auth, body=None, raw=False: calls.append(auth) or PNG):
+            jira = ticket.Jira("acme.atlassian.net", ticket.Auth("Basic x"))
+            for url in ("https://acme.atlassian.net/rest/api/3/attachment/content/1", "https://evil.example/x.png",
+                        "http://acme.atlassian.net/x.png", "https://acme.atlassian.net.evil.example/x.png"):
+                jira.download(url)
+            ado = ticket.Ado("Org", "P", ticket.Auth("Bearer t"))
+            for url in (f"{ADO}/_apis/wit/attachments/{GUID1}", f"https://org.visualstudio.com/P/_apis/wit/attachments/{GUID1}",
+                        "https://images.example/shot.png"):
+                ado.download(url)
+        self.assertEqual(calls, ["Basic x", None, None, None, "Bearer t", "Bearer t", None])
+
+    def test_attachment_names_differ_by_more_than_case(self):
+        doc = ticket.Doc(ticket.Jira("a.atlassian.net", ticket.Auth("")))
+        doc.attachments.append(("u1", doc.unique("Spec.pdf")))
+        self.assertEqual(doc.unique("spec.pdf"), "spec-2.pdf")
 
     def test_redirect_to_another_host_drops_the_token(self):
         h = ticket.SameHostAuth()

@@ -37,7 +37,8 @@ Write the spec to `.dev-kit/specs/<feature>.md` from `${CLAUDE_PLUGIN_ROOT}/temp
 ### 3. Implement
 Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for large work):
 - small work → implement here, test first, commit per behaviour.
-- Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`, `finishing-a-development-branch` (merge back locally, no push/PR).
+- Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`; stop SDD before its `finishing-a-development-branch` step: the gate in step 4 comes first.
 
 ### 4. Pre-PR check
 Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.
+- Large work: run it in the worktree, on the feature branch, before anything is merged. Then copy its report (and `pr-body.md`) to `.dev-kit/reports/` of the main checkout. On GO, part `finishing-a-development-branch` (merge back locally, no push/PR); on NO-GO, leave the branch unmerged and say so.

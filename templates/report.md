@@ -12,7 +12,7 @@
 ## Commands run
 | Command | Result |
 |---|---|
-| <check command> | <pass/fail, counts> |
+| <check command> | <PASS / FAIL: … / NOT RUN: …, counts; a failure listed in the baseline is PASS> |
 
 ## Review setup (required)
 - Diff: <merge-base sha>...<HEAD sha> (the range reviewed)
@@ -21,7 +21,7 @@
 - Standards applied: <ids, e.g. review/finding-quality> | none
 
 ## Review
-Verdict: GO | NO-GO (from open **certain** blockers only)
+Verdict: GO | NO-GO (from open **certain** blockers and checks that FAIL or did NOT RUN)
 
 ### Certain findings
 | Severity | Conf. | file:line | Finding (what, when it happens, impact, fix) | Rule | Status |

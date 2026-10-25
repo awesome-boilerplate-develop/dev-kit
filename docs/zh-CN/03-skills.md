@@ -114,7 +114,7 @@ flowchart LR
 2. **写 spec** `.dev-kit/specs/<feature>.md`，按 `templates/spec.md`：目标、rule、接口、验收标准、范围之外，以及一个 **Decisions** 部分（问题、答案、谁决定，或 “assumption”）。
 3. **遵循 rule C1：**
    - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit。
-   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch`（合并回你正在工作的分支；不 push/不开 PR）。
+   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development`，在 SDD 自己的 finishing 步骤之前停下。第 4 步的 `dk:pre-pr-check` 在 worktree 中的 feature 分支上、合并之前运行；只有 GO 时 `finishing-a-development-branch` 才合并回你正在工作的分支（不 push/不开 PR）。
 4. **运行 `dk:pre-pr-check`。**
 
 ```mermaid
@@ -123,9 +123,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **示例（示意）：** 工单“顾客在结账时输入折扣码”。

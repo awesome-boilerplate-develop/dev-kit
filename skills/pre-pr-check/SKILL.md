@@ -28,7 +28,8 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 **Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
 
 ### 1. Checks and a lowered bar
-- Run the check command now; keep the output as Evidence.
+- Checks, review and report all cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD, so stop and ask the user to commit them or set them aside; never stash, commit or discard them yourself.
+- Run the check command now; keep the output as Evidence. A check that fails outside the baseline, or cannot run, goes in Commands run as `FAIL: …` or `NOT RUN: …`. It is not a finding (R6 drops what CI catches): it makes the verdict NO-GO on its own.
 - Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.
 - If `.dev-kit/CONSTRAINTS.md` (or the project's own `CONSTRAINTS.md`) exists, also check the diff against its floor and numbered rules; a change that breaks one is a blocker.
 
@@ -44,17 +45,17 @@ Run `git diff --shortstat main...HEAD` and list the touched files; pick the dept
 - *Four reviewers* (one turn, in parallel): two general-purpose subagents with part `code-review` in the roles "Standards axis only" and "Spec axis only", plus `dk:security-auditor` and `dk:test-engineer`.
 
 Every reviewer (and you, in self-review) gets: the diff range, the spec (`.dev-kit/specs/…` or the issue text), the step-2 graph summary, `${CLAUDE_PLUGIN_ROOT}/standards/review/finding-quality.md` (rule R1), and the loaded standards (rule T1) whose `topic` belongs to its role, as paths, with the instruction to apply their `## Review`, `## Do not flag` and `## Severity` sections and cite rule ids:
-- Standards reviewer: coding, architecture, process · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing.
+- Standards reviewer: coding, architecture, process, ops · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing.
 - One reviewer or self-review: all loaded topics. Reviewers return findings as `file:line | severity | confidence 0–100 | when it happens | rule id or — | finding`.
 
 ### 4. Merge and gate
 - Deduplicate by location and defect.
 - Drop findings that fail any condition of `finding-quality` (R1–R7) or have confidence < 50.
 - Split the rest into **certain** (≥ 80) and **suspect** (50–79). Map other severity labels with rule S1.
-- Any open certain `blocker` → `Verdict: NO-GO`; otherwise `Verdict: GO`.
+- Any open certain `blocker`, or a check that is `FAIL` / `NOT RUN` in step 1 → `Verdict: NO-GO`; otherwise `Verdict: GO`.
 
 ### 5. Fix certain blockers
-Certain blockers: Read part `receiving-code-review`, fix with evidence (or push back with reasons), back to step 1 (max 2 rounds).
+Certain blockers and failing checks: Read part `receiving-code-review`, fix with evidence (or push back with reasons), commit each fix (only the files you changed) so the next round checks and reviews HEAD, back to step 1 (max 2 rounds).
 
 ### 6. Report and PR body
 - Report from the template, including the required **Review setup** section; its Diff line is `git merge-base main HEAD`...`git rev-parse HEAD`, taken when you write the report.
