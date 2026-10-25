@@ -73,12 +73,16 @@ class TreeBuilder(html.parser.HTMLParser):
         self.root = self.cur = Node("root")
 
     def handle_starttag(self, tag, attrs):
+        if tag == "ins":  # Jira renders a literal "+ … +" as <ins>, often across tags: keep the plus signs
+            return self.handle_data("+")
         node = Node(tag, attrs, self.cur)
         self.cur.children.append(node)
         if tag not in VOID:
             self.cur = node
 
     def handle_endtag(self, tag):
+        if tag == "ins":
+            return self.handle_data("+")
         n = self.cur
         while n is not self.root and n.tag != tag:
             n = n.parent
@@ -200,7 +204,7 @@ class Markdown:
             return wrap(inner, "**")
         if t in ("i", "em"):
             return wrap(inner, "*")
-        if t == "code":
+        if t in ("code", "tt"):
             return wrap(inner, "`")
         if t in ("s", "strike", "del"):
             return wrap(inner, "~~")

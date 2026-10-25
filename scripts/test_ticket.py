@@ -55,6 +55,11 @@ class Converter(unittest.TestCase):
         self.assertIn("[site](http://x) :)", out)
         self.assertEqual(seen, [])
 
+    def test_jira_plus_signs_rendered_as_ins(self):
+        # Jira renders "a + b + c" in a rich field as <ins> across tags; the plus signs must survive.
+        out, _ = md("<p><tt>a</tt> <b><ins></b> <tt>b</tt> <b></ins></b> <tt>c</tt></p>")
+        self.assertEqual(out, "`a` **+** `b` **+** `c`")
+
 
 class Refs(unittest.TestCase):
     def test_links(self):
