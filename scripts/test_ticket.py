@@ -68,13 +68,13 @@ class Refs(unittest.TestCase):
         self.assertEqual(ticket.parse_ref("https://org.visualstudio.com/Proj/_workitems/edit/7", {})["org"], "org")
         self.assertEqual(ticket.parse_ref("https://acme.atlassian.net/browse/PROJ-42", {}),
                          {"provider": "jira", "site": "acme.atlassian.net", "key": "PROJ-42"})
-        self.assertEqual(ticket.parse_ref("https://acme.atlassian.net/jira/software/projects/OMS/boards/1"
-                                          "?selectedIssue=OMS-7", {})["key"], "OMS-7")
+        self.assertEqual(ticket.parse_ref("https://acme.atlassian.net/jira/software/projects/PROJ/boards/1"
+                                          "?selectedIssue=PROJ-7", {})["key"], "PROJ-7")
 
     def test_bare_keys_need_settings(self):
         self.assertEqual(ticket.parse_ref("#12", {"provider": "azure", "org": "o", "project": "p"})["key"], "12")
-        self.assertEqual(ticket.parse_ref("oms-3", {"provider": "jira", "site": "s"})["key"], "OMS-3")
-        for bad in ("12", "OMS-3", "hello"):
+        self.assertEqual(ticket.parse_ref("proj-3", {"provider": "jira", "site": "s"})["key"], "PROJ-3")
+        for bad in ("12", "PROJ-3", "hello"):
             with self.assertRaises(ticket.Fail):
                 ticket.parse_ref(bad, {})
 
@@ -290,7 +290,7 @@ class AdoFetch(unittest.TestCase):
 def jira_routes():
     site = "https://acme.atlassian.net"
     issues = {
-        "OMS-1": {"key": "OMS-1",
+        "PROJ-1": {"key": "PROJ-1",
                   "names": {"description": "Description", "customfield_100": "Acceptance Criteria", "customfield_5": "Sprint"},
                   "renderedFields": {
                       "description": '<p>Story text <span class="image-wrap"><img src="/secure/thumbnail/10001/a.png"></span></p>',
@@ -302,13 +302,13 @@ def jira_routes():
                                             {"id": 10002, "filename": "doc.pdf", "size": 4096, "content": f"{site}/rest/api/3/attachment/content/10002"},
                                             {"id": 10003, "filename": "shot.png", "size": 100, "content": f"{site}/rest/api/3/attachment/content/10003"}],
                              "issuelinks": [{"type": {"inward": "is blocked by", "outward": "blocks"},
-                                             "outwardIssue": {"key": "OMS-2", "fields": {"summary": "Pay", "status": {"name": "To Do"},
+                                             "outwardIssue": {"key": "PROJ-2", "fields": {"summary": "Pay", "status": {"name": "To Do"},
                                                                                        "issuetype": {"name": "Story"}}}}],
                              "comment": {"comments": [{"id": "1", "author": {"displayName": "Bo"}, "created": "2026-01-01T10:00:00.000+0000"},
                                                       {"id": "2", "author": {"displayName": "Cy"}, "created": "2026-01-02T10:00:00.000+0000"}]}}},
-        "OMS-3": {"key": "OMS-3", "names": {}, "renderedFields": {"description": "<p>Do the FE part</p>"},
+        "PROJ-3": {"key": "PROJ-3", "names": {}, "renderedFields": {"description": "<p>Do the FE part</p>"},
                   "fields": {"issuetype": {"name": "Sub-task", "subtask": True}, "summary": "FE", "status": {"name": "To Do"},
-                             "parent": {"key": "OMS-1", "fields": {"summary": "Checkout", "issuetype": {"name": "Story"}}}}},
+                             "parent": {"key": "PROJ-1", "fields": {"summary": "Checkout", "issuetype": {"name": "Story"}}}}},
     }
     return [
         (r"/rest/api/3/attachment/content/10001", PNG),
@@ -316,9 +316,9 @@ def jira_routes():
         (r"/rest/api/3/attachment/content/10003", PNG),
         (r"/issue/([A-Z]+-\d+)/remotelink", lambda m: [{"relationship": "mentioned in",
                                                         "object": {"url": "https://git.example/pr/1", "title": "PR 1"}}]
-         if m.group(1) == "OMS-1" else []),
+         if m.group(1) == "PROJ-1" else []),
         (r"/issue/([A-Z]+-\d+)\?", lambda m: issues[m.group(1)]),
-        (r"/search/jql\?jql=parent", {"issues": [{"key": "OMS-3", "fields": {"summary": "FE", "status": {"name": "To Do"},
+        (r"/search/jql\?jql=parent", {"issues": [{"key": "PROJ-3", "fields": {"summary": "FE", "status": {"name": "To Do"},
                                                                              "issuetype": {"name": "Sub-task"}}}]}),
     ]
 
@@ -336,7 +336,7 @@ class JiraFetch(unittest.TestCase):
         self.dir.cleanup()
 
     def test_story(self):
-        path, item, wtype, n_img, n_com, nxt, _ = ticket.fetch(self.board, "OMS-1", self.out)
+        path, item, wtype, n_img, n_com, nxt, _ = ticket.fetch(self.board, "PROJ-1", self.out)
         text = path.read_text(encoding="utf-8")
         self.assertEqual((wtype, n_img, n_com, nxt), ("Story", 2, 2, "story-runner"))
         self.assertNotIn("[shot.png]", text)  # shown in a comment, which is converted before the attachments list
@@ -344,7 +344,7 @@ class JiraFetch(unittest.TestCase):
         self.assertEqual(re.findall(r"^## (.+)$", text, re.M),
                          ["Description", "Acceptance Criteria", "Links", "Attachments", "Comments (2, oldest first)"])
         self.assertIn("- **Sprint:** Sprint 5", text)
-        self.assertIn("| blocks | [OMS-2](https://acme.atlassian.net/browse/OMS-2) | Story | Pay | To Do |", text)
+        self.assertIn("| blocks | [PROJ-2](https://acme.atlassian.net/browse/PROJ-2) | Story | Pay | To Do |", text)
         self.assertIn("[PR 1](https://git.example/pr/1)", text)
         self.assertIn("[doc.pdf](attachments/doc.pdf)", text)
         self.assertNotIn("[a.png]", text)  # shown inline already
@@ -352,12 +352,12 @@ class JiraFetch(unittest.TestCase):
         self.assertLess(text.index("first"), text.index("second"))
 
     def test_subtask_goes_into_its_story(self):
-        path, item, wtype, *_, nxt, note = ticket.fetch(self.board, "OMS-3", self.out)
+        path, item, wtype, *_, nxt, note = ticket.fetch(self.board, "PROJ-3", self.out)
         text = path.read_text(encoding="utf-8")
-        self.assertEqual((path.parent.name, wtype, nxt), ("OMS-1", "Story", "story-runner"))
-        self.assertIn("## Sub-task OMS-3 FE", text)
+        self.assertEqual((path.parent.name, wtype, nxt), ("PROJ-1", "Story", "story-runner"))
+        self.assertIn("## Sub-task PROJ-3 FE", text)
         self.assertIn("### Description\n\nDo the FE part", text)
-        self.assertIn("| [OMS-3](https://acme.atlassian.net/browse/OMS-3) (in this file) | Sub-task | FE | To Do |", text)
+        self.assertIn("| [PROJ-3](https://acme.atlassian.net/browse/PROJ-3) (in this file) | Sub-task | FE | To Do |", text)
 
 
 class Plumbing(unittest.TestCase):
