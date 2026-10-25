@@ -9,7 +9,7 @@ dev-kit (tên plugin `dk`) là bộ skill giúp agent làm các thẻ kanban: st
 
 Các tài liệu này có bằng tiếng Anh, tiếng Việt (tầng 1–2), tiếng Trung giản thể và tiếng Nhật (tầng 1). Bản tiếng Anh là bản chuẩn; các bản dịch có thể chậm hơn.
 
-> Phiên bản tài liệu: dev-kit **1.7.5** (2026-10-24). 1.0.0 là bản public đầu tiên; các số version cũ hơn trong tài liệu (0.x) là các vòng lab riêng tư. Các số liệu đến từ lab của dev-kit (riêng tư) (chủ yếu Haiku 5.5, một phần Sonnet 5.5, Claude Code 2.1.296) và từ các backtest trên một repository Angular riêng tư ở công ty (Sonnet 5.5, ở 1.7.4 thêm Haiku 5.5 và Opus 5.5; một lần chạy trên Codex). Những gì chưa đo được đánh dấu ❓.
+> Phiên bản tài liệu: dev-kit **1.9.2** (2026-10-25). 1.0.0 là bản public đầu tiên; các số version cũ hơn trong tài liệu (0.x) là các vòng lab riêng tư. Các số liệu đến từ lab của dev-kit (riêng tư) (chủ yếu Haiku 5.5, một phần Sonnet 5.5, Claude Code 2.1.296) và từ các backtest trên một repository Angular riêng tư ở công ty (Sonnet 5.5, ở 1.7.4 thêm Haiku 5.5 và Opus 5.5; một lần chạy trên Codex). Những gì chưa đo được đánh dấu ❓.
 
 ## Thứ tự đọc
 

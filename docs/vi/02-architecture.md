@@ -61,8 +61,8 @@ flowchart LR
 
 | Part | Nguồn | Được dùng bởi |
 |---|---|---|
-| `grilling` | Matt | story-runner (ticket mơ hồ) |
-| `domain-modeling` | Matt | story-runner (có thuật ngữ mới) |
+| `grilling` | Matt | story-runner (ticket mơ hồ), brainstorm |
+| `domain-modeling` | Matt | story-runner (có thuật ngữ mới), brainstorm |
 | `codebase-design` | Matt | code-refactor (ranh giới chưa rõ) |
 | `code-review` | Matt | pre-pr-check (mọi mức review) |
 | `pr` | Matt | pre-pr-check (nội dung PR) |
@@ -90,7 +90,9 @@ Các agent persona `dk:security-auditor` và `dk:test-engineer` (agent-skills) c
 | `.dev-kit/init-report.md` | `dk:init` | Đã có gì, đã tạo gì, còn thiếu gì, lệnh đã chạy và kết quả |
 | `.dev-kit/baseline.md` | `dk:init` (khi baseline đỏ và bạn chấp nhận) | Danh sách test đang fail từ trước; controller so với danh sách này (rule B1) |
 | `.dev-kit/standards/` | bạn | Tiêu chuẩn project của bạn (rule T1); tiêu chuẩn team có thể nằm trong một thư mục chia sẻ đặt qua `standards.team` |
-| `.dev-kit/specs/<feature>.md` | story-runner | Theo `templates/spec.md`: mục tiêu, quy tắc, giao diện, tiêu chí chấp nhận, ngoài phạm vi, **Decisions** |
+| `.dev-kit/specs/<feature>.md` | story-runner, brainstorm | Theo `templates/spec.md`: mục tiêu, quy tắc, giao diện, tiêu chí chấp nhận, ngoài phạm vi, **Decisions** |
+| `.dev-kit/tickets/<KEY>/ticket.md` | ticket | Ticket đúng như board hiển thị: phần đầu, các mục theo thứ tự của form, link, file đính kèm, comment, cùng `images/` và `attachments/`; task nằm dưới một story được ghi vào file của story. `ticket.<lang>.md` là bản dịch tùy chọn |
+| `.dev-kit/tickets/index-<date>.md` | ticket (bộ lọc) | Các ticket mà bộ lọc JQL/WIQL tìm được, kèm skill dk nên chạy tiếp |
 | `.dev-kit/plans/` | story-runner/code-refactor (việc lớn) | Plan theo `writing-plans` |
 | `.dev-kit/reports/<name>.md` | mọi controller | Báo cáo theo `templates/report.md`: đổi gì, vì sao, test, lệnh đã chạy, bảng review, câu hỏi mở |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (việc lớn) | Ledger, brief từng task, gói review |

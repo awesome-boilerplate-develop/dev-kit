@@ -7,11 +7,13 @@
 
 ## 1.1 dev-kit 是什么
 
-dev-kit 是一个包含 **5 个 skill** 的 Claude Code plugin：
+dev-kit 是一个包含 **7 个 skill** 的 Claude Code plugin：
 
 | Skill | 角色 |
 |---|---|
 | `dk:init` | 为一台机器和一个仓库搭建环境 |
+| `dk:brainstorm` | 在写代码之前，把一个想法变成达成一致的 spec |
+| `dk:ticket` | 把 Jira 或 Azure DevOps 的 ticket 拉成 Markdown，作为其他 skill 的输入 |
 | `dk:story-runner` | 从头到尾完成一张 story/功能卡片 |
 | `dk:bug-fixer` | 修复一张 bug 卡片，并附带防止复发的测试 |
 | `dk:code-refactor` | 在不改变行为的前提下重构 |

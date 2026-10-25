@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.9.2 (2026-10-25)
+- **README, install and update per CLI:** each CLI's section has an Install block and an Update block (Claude Code also in a session); the separate Updating section is gone. The Claude Code update was run on 2026-10-25 (1.7.5 to 1.9.1).
+- **Docs up to date:** the translations (vi, ja, zh-CN) now carry `dk:brainstorm` and `dk:ticket` (skill tables, the skills you should see after install, the tickets section of setup, the artifacts table), all 22 point to v1.9.2, and the docs version reads 1.9.2. The English `dk:ticket` steps said the board settings were confirmed with you; they are written from the link after the fetch, as the skill does.
+- **Tags:** v1.9.0 and v1.9.1 added on their release commits.
+
 ## 1.9.1 (2026-10-25)
 - **`dk:ticket` login guidance:** when no credential is found the skill now guides the user in numbered steps with the full links: the Atlassian API token page, the Azure DevOps PAT page, the exact `login` command for their own terminal, then "done". The script's error and the `login` prompts print the same links.
 - **Description:** the example phrases (one of them Vietnamese) are dropped, like the other skills' descriptions; the skill is matched by meaning.

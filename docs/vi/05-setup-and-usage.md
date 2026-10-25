@@ -28,7 +28,7 @@ claude plugin install dk@dev-kit
 
 Trong một session: `/plugin marketplace add awesome-boilerplate-develop/dev-kit`, rồi `/plugin install dk@dev-kit`. Để thử một bản checkout cục bộ mà không cài (ví dụ khi đang sửa kit): `claude --plugin-dir /path/to/dev-kit`.
 
-Kiểm tra đã nạp chưa: trong một session, nhờ agent liệt kê các skill bắt đầu bằng `dk:`. Bạn phải thấy đủ 5: `dk:init`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
+Kiểm tra đã nạp chưa: trong một session, nhờ agent liệt kê các skill bắt đầu bằng `dk:`. Bạn phải thấy đủ 7: `dk:init`, `dk:brainstorm`, `dk:ticket`, `dk:story-runner`, `dk:bug-fixer`, `dk:code-refactor`, `dk:pre-pr-check`.
 
 **Các CLI khác** (cài từ repo công khai ngày 2026-10-14; chi tiết và lưu ý nằm trong từng file dưới `harness/`):
 
@@ -140,6 +140,19 @@ Use skill dk:bug-fixer for this card:
 - `.dev-kit/reports/pr-body.md`: nội dung PR đã soạn;
 - `.dev-kit/specs/` (story): đặc biệt là mục **Decisions**, để xem agent đã chốt những gì;
 - các commit trên branch hiện tại. dev-kit không push và không mở PR.
+
+### Ticket từ Jira hoặc Azure DevOps (`dk:ticket`)
+
+Đưa cho `dk:ticket` link của ticket (`https://<site>.atlassian.net/browse/PROJ-42`, `https://dev.azure.com/<org>/<project>/_workitems/edit/1234`) hoặc nhờ nó lấy "các bug đang mở của tôi". Nó ghi `.dev-kit/tickets/<KEY>/ticket.md`, hỏi có cần bản dịch không, và nêu skill nên chạy tiếp, ví dụ `/dk:story-runner .dev-kit/tickets/1200/ticket.md`. Các controller không thay đổi: file này chính là card bạn đưa cho chúng.
+
+Đăng nhập một lần cho mỗi site hoặc organisation, trong terminal của chính bạn (agent không bao giờ thấy token):
+
+| Board | Cách làm |
+|---|---|
+| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`: email và API token tạo ở https://id.atlassian.com/manage-profile/security/api-tokens, lưu trong `~/.dev-kit/credentials.json` (quyền 600). Hoặc đặt `JIRA_EMAIL` và `JIRA_API_TOKEN` |
+| Azure DevOps | `az login` (thêm `--tenant <tenant>` với tài khoản công ty); Azure CLI tự làm mới token. Không có Azure CLI: `ticket.py login azure --org <org>` với PAT quyền Work Items (Read) tạo ở `https://dev.azure.com/<org>/_usersSettings/tokens`, hoặc `AZURE_DEVOPS_EXT_PAT` |
+
+Hai tài khoản trên cùng một site: `--profile <name>` khi đăng nhập và `ticket.profile: <name>` trong `.dev-kit/config.yml` của repo. `ticket.py check` cho biết repo đang dùng tài khoản nào.
 
 ## 5.9 Ghi nhật ký dùng thử
 

@@ -27,40 +27,82 @@ Plugin có tên `dk`. Một số CLI hiển thị skill mà không có tiền t�
 
 ## Cài đặt
 
+Mỗi CLI dưới đây có lệnh cài đặt và lệnh cập nhật. Sau khi cập nhật, mở phiên mới để agent nạp skill mới; lệnh liệt kê plugin của CLI cho biết phiên bản (xem `CHANGELOG.md` để biết thay đổi gì).
+
 ### Claude Code
+
+Cài đặt:
 
 ```bash
 claude plugin marketplace add awesome-boilerplate-develop/dev-kit
 claude plugin install dk@dev-kit
 ```
 
-Trong một session, có thể dùng `/plugin marketplace add awesome-boilerplate-develop/dev-kit` và `/plugin install dk@dev-kit`.
+Cập nhật, rồi khởi động lại Claude Code:
+
+```bash
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+```
+
+Trong một session: `/plugin marketplace add awesome-boilerplate-develop/dev-kit` và `/plugin install dk@dev-kit`; để cập nhật, chạy `/plugin marketplace update dev-kit` rồi cập nhật `dk` trong `/plugin`.
 
 ### Codex
+
+Cài đặt:
 
 ```bash
 codex plugin marketplace add awesome-boilerplate-develop/dev-kit
 codex plugin add dk@dev-kit
 ```
 
+Cập nhật:
+
+```bash
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+```
+
 ### GitHub Copilot CLI
+
+Cài đặt:
 
 ```bash
 copilot plugin marketplace add awesome-boilerplate-develop/dev-kit
 copilot plugin install dk@dev-kit
 ```
 
+Cập nhật:
+
+```bash
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+```
+
 ### Antigravity
+
+Cài đặt:
 
 ```bash
 agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
 ```
 
+Để cập nhật, chạy lại đúng lệnh này; nó thay bản cũ.
+
 ### omp
+
+Cài đặt:
 
 ```bash
 omp plugin marketplace add awesome-boilerplate-develop/dev-kit
 omp plugin install dk@dev-kit
+```
+
+Cập nhật:
+
+```bash
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
 ```
 
 ### OpenCode
@@ -79,36 +121,14 @@ Sau đó cho OpenCode đọc thư mục kit, trong `~/.config/opencode/opencode.
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
-### Cập nhật
-
-Làm mới catalog của marketplace rồi cập nhật plugin; sau đó mở phiên mới để agent nạp skill mới. Xem phiên bản bằng lệnh liệt kê plugin của CLI (hoặc `CHANGELOG.md`).
+Để cập nhật, pull bản clone rồi link lại, phòng khi có thư mục skill mới:
 
 ```bash
-# Claude Code (from `claude plugin --help`; restart required)
-claude plugin marketplace update dev-kit
-claude plugin update dk@dev-kit
-
-# Codex
-codex plugin marketplace upgrade dev-kit
-codex plugin add dk@dev-kit
-
-# GitHub Copilot CLI (from `copilot plugin --help`)
-copilot plugin marketplace update dev-kit
-copilot plugin update dk@dev-kit
-
-# Antigravity: install again; it replaces its copy
-agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
-
-# omp
-omp plugin marketplace update dev-kit
-omp plugin upgrade dk@dev-kit
-
-# OpenCode: pull the clone; re-link in case a skill folder was added
 git -C ~/dev-kit pull
 for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
 ```
 
-Lệnh của Codex, Antigravity và omp đã được chạy cho từng bản phát hành ngày 2026-10-15; dòng của Claude Code và Copilot lấy theo phần help của chính các CLI đó và chưa được chạy ở đây.
+Lệnh cập nhật của Codex, Antigravity và omp đã được chạy cho từng bản phát hành ngày 2026-10-15, của Claude Code ngày 2026-10-25 (1.7.5 lên 1.9.1); dòng của Copilot lấy theo `copilot plugin --help` và chưa được chạy ở đây.
 
 ### Các CLI khác
 

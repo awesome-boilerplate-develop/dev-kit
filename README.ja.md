@@ -27,40 +27,82 @@ plugin 名は `dk` です。CLI によっては skill が `dk:` 接頭辞なし�
 
 ## インストール
 
+各 CLI にインストールと更新のコマンドがあります。更新後は新しいセッションを開いてエージェントに新しい skill を読み込ませます。バージョンは CLI のプラグイン一覧で確認できます（変更点は `CHANGELOG.md`）。
+
 ### Claude Code
+
+インストール：
 
 ```bash
 claude plugin marketplace add awesome-boilerplate-develop/dev-kit
 claude plugin install dk@dev-kit
 ```
 
-セッション内では、`/plugin marketplace add awesome-boilerplate-develop/dev-kit` と `/plugin install dk@dev-kit` で同じことができます。
+更新し、Claude Code を再起動：
+
+```bash
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+```
+
+セッション内では `/plugin marketplace add awesome-boilerplate-develop/dev-kit` と `/plugin install dk@dev-kit`。更新は `/plugin marketplace update dev-kit` のあと `/plugin` で `dk` を更新します。
 
 ### Codex
+
+インストール：
 
 ```bash
 codex plugin marketplace add awesome-boilerplate-develop/dev-kit
 codex plugin add dk@dev-kit
 ```
 
+更新：
+
+```bash
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+```
+
 ### GitHub Copilot CLI
+
+インストール：
 
 ```bash
 copilot plugin marketplace add awesome-boilerplate-develop/dev-kit
 copilot plugin install dk@dev-kit
 ```
 
+更新：
+
+```bash
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+```
+
 ### Antigravity
+
+インストール：
 
 ```bash
 agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
 ```
 
+更新するには同じコマンドをもう一度実行します（既存のコピーを置き換えます）。
+
 ### omp
+
+インストール：
 
 ```bash
 omp plugin marketplace add awesome-boilerplate-develop/dev-kit
 omp plugin install dk@dev-kit
+```
+
+更新：
+
+```bash
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
 ```
 
 ### OpenCode
@@ -79,36 +121,14 @@ for s in ~/dev-kit/skills/*; do ln -s "$s" ~/.config/opencode/skills/; done
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
-### 更新
-
-marketplace のカタログを更新してからプラグインを更新し、そのあと新しいセッションを開いてエージェントに新しい skill を読み込ませます。バージョンは CLI のプラグイン一覧（または `CHANGELOG.md`）で確認できます。
+更新するには、クローンを pull し、skill フォルダーが増えた場合に備えてリンクし直します：
 
 ```bash
-# Claude Code (from `claude plugin --help`; restart required)
-claude plugin marketplace update dev-kit
-claude plugin update dk@dev-kit
-
-# Codex
-codex plugin marketplace upgrade dev-kit
-codex plugin add dk@dev-kit
-
-# GitHub Copilot CLI (from `copilot plugin --help`)
-copilot plugin marketplace update dev-kit
-copilot plugin update dk@dev-kit
-
-# Antigravity: install again; it replaces its copy
-agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
-
-# omp
-omp plugin marketplace update dev-kit
-omp plugin upgrade dk@dev-kit
-
-# OpenCode: pull the clone; re-link in case a skill folder was added
 git -C ~/dev-kit pull
 for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
 ```
 
-Codex、Antigravity、omp のコマンドは 2026-10-15 の各リリースで実際に実行しました。Claude Code と Copilot の行は各 CLI のヘルプに基づいており、ここでは実行していません。
+更新コマンドは Codex、Antigravity、omp では 2026-10-15 の各リリースで、Claude Code では 2026-10-25（1.7.5 から 1.9.1）に実際に実行しました。Copilot の行は `copilot plugin --help` に基づいており、ここでは実行していません。
 
 ### その他の CLI
 

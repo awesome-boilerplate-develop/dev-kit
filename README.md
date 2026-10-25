@@ -24,40 +24,82 @@ The plugin is named `dk`. Some CLIs show the skills without the `dk:` prefix.
 
 ## Install
 
+Each CLI below has its install and update commands. After an update, start a new session so the agent loads the new skills; the CLI's plugin list shows the version (see `CHANGELOG.md` for what changed).
+
 ### Claude Code
+
+Install:
 
 ```bash
 claude plugin marketplace add awesome-boilerplate-develop/dev-kit
 claude plugin install dk@dev-kit
 ```
 
-Inside a session, the same with `/plugin marketplace add awesome-boilerplate-develop/dev-kit` and `/plugin install dk@dev-kit`.
+Update, then restart Claude Code:
+
+```bash
+claude plugin marketplace update dev-kit
+claude plugin update dk@dev-kit
+```
+
+Inside a session: `/plugin marketplace add awesome-boilerplate-develop/dev-kit` and `/plugin install dk@dev-kit`; to update, `/plugin marketplace update dev-kit`, then update `dk` from `/plugin`.
 
 ### Codex
+
+Install:
 
 ```bash
 codex plugin marketplace add awesome-boilerplate-develop/dev-kit
 codex plugin add dk@dev-kit
 ```
 
+Update:
+
+```bash
+codex plugin marketplace upgrade dev-kit
+codex plugin add dk@dev-kit
+```
+
 ### GitHub Copilot CLI
+
+Install:
 
 ```bash
 copilot plugin marketplace add awesome-boilerplate-develop/dev-kit
 copilot plugin install dk@dev-kit
 ```
 
+Update:
+
+```bash
+copilot plugin marketplace update dev-kit
+copilot plugin update dk@dev-kit
+```
+
 ### Antigravity
+
+Install:
 
 ```bash
 agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
 ```
 
+To update, run the same command again; it replaces its copy.
+
 ### omp
+
+Install:
 
 ```bash
 omp plugin marketplace add awesome-boilerplate-develop/dev-kit
 omp plugin install dk@dev-kit
+```
+
+Update:
+
+```bash
+omp plugin marketplace update dev-kit
+omp plugin upgrade dk@dev-kit
 ```
 
 ### OpenCode
@@ -76,36 +118,14 @@ Then let OpenCode read the kit folder, in `~/.config/opencode/opencode.json`:
 { "permission": { "external_directory": { "~/dev-kit/**": "allow" } } }
 ```
 
-### Updating
-
-Refresh the marketplace catalog, then update the plugin; start a new session afterwards so the agent loads the new skills. Check the version with the CLI's plugin list (or `CHANGELOG.md`).
+To update, pull the clone and link again in case a skill folder was added:
 
 ```bash
-# Claude Code (from `claude plugin --help`; restart required)
-claude plugin marketplace update dev-kit
-claude plugin update dk@dev-kit
-
-# Codex
-codex plugin marketplace upgrade dev-kit
-codex plugin add dk@dev-kit
-
-# GitHub Copilot CLI (from `copilot plugin --help`)
-copilot plugin marketplace update dev-kit
-copilot plugin update dk@dev-kit
-
-# Antigravity: install again; it replaces its copy
-agy plugin install https://github.com/awesome-boilerplate-develop/dev-kit
-
-# omp
-omp plugin marketplace update dev-kit
-omp plugin upgrade dk@dev-kit
-
-# OpenCode: pull the clone; re-link in case a skill folder was added
 git -C ~/dev-kit pull
 for s in ~/dev-kit/skills/*; do ln -sfn "$s" ~/.config/opencode/skills/; done
 ```
 
-The Codex, Antigravity and omp commands were run for each release on 2026-10-15; the Claude Code and Copilot lines follow those CLIs' own help and were not run here.
+The update commands were run for Codex, Antigravity and omp for each release on 2026-10-15, and for Claude Code on 2026-10-25 (1.7.5 to 1.9.1); the Copilot lines follow `copilot plugin --help` and were not run here.
 
 ### Other CLIs
 

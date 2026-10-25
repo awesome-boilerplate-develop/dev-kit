@@ -7,11 +7,13 @@
 
 ## 1.1 dev-kit là gì
 
-dev-kit là một plugin Claude Code với **5 skill**:
+dev-kit là một plugin Claude Code với **7 skill**:
 
 | Skill | Vai trò |
 |---|---|
 | `dk:init` | Chuẩn bị môi trường cho một máy và một repo |
+| `dk:brainstorm` | Biến một ý tưởng thành spec đã thống nhất, trước khi viết code |
+| `dk:ticket` | Kéo một ticket Jira hoặc Azure DevOps về dạng Markdown làm đầu vào cho các skill khác |
 | `dk:story-runner` | Làm một thẻ story/feature từ đầu đến cuối |
 | `dk:bug-fixer` | Sửa một thẻ bug, kèm test ngăn tái phát |
 | `dk:code-refactor` | Tái cấu trúc mà không đổi hành vi |

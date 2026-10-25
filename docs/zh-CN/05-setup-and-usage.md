@@ -28,7 +28,7 @@ claude plugin install dk@dev-kit
 
 在 session 中：`/plugin marketplace add awesome-boilerplate-develop/dev-kit`，然后 `/plugin install dk@dev-kit`。如果想在不安装的情况下试用本地 checkout（例如在修改 kit 的时候）：`claude --plugin-dir /path/to/dev-kit`。
 
-检查是否已加载：在一个 session 中，让 agent 列出以 `dk:` 开头的 skill。你必须看到全部 5 个：`dk:init`、`dk:story-runner`、`dk:bug-fixer`、`dk:code-refactor`、`dk:pre-pr-check`。
+检查是否已加载：在一个 session 中，让 agent 列出以 `dk:` 开头的 skill。你必须看到全部 7 个：`dk:init`、`dk:brainstorm`、`dk:ticket`、`dk:story-runner`、`dk:bug-fixer`、`dk:code-refactor`、`dk:pre-pr-check`。
 
 **其他 CLI**（于 2026-10-14 从公开仓库安装；详情和注意事项见 `harness/` 下的各个文件）：
 
@@ -140,6 +140,19 @@ Use skill dk:bug-fixer for this card:
 - `.dev-kit/reports/pr-body.md`：起草好的 PR 正文；
 - `.dev-kit/specs/`（story）：尤其是 **Decisions** 部分，看看 agent 敲定了什么；
 - 当前分支上的 commit。dev-kit 不会 push，也不会开 PR。
+
+### 来自 Jira 或 Azure DevOps 的 ticket（`dk:ticket`）
+
+把 ticket 链接（`https://<site>.atlassian.net/browse/PROJ-42`、`https://dev.azure.com/<org>/<project>/_workitems/edit/1234`）交给 `dk:ticket`，或让它拉取“我未关闭的 bug”。它会写入 `.dev-kit/tickets/<KEY>/ticket.md`，询问是否需要翻译，并给出下一步要运行的 skill，例如 `/dk:story-runner .dev-kit/tickets/1200/ticket.md`。controller 不变：这个文件就是你交给它们的 card。
+
+每个站点或 organisation 只需登录一次，在你自己的终端里进行（agent 永远看不到 token）：
+
+| 看板 | 方法 |
+|---|---|
+| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`：邮箱和在 https://id.atlassian.com/manage-profile/security/api-tokens 创建的 API token，保存在 `~/.dev-kit/credentials.json`（权限 600）。或设置 `JIRA_EMAIL` 和 `JIRA_API_TOKEN` |
+| Azure DevOps | `az login`（公司账号加 `--tenant <tenant>`）；Azure CLI 会自己刷新 token。没有 Azure CLI 时：用在 `https://dev.azure.com/<org>/_usersSettings/tokens` 创建、权限为 Work Items (Read) 的 PAT 运行 `ticket.py login azure --org <org>`，或设置 `AZURE_DEVOPS_EXT_PAT` |
+
+同一站点上有两个账号：登录时用 `--profile <name>`，并在仓库的 `.dev-kit/config.yml` 中写 `ticket.profile: <name>`。`ticket.py check` 会告诉你仓库用的是哪个账号。
 
 ## 5.9 记录试用日志
 

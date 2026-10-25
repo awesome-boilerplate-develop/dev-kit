@@ -28,7 +28,7 @@ claude plugin install dk@dev-kit
 
 セッション内では、`/plugin marketplace add awesome-boilerplate-develop/dev-kit` のあと `/plugin install dk@dev-kit` を実行します。インストールせずにローカルのチェックアウトを試すには（たとえば kit を変更している間）: `claude --plugin-dir /path/to/dev-kit`。
 
-読み込まれたかの確認: セッション内で、エージェントに `dk:` で始まる skill を一覧させます。5 つすべてが見えるはずです: `dk:init`、`dk:story-runner`、`dk:bug-fixer`、`dk:code-refactor`、`dk:pre-pr-check`。
+読み込まれたかの確認: セッション内で、エージェントに `dk:` で始まる skill を一覧させます。7 つすべてが見えるはずです: `dk:init`、`dk:brainstorm`、`dk:ticket`、`dk:story-runner`、`dk:bug-fixer`、`dk:code-refactor`、`dk:pre-pr-check`。
 
 **その他の CLI**（2026-10-14 に公開リポジトリからインストールして確認。詳細と注意点は `harness/` の各ファイルにあります）:
 
@@ -140,6 +140,19 @@ Use skill dk:bug-fixer for this card:
 - `.dev-kit/reports/pr-body.md`: 下書きの PR 本文。
 - `.dev-kit/specs/`（story）: 特に **Decisions** セクションで、エージェントが何を決めたかを確認する。
 - 現在のブランチ上のコミット。dev-kit は push せず、PR も開きません。
+
+### Jira または Azure DevOps のチケット（`dk:ticket`）
+
+`dk:ticket` にチケットのリンク（`https://<site>.atlassian.net/browse/PROJ-42`、`https://dev.azure.com/<org>/<project>/_workitems/edit/1234`）を渡すか、「自分の未解決のバグ」を頼みます。`.dev-kit/tickets/<KEY>/ticket.md` を書き、翻訳が必要か尋ね、次に実行する skill を示します（例: `/dk:story-runner .dev-kit/tickets/1200/ticket.md`）。コントローラーは変わりません。このファイルがそのまま渡すカードです。
+
+サイトまたは organisation ごとに一度、自分のターミナルでサインインします（エージェントはトークンを見ません）：
+
+| ボード | 方法 |
+|---|---|
+| Jira Cloud | `python3 <dev-kit>/scripts/ticket.py login jira --site <site>.atlassian.net`: メールアドレスと https://id.atlassian.com/manage-profile/security/api-tokens で作る API トークン。`~/.dev-kit/credentials.json`（モード 600）に保存されます。または `JIRA_EMAIL` と `JIRA_API_TOKEN` を設定 |
+| Azure DevOps | `az login`（会社アカウントは `--tenant <tenant>` を付ける）。トークンは Azure CLI が自分で更新します。Azure CLI がない場合: `https://dev.azure.com/<org>/_usersSettings/tokens` で作るスコープ Work Items (Read) の PAT で `ticket.py login azure --org <org>`、または `AZURE_DEVOPS_EXT_PAT` |
+
+同じサイトに 2 つのアカウントがある場合: ログイン時に `--profile <name>`、リポジトリの `.dev-kit/config.yml` に `ticket.profile: <name>`。`ticket.py check` でリポジトリがどのアカウントを使うか分かります。
 
 ## 5.9 試用ログをつける
 
