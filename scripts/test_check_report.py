@@ -58,8 +58,11 @@ class CheckReport(unittest.TestCase):
             r = self.check(report(result=result))
             self.assertIn("required check failed or did not run but verdict is GO", r.stdout, result)
             self.assertEqual(self.check(report(verdict="NO-GO", result=result)).returncode, 0, result)
+        for result in ("12 passed, 3 failed (2 known failures, 1 new failure)", "PASS: 3 failed, 2 known", "PASS: exit 1"):
+            self.assertIn("did not run but verdict is GO", self.check(report(result=result)).stdout, result)
         for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi", "none: no skips added", "12 passed, 0 failed",
-                       "PASS: 40 passed, 2 skipped", "PASS, 2 skipped (marked skip in baseline)"):
+                       "PASS: 40 passed, 2 skipped", "PASS, 2 skipped (marked skip in baseline)",
+                       "PASS: 38 passed, 2 failed, 2 known (baseline)", "PASS: exit 1, 2 known baseline failures"):
             self.assertEqual(self.check(report(result=result)).returncode, 0, result)
 
     def test_gate_holds_against_layout_tricks(self):
@@ -86,6 +89,20 @@ class CheckReport(unittest.TestCase):
                        "one, rẻ hơn"):
             r = self.check(report().replace("one — reason: small diff: 1 file, 3 lines", reason))
             self.assertIn("justified by cost", r.stdout, reason)
+
+    def test_uncommitted_changes_forbid_go(self):
+        tree = report().replace("- Depth:", "- Tree: uncommitted: src/pay.ts\n- Depth:")
+        self.assertIn("the checks did not run on HEAD", self.check(tree).stdout)
+        self.assertEqual(self.check(tree.replace("Verdict: GO", "Verdict: NO-GO")).returncode, 0)
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            pathlib.Path(d, "pay.ts").write_text("fixed but not committed\n")
+            pathlib.Path(d, ".dev-kit").mkdir()
+            pathlib.Path(d, ".dev-kit", "notes.md").write_text("kit output\n")
+            r = self.run_check(report(), d)
+            self.assertIn("uncommitted changes outside .dev-kit/ (pay.ts)", r.stdout)
+            pathlib.Path(d, "pay.ts").unlink()
+            self.assertEqual(self.run_check(report(), d).returncode, 0, "the report itself and .dev-kit/ do not count")
 
     def test_fixed_later_keeps_the_blocker_open(self):
         for status in ("fixed (will do)", "fixed later", "fixed — chưa commit"):

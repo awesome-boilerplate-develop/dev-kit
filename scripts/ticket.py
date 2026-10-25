@@ -879,16 +879,21 @@ def fetch(board, key, out_root, with_parent=True, types=None):
     old = out_root / safe_name(parent.key) / "ticket.md" if parent else None
     keys = re.findall(r"^<!-- dk:ticket task=(\S+) -->$", old.read_text(encoding="utf-8"), re.M) if old and old.exists() else []
     keys = list(dict.fromkeys(keys + [t.key for t in new]))
-    if keys:
+    if parent:  # a story, also on its own: its children from the board are listed
         folder = out_root / safe_name(parent.key)
-        tasks, gone = [], []
+        tasks, gone, moved = [], [], []
         for k in keys:
             try:
-                tasks.append(next((t for t in new if t.key == k), None) or board.item(k))
-            except Fail as e:  # a task deleted or moved on the board is dropped, not a reason to stop refreshing the story
+                t = next((t for t in new if t.key == k), None) or board.item(k)
+            except Fail as e:  # a task deleted on the board is dropped, not a reason to stop refreshing the story
                 if "HTTP 404" not in str(e):
                     raise
                 gone.append(k)
+                continue
+            if t.parent and t.parent["key"] != parent.key:  # moved to another story: it is no longer this story's scope
+                moved.append(f"{t.display} (now under {t.parent['display']})")
+                continue
+            tasks.append(t)
         keys = [t.key for t in tasks]
         parts = [header(board, parent, requested=tasks)] + doc.body(parent, 2)
         for t in tasks:
@@ -907,9 +912,11 @@ def fetch(board, key, out_root, with_parent=True, types=None):
             parts.append("\n".join(lines))
         path = doc.write(folder, "\n\n".join(parts))
         note = (f"{item.type} {item.display} is written into the file of {parent.type} {parent.display} "
-                f"(scope: {item.display})") if new else f"kept the attached tasks: {', '.join(t.display for t in tasks)}"
-        if gone:
-            note += f"; dropped, not found on the board: {', '.join(gone)}"
+                f"(scope: {item.display})") if new else (f"kept the attached tasks: {', '.join(t.display for t in tasks)}"
+                                                        if tasks else "")
+        for what, keys_out in (("not found on the board", gone), ("moved to another parent", moved)):
+            if keys_out:
+                note += f"{'; ' if note else ''}dropped, {what}: {', '.join(keys_out)}"
         n_com = len(parent.comments) + sum(len(t.comments) for t in tasks)
         return path, item, parent.type, len(doc.images), n_com, next_skill(parent, types), note
     path = doc.write(out_root / safe_name(item.key), "\n\n".join([header(board, item)] + doc.body(item, 2)))

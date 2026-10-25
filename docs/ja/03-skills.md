@@ -157,7 +157,7 @@ flowchart TD
 **Report-only モード:** リクエストに「コードを変更しない」とあれば、ファイルを編集せず、ステップ 4 を省略する。
 
 **ステップ:**
-1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。diff が空（base ブランチそのもの、またはマージ済み）なら停止する: review する対象がなく、verdict もない。review は HEAD を対象にする。未コミットの変更には手を触れず report に名前を記し、それが残っている間は修正の前にあなたに確認する。baseline 外で失敗した check、または実行できなかった check は、それだけで verdict を NO-GO にする。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
+1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。diff が空（base ブランチそのもの、またはマージ済み）なら停止する: review する対象がなく、verdict もない。review は HEAD を対象にする。未コミットの変更には手を触れず report に名前を記す。その場合 checks は HEAD ではなくそれらの変更の上で走るので、コミットするまで verdict は NO-GO になる。変更が残っている間は修正の前にあなたに確認する。baseline 外で失敗した check、または実行できなかった check は、それだけで verdict を NO-GO にする。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
 2. **rule C2 に従ってレビューのレベルを選ぶ:**
 
    | レベル | 場面 | 内容 |

@@ -16,8 +16,11 @@ The Certain findings, Suspect findings and Commands run sections must be present
 Section headings may carry extra text ("### Certain findings (1)"); a table's header row is the row above its |---| line.
 A certain blocker is open unless its Status cell says "fixed" (not "fixed later", "fixed (will do)"); an open blocker needs Verdict NO-GO. Commands run lists at least one
 check. A row fails when its Result starts with FAIL, NOT RUN or SKIP (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy /
-bỏ qua, with or without accents), or says anywhere that it did not run ("could not run", "not executed", "0 tests ran") or names a
-failure count or a non-zero exit ("12 passed, 3 failed", "exit 1"), unless it says that is the baseline / known failures.
+bỏ qua, with or without accents), or says anywhere that it did not run ("could not run", "not executed", "0 tests ran"), names a
+new failure ("1 new failure"), or names more failures than it names known / baseline ones ("3 failed (2 known)"); a non-zero exit
+fails unless known failures explain it.
+Uncommitted changes outside .dev-kit/ (the Tree line says "uncommitted", or git status shows them now) mean the checks ran on
+something other than HEAD: GO FAILs, and NO-GO is allowed for that reason alone.
 A failing row needs Verdict NO-GO: a failing required check gates on its own, findings or not.
 The Verdict line must name one verdict: the template's "GO | NO-GO" left as written FAILs.
 With --base, an empty diff (HEAD is the merge base) FAILs: nothing was reviewed, so there is no verdict to give.
@@ -212,13 +215,21 @@ def failing(result):
     if re.match(r"[\W_]*(fail|not run|skip|thất bại|lỗi|không chạy|chưa chạy|bỏ qua|that bai|loi\b|khong chay|chua chay|bo qua)",
                 result, re.I):
         return True
-    return not re.search(r"baseline|known", result, re.I) and bool(re.search(
-        r"\b[1-9]\d*\s+(failed|failing|failures?|errors?)\b|\bexit(\s+code)?\s*[:=]?\s*[1-9]"
-        r"|\b(did|could|can)\s*(not|n't)\s+(be\s+)?run|\bnot executed|\b(0|no)\s+tests?\s+(ran|run|were run|executed)"
-        r"|không chạy được|khong chay duoc", result, re.I))
+    if re.search(r"\b(did|could|can)\s*(not|n't)\s+(be\s+)?run|\bnot executed|\b(0|no)\s+tests?\s+(ran|run|were run|executed)"
+                 r"|không chạy được|khong chay duoc|\b[1-9]\d*\s+new\b", result, re.I):
+        return True
+    # Known failures excuse only as many failures as they number: "3 failed (2 known)" still has one new failure.
+    known = sum(int(n) for n in re.findall(r"\b(\d+)\s+(?:known|baseline)\b", result, re.I))
+    total = max((int(n) for n in re.findall(r"\b(\d+)\s+(?:failed|failing|failures?|errors?)\b", result, re.I)), default=0)
+    return total > known or (not known and bool(re.search(r"\bexit(\s+code)?\s*[:=]?\s*[1-9]", result, re.I)))
 
 
 failed = [c[0] for c in commands if len(c) > 1 and failing(c[1])]
+report_rel = os.path.relpath(os.path.realpath(args[0]), os.path.realpath(root)).replace(os.sep, "/")
+status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=root).stdout.splitlines()
+dirty = [ln[3:] for ln in status if not ln[3:].startswith(".dev-kit/") and ln[3:] != report_rel]
+if re.search(r"Tree:.*uncommitted", setup or "", re.I) and not dirty:
+    dirty = ["(named on the Tree line)"]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
 verdict_line = re.search(r"Verdict:[^\n]*", text)
 if not verdict:
@@ -229,8 +240,11 @@ elif blockers and verdict.group(1) != "NO-GO":
     problems.append("open certain blocker but verdict is GO")
 elif failed and verdict.group(1) != "NO-GO":
     problems.append(f"a required check failed or did not run but verdict is GO: {', '.join(failed)}")
-elif not blockers and not failed and verdict.group(1) == "NO-GO":
-    problems.append("verdict NO-GO without an open certain blocker or a failing check")
+elif dirty and verdict.group(1) != "NO-GO":
+    problems.append(f"uncommitted changes outside .dev-kit/ ({', '.join(dirty[:5])}): the checks did not run on HEAD, so the verdict "
+                    "is NO-GO until they are committed and the checks run again")
+elif not blockers and not failed and not dirty and verdict.group(1) == "NO-GO":
+    problems.append("verdict NO-GO without an open certain blocker, a failing check or uncommitted changes")
 
 for p in problems:
     print("FAIL:", p)

@@ -29,7 +29,7 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 
 ### 1. Checks and a lowered bar
 - `git diff --shortstat main...HEAD` is empty (on `main` itself, or the work is already merged) → stop: nothing to review, so no review, no report and no verdict; say so in the final reply.
-- The review and report cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD. Never stash, commit or discard them; go on, and name them on the Tree line of Review setup (the checks ran with them).
+- The review and report cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD. Never stash, commit or discard them; go on, and name them on the Tree line of Review setup. The checks run with them, so they say nothing about HEAD: the verdict is NO-GO until the changes are committed (or set aside by the user) and the checks run again.
 - Run the check command now; keep the output as Evidence. A check that fails outside the baseline, or cannot run, goes in Commands run as `FAIL: …` or `NOT RUN: …`. It is not a finding (R6 drops what CI catches): it makes the verdict NO-GO on its own.
 - Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.
 - If `.dev-kit/CONSTRAINTS.md` (or the project's own `CONSTRAINTS.md`) exists, also check the diff against its floor and numbered rules; a change that breaks one is a blocker.
@@ -53,7 +53,7 @@ Every reviewer (and you, in self-review) gets: the diff range, the spec (`.dev-k
 - Deduplicate by location and defect.
 - Drop findings that fail any condition of `finding-quality` (R1–R7) or have confidence < 50.
 - Split the rest into **certain** (≥ 80) and **suspect** (50–79). Map other severity labels with rule S1.
-- Any open certain `blocker`, or a check that is `FAIL` / `NOT RUN` in step 1 → `Verdict: NO-GO`; otherwise `Verdict: GO`.
+- Any open certain `blocker`, a check that is `FAIL` / `NOT RUN` in step 1, or uncommitted changes on the Tree line → `Verdict: NO-GO`; otherwise `Verdict: GO`.
 
 ### 5. Fix certain blockers
 Certain blockers and failing checks. If step 1 found uncommitted changes, ask the user before fixing (a fix commit could take theirs along); with no one to answer, fix nothing and leave the verdict as it is. Read part `receiving-code-review`, fix with evidence (or push back with reasons), commit each fix (only the files you changed) so the next round checks and reviews HEAD, back to step 1 (max 2 rounds).

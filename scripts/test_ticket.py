@@ -360,7 +360,9 @@ class JiraFetch(unittest.TestCase):
         self.assertNotIn("[shot.png]", text)  # shown in a comment, which is converted before the attachments list
         self.assertLess(text.index("second"), text.index("images/2.png"))
         self.assertEqual(re.findall(r"^## (.+)$", text, re.M),
-                         ["Description", "Acceptance Criteria", "Links", "Attachments", "Comments (2, oldest first)"])
+                         ["Description", "Acceptance Criteria", "Links", "Attachments", "Comments (2, oldest first)",
+                          "Children (from the board)"])
+        self.assertIn("| [PROJ-3](https://acme.atlassian.net/browse/PROJ-3) | Sub-task | FE | To Do |", text)  # fetched alone
         self.assertIn("- **Sprint:** Sprint 5", text)
         self.assertIn("| blocks | [PROJ-2](https://acme.atlassian.net/browse/PROJ-2) | Story | Pay | To Do |", text)
         self.assertIn("[PR 1](https://git.example/pr/1)", text)
@@ -398,6 +400,14 @@ class JiraFetch(unittest.TestCase):
         self.fake.routes.insert(0, (r"/issue/PROJ-3\?", lambda m: (_ for _ in ()).throw(ticket.Fail("not found (HTTP 404): x"))))
         path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
         self.assertIn("dropped, not found on the board: PROJ-3", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_task_moved_to_another_story_is_dropped(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        task = self.fake.routes[4][1](re.search(r"(PROJ-3)", "PROJ-3"))
+        task["fields"]["parent"] = {"key": "PROJ-9", "fields": {"summary": "Other", "issuetype": {"name": "Story"}}}
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, moved to another parent: PROJ-3 (now under PROJ-9)", note)
         self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
 
     def test_local_file_image_is_never_opened(self):
