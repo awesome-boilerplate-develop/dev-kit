@@ -137,7 +137,7 @@ Use skill dk:bug-fixer for this card:
 
 **確認する出力:**
 - `.dev-kit/reports/<name>.md`: 何を行ったか、なぜか、実行したコマンドとその結果。
-- `.dev-kit/reports/pr-body.md`: 下書きの PR 本文。
+- `.dev-kit/reports/pr-body.md`: 下書きの PR 本文（GO のときのみ）。
 - `.dev-kit/specs/`（story）: 特に **Decisions** セクションで、エージェントが何を決めたかを確認する。
 - 現在のブランチ上のコミット。dev-kit は push せず、PR も開きません。
 

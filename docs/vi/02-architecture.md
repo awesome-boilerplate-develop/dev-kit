@@ -96,7 +96,7 @@ Các agent persona `dk:security-auditor` và `dk:test-engineer` (agent-skills) c
 | `.dev-kit/plans/` | story-runner/code-refactor (việc lớn) | Plan theo `writing-plans` |
 | `.dev-kit/reports/<name>.md` | mọi controller | Báo cáo theo `templates/report.md`: đổi gì, vì sao, test, lệnh đã chạy, bảng review, câu hỏi mở |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (việc lớn) | Ledger, brief từng task, gói review |
-| `.dev-kit/reports/pr-body.md` | pre-pr-check | Nội dung PR: Summary / Evidence / Merge Danger |
+| `.dev-kit/reports/pr-body.md` | pre-pr-check, khi GO | Nội dung PR: Summary / Evidence / Merge Danger |
 | `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | part `domain-modeling` | Thuật ngữ và quyết định mới; `GLOSSARY.md` và `docs/adr/` của chính project được đọc, và mọi thay đổi với chúng được đề xuất cho bạn |
 | `.dev-kit/CONSTRAINTS.md` | part `constraint-driven-development` (tùy chọn) | Chuẩn chất lượng của bạn; `pre-pr-check` đối chiếu diff với nó. Nếu có `CONSTRAINTS.md` của project ở gốc repo thì đọc file đó thay vào |
 

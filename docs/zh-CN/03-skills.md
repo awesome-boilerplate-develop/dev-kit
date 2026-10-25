@@ -169,7 +169,7 @@ flowchart TD
    每个 reviewer 都会收到 diff 范围和 spec/issue 文本，并返回 `file:line | blocker/major/minor | reason`。
 3. **把结果合并**成一张按 blocker/major/minor 分级的表。只要还有任何 blocker 未解决，或有 check 失败，就是 `Verdict: NO-GO`；否则是 `GO`。
 4. **如果有 blocker：** 读取 `receiving-code-review` part，用证据修复（或附理由反驳），每个修复单独提交，然后回到第 1 步。最多 2 轮。
-5. **附带 findings 表出报告。** 除非是 report-only 模式，否则按 `pr` part 写入 `.dev-kit/reports/pr-body.md`（Summary / Evidence / Merge Danger），其中 Evidence 是第 1 步的输出。
+5. **附带 findings 表出报告。** 在 GO 且不是 report-only 模式时，按 `pr` part 写入 `.dev-kit/reports/pr-body.md`（Summary / Evidence / Merge Danger），其中 Evidence 是第 1 步的输出。
 
 **示例（示意）：** 一个“部分退款”分支涉及权限和个人数据，所以运行 4 个 reviewer。结果是 NO-GO，blocker 如下：
 - 非员工角色仍然可以发起退款；

@@ -93,7 +93,7 @@ The persona agents `dk:security-auditor` and `dk:test-engineer` (agent-skills) a
 | `.dev-kit/plans/` | story-runner/code-refactor (large work) | Plan per `writing-plans` |
 | `.dev-kit/reports/<name>.md` | every controller | Report per `templates/report.md`: what changed, why, tests, commands run, review table, open questions |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets |
-| `.dev-kit/reports/pr-body.md` | pre-pr-check | PR body: Summary / Evidence / Merge Danger |
+| `.dev-kit/reports/pr-body.md` | pre-pr-check, on GO | PR body: Summary / Evidence / Merge Danger |
 | `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | the `domain-modeling` part | New terms and decisions; the project's own `GLOSSARY.md` and `docs/adr/` are read, and changes to them are proposed to you |
 | `.dev-kit/CONSTRAINTS.md` | the `constraint-driven-development` part (optional) | Your quality bar; `pre-pr-check` checks the diff against it. A project `CONSTRAINTS.md` at the root is read instead |
 

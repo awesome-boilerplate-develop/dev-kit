@@ -169,7 +169,7 @@ flowchart TD
    Mỗi reviewer nhận phạm vi diff và nội dung spec/issue, và trả về `file:line | blocker/major/minor | lý do`.
 3. **Gộp kết quả** vào một bảng theo thang blocker/major/minor. Nếu còn blocker nào mở, hoặc có check fail, thì `Verdict: NO-GO`; ngược lại là `GO`.
 4. **Nếu có blocker:** đọc part `receiving-code-review`, sửa kèm bằng chứng (hoặc phản biện kèm lý do), commit từng bản sửa, rồi quay lại bước 1. Tối đa 2 vòng.
-5. **Báo cáo kèm bảng finding.** Trừ khi ở chế độ report-only, ghi `.dev-kit/reports/pr-body.md` theo part `pr` (Summary / Evidence / Merge Danger), trong đó Evidence là output của bước 1.
+5. **Báo cáo kèm bảng finding.** Khi GO và không ở chế độ report-only, ghi `.dev-kit/reports/pr-body.md` theo part `pr` (Summary / Evidence / Merge Danger), trong đó Evidence là output của bước 1.
 
 **Ví dụ (minh họa):** một branch "hoàn tiền một phần" đụng tới quyền và dữ liệu cá nhân nên chạy 4 reviewer. Kết quả là NO-GO với các blocker sau:
 - một role không phải nhân viên vẫn có thể hoàn tiền;

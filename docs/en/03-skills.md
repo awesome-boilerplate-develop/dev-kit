@@ -166,7 +166,7 @@ flowchart TD
    Each reviewer receives the diff range and the spec/issue text, and returns `file:line | blocker/major/minor | reason`.
 3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, or a check failed, `Verdict: NO-GO`; otherwise `GO`.
 4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), commit each fix, and go back to step 1. At most 2 rounds.
-5. **Report with the findings table.** Unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
+5. **Report with the findings table.** On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
 
 **Example (illustration):** a "partial refund" branch touches permissions and personal data, so it runs 4 reviewers. The result is NO-GO with these blockers:
 - a non-staff role can still issue refunds;

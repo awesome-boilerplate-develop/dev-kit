@@ -62,4 +62,4 @@ Certain blockers and failing checks. If step 1 found uncommitted changes, ask th
 - Report from the template, including the required **Review setup** section; its Diff line is `git merge-base main HEAD`...`git rev-parse HEAD`, taken when you write the report.
 - Write it after the last commit of the work: a later commit outside `.dev-kit/` makes the report stale.
 - Then run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_report.py <report path> --base main` from the repo root; if it prints FAIL lines, fix the report (move, drop or re-tier findings; fix the verdict) and run it again until it prints OK (at most 3 tries; if still failing, say so in the final reply).
-- Unless report-only, a PR body in `.dev-kit/reports/pr-body.md`, following part `pr` (Summary / Evidence / Merge Danger; Evidence = the check output from step 1).
+- On GO and unless report-only, a PR body in `.dev-kit/reports/pr-body.md`; on NO-GO write none and delete an earlier one (there is no PR to open). The PR body follows part `pr` (Summary / Evidence / Merge Danger; Evidence = the check output from step 1).

@@ -137,7 +137,7 @@ Use skill dk:bug-fixer for this card:
 
 **Output cần xem:**
 - `.dev-kit/reports/<name>.md`: đã làm gì, vì sao, các lệnh đã chạy và kết quả;
-- `.dev-kit/reports/pr-body.md`: nội dung PR đã soạn;
+- `.dev-kit/reports/pr-body.md`: nội dung PR đã soạn (chỉ khi GO);
 - `.dev-kit/specs/` (story): đặc biệt là mục **Decisions**, để xem agent đã chốt những gì;
 - các commit trên branch hiện tại. dev-kit không push và không mở PR.
 
