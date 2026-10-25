@@ -95,6 +95,10 @@ class Settings(unittest.TestCase):
                          "  tenant:\n  types: { Bug: bug-fixer, Tech Debt: code-refactor }\nbase_branch: main\n")
             self.assertEqual(ticket.read_config(p), {"provider": "jira", "site": "a.atlassian.net",
                                                      "types": {"Bug": "bug-fixer", "Tech Debt": "code-refactor"}})
+            p.write_text("ticket:\n  provider: jira\n  types:\n    Bug: bug-fixer   # fixes\n    Tech Debt: code-refactor\n"
+                         "  site: a.atlassian.net\nbase_branch: main\n")
+            self.assertEqual(ticket.read_config(p), {"provider": "jira", "site": "a.atlassian.net",
+                                                     "types": {"Bug": "bug-fixer", "Tech Debt": "code-refactor"}})
 
 
 class Credentials(unittest.TestCase):
@@ -389,6 +393,21 @@ class JiraFetch(unittest.TestCase):
         self.assertEqual(self.board.query("project = A", 2), ["A-1", "A-2"])
         self.assertEqual(self.board.query("project = A", 10), ["A-1", "A-2", "A-3"])
 
+    def test_deleted_task_is_dropped_from_the_story(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        self.fake.routes.insert(0, (r"/issue/PROJ-3\?", lambda m: (_ for _ in ()).throw(ticket.Fail("not found (HTTP 404): x"))))
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, not found on the board: PROJ-3", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_local_file_image_is_never_opened(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["renderedFields"]["description"] = '<p><img src="file:///etc/hosts"><img src="ftp://h/x.png"></p>'
+        path, item, wtype, n_img, *_ = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual(n_img, 1)  # only the image in a comment
+        self.assertIn("file:///etc/hosts", path.read_text(encoding="utf-8"))
+        self.assertFalse(any(u.startswith(("file:", "ftp:")) for u, _ in self.fake.calls))
+
     def test_failed_refresh_keeps_the_old_copy(self):
         path, *_ = ticket.fetch(self.board, "PROJ-1", self.out)
         before = {f: f.read_bytes() for f in path.parent.rglob("*") if f.is_file()}
@@ -447,8 +466,35 @@ class Plumbing(unittest.TestCase):
         req = urllib.request.Request("https://acme.atlassian.net/a", headers={"Authorization": "Basic x"})
         same = h.redirect_request(req, None, 302, "", {}, "https://acme.atlassian.net/b")
         other = h.redirect_request(req, None, 302, "", {}, "https://media.example/b")
+        downgrade = h.redirect_request(req, None, 302, "", {}, "http://acme.atlassian.net/b")
         self.assertIn("Authorization", same.headers)
         self.assertNotIn("Authorization", other.headers)
+        self.assertNotIn("Authorization", downgrade.headers)
+
+    def test_opener_has_no_file_or_ftp(self):
+        for url in ("file:///etc/hosts", "ftp://example.invalid/x"):
+            with self.assertRaisesRegex(ticket.Fail, "unknown url type"):
+                ticket.request(url, None, raw=True)
+        self.assertEqual(ticket.request("data:,abc", None, raw=True), b"abc")
+
+    def test_windows_device_names_and_quoted_links(self):
+        self.assertEqual([ticket.safe_name(n) for n in ("aux.pdf", "CON", "com1.txt", "auxiliary.pdf")],
+                         ["_aux.pdf", "_CON", "_com1.txt", "auxiliary.pdf"])
+        self.assertEqual(ticket.Ado("org", "My Proj", ticket.Auth("")).link(7),
+                         "https://dev.azure.com/org/My%20Proj/_workitems/edit/7")
+
+    def test_error_line_for_a_non_utf8_config(self):
+        with tempfile.TemporaryDirectory() as d:
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                pathlib.Path(".dev-kit").mkdir()
+                pathlib.Path(".dev-kit/config.yml").write_bytes(b"ticket:\n  site: caf\xe9\n")
+                with mock.patch("sys.stderr") as err:
+                    self.assertEqual(ticket.main(["check"]), 1)
+                self.assertIn("not UTF-8", "".join(c.args[0] for c in err.write.call_args_list))
+            finally:
+                os.chdir(cwd)
 
     def test_sha_ignores_the_fetch_time(self):
         with tempfile.TemporaryDirectory() as d:

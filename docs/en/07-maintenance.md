@@ -60,7 +60,7 @@ All three sources are MIT. The original LICENSE files are in [`LICENSES/`](../..
 
 Follow Superpowers v7.0.0: one `skills/` set, one manifest per CLI, differences go in `harness/<cli>.md`. Do not split controller content per CLI.
 
-- **Adding a new CLI:** add a manifest (if the CLI has a plugin format), add a line to `.version-bump.json`, write `harness/<cli>.md`, and add the CLI name to the Harness section of the 5 controllers.
+- **Adding a new CLI:** add a manifest (if the CLI has a plugin format), add a line to `.version-bump.json`, write `harness/<cli>.md`, and add the CLI name to the Harness paragraph of the 7 skills (`skills/*/SKILL.md`).
 - **Checking after changing a controller or when a CLI has a major release:** install the kit, then ask the agent to load `pre-pr-check` and follow only the Harness section, and to return the kit directory, the first line of `rules/RULES.md`, the note file it read, and the name of the subagent tool. It passes when all four are correct.
 - **Three things not to do,** taken from ADR 0002 of mattpocock/skills and a trial on 2026-10-14:
   - putting `parts/` inside `skills/`: Codex scans skills recursively, so parts would become skills and cost context at session start;

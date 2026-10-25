@@ -27,6 +27,7 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -242,22 +243,28 @@ def cell(text):
 
 
 def safe_name(name):
-    return re.sub(r'[\\/:*?"<>|\x00-\x1f]', "_", name).strip(". ") or "file"
+    name = re.sub(r'[\\/:*?"<>|\x00-\x1f]', "_", name).strip(". ") or "file"
+    return "_" + name if re.match(r"(?i)(con|prn|aux|nul|com\d|lpt\d)(\.|$)", name) else name  # Windows device names
 
 
 # ---------- HTTP ----------
 
 class SameHostAuth(urllib.request.HTTPRedirectHandler):
-    """Follows redirects but never sends the Authorization header to another host (Jira attachments redirect)."""
+    """Follows redirects but never sends the Authorization header to another host or over http (Jira attachments redirect)."""
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         new = super().redirect_request(req, fp, code, msg, headers, newurl)
-        if new is not None and urllib.parse.urlparse(newurl).netloc != urllib.parse.urlparse(req.full_url).netloc:
+        to = urllib.parse.urlparse(newurl)
+        if new is not None and (to.netloc != urllib.parse.urlparse(req.full_url).netloc or to.scheme != "https"):
             new.headers.pop("Authorization", None)
         return new
 
 
-_opener = urllib.request.build_opener(SameHostAuth)
+# http(s) and data: only; build_opener would add file: and ftp:, which a link in a ticket must not reach.
+_opener = urllib.request.OpenerDirector()
+for _h in (urllib.request.UnknownHandler, urllib.request.HTTPHandler, urllib.request.HTTPSHandler, urllib.request.DataHandler,
+           urllib.request.HTTPDefaultErrorHandler, urllib.request.HTTPErrorProcessor, SameHostAuth):
+    _opener.add_handler(_h())
 
 
 def request(url, auth, body=None, raw=False):
@@ -297,9 +304,10 @@ def request(url, auth, body=None, raw=False):
 # ---------- settings and credentials ----------
 
 def read_config(path=None):
-    """The flat `ticket:` section of .dev-kit/config.yml; `types: { Bug: bug-fixer }` becomes a dict."""
+    """The flat `ticket:` section of .dev-kit/config.yml; `types: { Bug: bug-fixer }`, or the same as an indented block
+    under `types:`, becomes a dict."""
     path = path or pathlib.Path(".dev-kit/config.yml")
-    cfg, inside = {}, False
+    cfg, inside, block, block_indent = {}, False, {}, None
     if not path.exists():
         return cfg
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -309,10 +317,20 @@ def read_config(path=None):
         if inside:
             if line.strip() and not line[0].isspace():
                 break
+            indent = len(line) - len(line.lstrip())
+            if block_indent is not None and indent > block_indent and line.split("#")[0].strip():
+                k, _, v = line.split("#")[0].strip().partition(":")
+                block[k.strip().strip("'\"")] = v.strip().strip("'\"")
+                continue
+            block_indent = None
             m = re.match(r"^\s+([A-Za-z_]+):\s*(.*?)\s*(#.*)?$", line)
-            if m and m.group(2):
+            if m and m.group(1) == "types" and not m.group(2):
+                block_indent = indent
+            elif m and m.group(2):
                 cfg[m.group(1)] = m.group(2).strip("'\"")
-    if cfg.get("types", "").startswith("{"):
+    if block:
+        cfg["types"] = block
+    elif cfg.get("types", "").startswith("{"):
         cfg["types"] = {k.strip().strip("'\""): v.strip().strip("'\"")
                         for k, v in (p.split(":", 1) for p in cfg["types"].strip("{}").split(",") if ":" in p)}
     else:
@@ -520,7 +538,7 @@ class Ado(Board):
         self.forms = {}
 
     def link(self, wid):
-        return f"https://dev.azure.com/{self.org}/{self.project}/_workitems/edit/{wid}"
+        return f"https://dev.azure.com/{urllib.parse.quote(self.org)}/{urllib.parse.quote(self.project)}/_workitems/edit/{wid}"
 
     def briefs(self, ids):
         """Type, title, state and assignee of many work items, 200 per request."""
@@ -616,7 +634,7 @@ class Ado(Board):
         m = re.match(r"vstfs:///Git/(PullRequestId|Commit)/[^%]+%2F([^%]+)%2F(.+)$", url, re.I)
         if not m:
             return url
-        repo = f"https://dev.azure.com/{self.org}/{self.project}/_git/{m.group(2)}"
+        repo = f"https://dev.azure.com/{urllib.parse.quote(self.org)}/{urllib.parse.quote(self.project)}/_git/{m.group(2)}"
         return f"{repo}/pullrequest/{m.group(3)}" if m.group(1).lower() == "pullrequestid" else f"{repo}/commit/{m.group(3)}"
 
     def image_ids(self, src):
@@ -747,7 +765,10 @@ class Doc:
         self.md = Markdown(self.on_image)
 
     def on_image(self, src):
-        self.images.append(self.board.absolute(src))
+        src = self.board.absolute(src)
+        if urllib.parse.urlparse(src).scheme not in ("http", "https", "data"):
+            return src  # file:, ftp: and the like are left as written, never opened
+        self.images.append(src)
         n = len(self.images)
         return f"images/{n}.__ext{n}__"
 
@@ -803,11 +824,7 @@ class Doc:
         files = [(name, self.board.download(url)) for url, name in self.attachments]
         folder.mkdir(parents=True, exist_ok=True)
         for sub in ("images", "attachments"):
-            d = folder / sub
-            if d.exists():
-                for old in d.iterdir():
-                    old.unlink()
-                d.rmdir()
+            shutil.rmtree(folder / sub, ignore_errors=True)
         for n, (data, ext) in enumerate(images, 1):
             (folder / "images").mkdir(exist_ok=True)
             (folder / "images" / f"{n}.{ext}").write_bytes(data)
@@ -864,7 +881,15 @@ def fetch(board, key, out_root, with_parent=True, types=None):
     keys = list(dict.fromkeys(keys + [t.key for t in new]))
     if keys:
         folder = out_root / safe_name(parent.key)
-        tasks = [next((t for t in new if t.key == k), None) or board.item(k) for k in keys]
+        tasks, gone = [], []
+        for k in keys:
+            try:
+                tasks.append(next((t for t in new if t.key == k), None) or board.item(k))
+            except Fail as e:  # a task deleted or moved on the board is dropped, not a reason to stop refreshing the story
+                if "HTTP 404" not in str(e):
+                    raise
+                gone.append(k)
+        keys = [t.key for t in tasks]
         parts = [header(board, parent, requested=tasks)] + doc.body(parent, 2)
         for t in tasks:
             meta = [("State", t.state), ("Assigned to", dict(t.meta).get("Assigned to") or dict(t.meta).get("Assignee")),
@@ -883,6 +908,8 @@ def fetch(board, key, out_root, with_parent=True, types=None):
         path = doc.write(folder, "\n\n".join(parts))
         note = (f"{item.type} {item.display} is written into the file of {parent.type} {parent.display} "
                 f"(scope: {item.display})") if new else f"kept the attached tasks: {', '.join(t.display for t in tasks)}"
+        if gone:
+            note += f"; dropped, not found on the board: {', '.join(gone)}"
         n_com = len(parent.comments) + sum(len(t.comments) for t in tasks)
         return path, item, parent.type, len(doc.images), n_com, next_skill(parent, types), note
     path = doc.write(out_root / safe_name(item.key), "\n\n".join([header(board, item)] + doc.body(item, 2)))
@@ -1044,6 +1071,13 @@ def main(argv):
         code = commands[argv[0]](list(argv[1:]), read_config(), os.environ)
     except Fail as e:
         print(f"error: {e}", file=sys.stderr)
+        return 1
+    except UnicodeDecodeError as e:
+        print(f"error: a file is not UTF-8 ({e.reason} at byte {e.start}): save .dev-kit/config.yml or the old ticket.md "
+              "as UTF-8", file=sys.stderr)
+        return 1
+    except KeyError as e:
+        print(f"error: the board answered in an unexpected shape (no {e}): report it with the ticket link", file=sys.stderr)
         return 1
     except (SystemExit, ValueError):
         code = 2

@@ -72,6 +72,33 @@ class CheckReport(unittest.TestCase):
         empty = report().replace("| make check | PASS: 12 tests |\n", "")
         self.assertIn("Commands run lists no check", self.check(empty).stdout)
 
+    def test_verdict_left_as_the_template_fails(self):
+        for line in ("GO | NO-GO (from open **certain** blockers and checks that FAIL or did NOT RUN)", "GO or NO-GO"):
+            self.assertIn("still has the template's choices", self.check(report(verdict=line)).stdout, line)
+        for line in ("**NO-GO**", "GO (no open certain blocker)"):
+            self.assertNotIn("template's choices", self.check(report(verdict=line)).stdout, line)
+
+    def test_depth_lowered_for_cost_fails(self):
+        for reason in ("one reviewer to save cost", "self — tiết kiệm token"):
+            r = self.check(report().replace("one — reason: small diff: 1 file, 3 lines", reason))
+            self.assertIn("justified by cost", r.stdout, reason)
+
+    def test_missing_tests_without_rule_is_not_certain(self):
+        r = self.check(report("| major | 90 | src/pay.ts:12 | refund path is untested | — | open |"))
+        self.assertIn("'missing tests' reported as certain without a rule", r.stdout)
+
+    def test_unknown_standard_file_fails(self):
+        r = self.check(report("| major | 90 | src/pay.ts:12 | total is negative | coding/no-such-file | open |"))
+        self.assertIn("rule id 'coding/no-such-file' not found", r.stdout)
+
+    def test_graph_line_when_the_repo_has_an_index(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            pathlib.Path(d, ".code-review-graph").mkdir()
+            self.assertIn("but the repo has one", self.run_check(report(), d).stdout)
+            summary = report().replace("no .code-review-graph/ index", "risk 0.2, 1 test gap")
+            self.assertEqual(self.run_check(summary, d).returncode, 0)
+
     def test_file_without_extension_is_located(self):
         r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))
         self.assertEqual(r.returncode, 0, r.stdout)

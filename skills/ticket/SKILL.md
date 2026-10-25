@@ -46,7 +46,7 @@ Run `ticket.py check <link>` (or `ticket.py check` with settings). On `error:` (
   3. Say "done" here.
   Environment variables `JIRA_EMAIL` + `JIRA_API_TOKEN` also work.
 - Azure DevOps:
-  1. With the Azure CLI installed, run `! az login` here (`! az login --tenant <tenant>` for a work account) and sign in in the browser.
+  1. With the Azure CLI installed, run `az login` in your terminal (`az login --tenant <tenant>` for a work account; in Claude Code you can type `! az login` here) and sign in in the browser.
   2. Say "done" here.
   Without az: create a PAT with scope Work Items (Read) at `https://dev.azure.com/<org>/_usersSettings/tokens`, then run `ticket.py login azure --org <org>` in their own terminal; or set `AZURE_DEVOPS_EXT_PAT`.
 Do not retry in a loop; one check after the user says it is done.

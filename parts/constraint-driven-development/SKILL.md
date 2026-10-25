@@ -7,7 +7,7 @@ description: Establishes a project's quality bar as a written contract and stops
 
 ## Overview
 
-Other skills in this pack describe what good looks like. `code-review-and-quality` gives you five axes. `test-driven-development` gives you a cycle. `security-and-hardening` gives you a threat list. All of that lives in prose the agent reads and may or may not follow, and none of it survives the end of the session.
+Other playbooks describe what good looks like. Part `code-review` gives you two axes. Part `test-driven-development` gives you a cycle. The `security` standards give you a checklist. All of that lives in prose the agent reads and may or may not follow, and none of it survives the end of the session.
 
 This skill produces something different: a written record of **this project's** bar, with numbers, that outlives the conversation and can be checked mechanically.
 
@@ -24,13 +24,13 @@ Apply this skill when:
 - An agent is producing volume nobody is reading line by line
 - CI has checks but nobody can say which ones block a merge and which ones are decoration
 - Coverage, performance, or accessibility numbers get argued about per-PR instead of decided once
-- You're about to run `/build auto` or any autonomous loop, and the only thing standing between it and main is a test suite the agent also wrote
+- You're about to run an autonomous loop (a headless controller run, for example), and the only thing standing between it and main is a test suite the agent also wrote
 
 **When NOT to use:**
 
 - The project already has a `CONSTRAINTS.md` and the user isn't changing it — read it and follow it instead
 - One-off scripts, spikes, throwaway prototypes
-- The user wants a code review right now (`code-review-and-quality`) or a CI pipeline built (`ci-cd-and-automation`)
+- The user wants a code review right now (`dk:pre-pr-check`) or a CI pipeline built
 - Pre-product-market-fit code with a two-week expected lifetime — the floor below is still worth it, the rest isn't
 
 ## Loading Constraints
@@ -56,7 +56,7 @@ Report what you found in two lines, then ask only what's left.
 
 ### Step 2: Four questions, each with a default
 
-Follow the one-question-at-a-time discipline from `interview-me`, with one change: every question here has a default, so "I don't know" is a complete answer that still produces a working config.
+Follow the one-question-at-a-time discipline from part `grilling`, with one change: every question here has a default, so "I don't know" is a complete answer that still produces a working config.
 
 ```
 Q1: Beyond the floor, which of these do you want enforced?
@@ -97,7 +97,7 @@ Upstream puts one file at the repo root so every agent and reviewer sees it. **U
 ```markdown
 # Constraints
 
-Last reviewed: 2026-08-08 by @addy
+Last reviewed: <date> by <name>
 
 ## Floor (always enforced, no setup required)
 
@@ -134,14 +134,14 @@ number and no command in this column is an aspiration, not a constraint.
 
 | ID | Rule | Path | Reason | Owner | Expires |
 |----|------|------|--------|-------|---------|
-| W1 | `no-explicit-any` | `src/legacy/**` | Rewrite tracked in ENG-441 | @addy | 2026-11-01 |
+| W1 | `no-explicit-any` | `src/legacy/**` | Rewrite tracked in <ticket> | <owner> | <date> |
 ```
 
 Do not add a line to `AGENTS.md` or `CLAUDE.md`: those files are tracked and shared (rule O1). dev-kit controllers read `.dev-kit/CONSTRAINTS.md` themselves (`dk:pre-pr-check` step 1).
 
 ### Step 4: Install what each dimension needs
 
-**In dev-kit:** install nothing and edit no tracked file yourself (`package.json`, lockfiles, CI, hooks, agent settings; rule O1). For each dimension that needs a tool, name the tool, its install command and the script line below, and ask the user; on no, put the dimension under "Measured, not yet enforced" or drop it. The commands in Step 5's table are upstream's lifecycle; in dev-kit, `dk:pre-pr-check` step 1 runs the checks.
+**In dev-kit:** install nothing and edit no tracked file yourself (`package.json`, lockfiles, CI, hooks, agent settings; rule O1). For each dimension that needs a tool, name the tool, its install command and the script line below, and ask the user; on no, put the dimension under "Measured, not yet enforced" or drop it. In dev-kit, `dk:pre-pr-check` step 1 runs the checks (Step 5's REVIEW row).
 
 Picking a dimension means installing something. Don't leave the user with a number and no mechanism, and don't invent your own checker when a de facto one exists — these tools are listed because their rule formats and thresholds are what everything else in the ecosystem targets, so the team's existing config keeps working.
 
@@ -191,10 +191,10 @@ The single biggest mistake is running everything everywhere. A check that stalls
 
 | Phase | Command | What runs | Budget |
 |-------|---------|-----------|--------|
-| BUILD | `/build` | Types, lint, secrets, the floor | under 5s, changed file only |
-| VERIFY | `/test` | Related tests, coverage on changed lines | under 90s |
-| REVIEW | `/review` | Everything, plus the guards below | minutes |
-| SHIP | `/ship` | Direction checks, no regressions | CI |
+| BUILD | `check:fast` after an edit | Types, lint, secrets, the floor | under 5s, changed file only |
+| VERIFY | `check:task` | Related tests, coverage on changed lines | under 90s |
+| REVIEW | `dk:pre-pr-check` | Everything, plus the guards below | minutes |
+| SHIP | CI (`check:full`) | Direction checks, no regressions | CI |
 
 Two rules that keep this tolerable:
 
@@ -295,19 +295,16 @@ The skill was applied correctly when:
 
 - [ ] `CONSTRAINTS.md` exists, and every number in it has a stated reason
 - [ ] The floor is enforced and passes on the current codebase without changes
-- [ ] Every dimension the user picked has a tool installed and a command that runs today
+- [ ] Every dimension the user picked has a tool installed and a command that runs today, or the user declined the install and it is under "Measured, not yet enforced"
 - [ ] Each constraint says where it runs, and the fast stage stays under a few seconds
 - [ ] At least one constraint is external (not judged by this project's own tests)
 - [ ] Measured-only metrics record today's value and a direction
 - [ ] Exceptions have an owner and an expiry date
-- [ ] `AGENTS.md` or `CLAUDE.md` points at the file
+- [ ] No tracked file changed: `dk:pre-pr-check` reads `.dev-kit/CONSTRAINTS.md` itself
 - [ ] A trial run on the current branch produces no failures the user disagrees with
 
 ## See Also
 
-- `interview-me` — the one-question-at-a-time discipline this skill's intake borrows
-- `code-review-and-quality` — how to review; this skill decides what the review enforces
-- `ci-cd-and-automation` — building the pipeline these constraints run in
-- `test-driven-development` — the suite that coverage and mutation constraints measure
-- `security-and-hardening` — what the security dimension should contain
-- `performance-optimization` — where the performance numbers come from
+- part `grilling` — the one-question-at-a-time discipline this skill's intake borrows
+- `dk:pre-pr-check` — step 1 reads this file; a change that breaks it is a blocker
+- part `test-driven-development` — the suite that coverage and mutation constraints measure

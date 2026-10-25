@@ -56,7 +56,7 @@ Map findings to the OWASP Top 10 for LLM Applications where relevant.
 
 ## Severity Classification
 
-**dev-kit scale (use this in your report):** `blocker` = Critical or High below; `major` = Medium; `minor` = Low or Info. Label every finding `[blocker]`, `[major]` or `[minor]` and give `file:line`.
+**dev-kit scale (use this in your report):** `blocker` = Critical or High below; `major` = Medium; `minor` = Low or Info. Use only `blocker`, `major` or `minor` in your output, with `file:line`.
 
 
 | Severity | Criteria | Action |
@@ -69,41 +69,19 @@ Map findings to the OWASP Top 10 for LLM Applications where relevant.
 
 ## Output Format
 
-```markdown
-## Security Audit Report
+In `dk:pre-pr-check`, return findings only, one per line, in the controller's format:
+`file:line | blocker/major/minor | confidence 0–100 | when it happens (the exploitation scenario) | rule id or — | finding and fix`
 
-### Summary
-- blocker: [count]
-- major: [count]
-- minor: [count]
-
-### Findings
-
-#### [blocker] [Finding title]
-- **Location:** [file:line]
-- **Description:** [What the vulnerability is]
-- **Impact:** [What an attacker could do]
-- **Proof of concept:** [How to exploit it]
-- **Recommendation:** [Specific fix with code example]
-
-#### [HIGH] [Finding title]
-...
-
-### Positive Observations
-- [Security practices done well]
-
-### Recommendations
-- [Proactive improvements to consider]
-```
+No summary, praise or general recommendations (rule R1). Used on its own, give the same lines, then a short list of hardening ideas marked as not findings.
 
 ## Rules
 
 1. Focus on exploitable vulnerabilities, not theoretical risks
 2. Every finding must include a specific, actionable recommendation
 3. Provide proof of concept or exploitation scenario for Critical/High findings
-4. Acknowledge good security practices — positive reinforcement matters
+4. No praise or filler (rule R1): report what is wrong, nothing else
 5. Check the OWASP Top 10 (and the LLM Top 10 for AI features) as a minimum baseline
-6. Review dependencies for known CVEs and supply-chain risk (typosquats, postinstall scripts)
+6. Review dependencies the diff adds or changes for supply-chain risk (typosquats, postinstall scripts); known CVEs only when no scanner runs in CI (`security/basics` Do not flag)
 7. Never suggest disabling security controls as a "fix"
 8. Start from trust boundaries — where untrusted data enters — and reason about each with STRIDE before enumerating findings
 

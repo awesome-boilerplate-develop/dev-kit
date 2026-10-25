@@ -18,6 +18,7 @@ A certain blocker is open unless its Status cell says "fixed"; an open blocker n
 check. A row fails when its Result starts with FAIL or NOT RUN (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy), or names
 a failure count or a non-zero exit anywhere ("12 passed, 3 failed", "exit 1") without saying it is the baseline / known failures.
 A failing row needs Verdict NO-GO: a failing required check gates on its own, findings or not.
+The Verdict line must name one verdict: the template's "GO | NO-GO" left as written FAILs.
 With --base, an empty diff (HEAD is the merge base) FAILs: nothing was reviewed, so there is no verdict to give.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
@@ -209,8 +210,11 @@ def failing(result):
 
 failed = [c[0] for c in commands if len(c) > 1 and failing(c[1])]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
+verdict_line = re.search(r"Verdict:[^\n]*", text)
 if not verdict:
     problems.append("missing 'Verdict: GO | NO-GO'")
+elif "|" in verdict_line.group() or ("NO-GO" in verdict_line.group() and re.search(r"(?<!NO-)\bGO\b", verdict_line.group())):
+    problems.append(f"the Verdict line still has the template's choices, pick one: {verdict_line.group()}")
 elif blockers and verdict.group(1) != "NO-GO":
     problems.append("open certain blocker but verdict is GO")
 elif failed and verdict.group(1) != "NO-GO":

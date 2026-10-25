@@ -1,5 +1,5 @@
 """Check for dangling references in a copied pack. Usage: python3 scripts/check_parts.py <plugin path>
-- `parts/<x>/SKILL.md` and "dev-kit part `x`" must point to a part that exists.
+- `parts/<x>/SKILL.md`, "part `x`" and "parts `a`, `b` and `c`" must point to a part that exists.
 - Relative Markdown links must exist (with or without a leading ./).
 - The paragraphs the controllers share (Commands, Graph, Standards, Outputs) must be identical in every controller."""
 import pathlib
@@ -10,8 +10,13 @@ pack = pathlib.Path(sys.argv[1])
 parts = {p.name for p in (pack / "parts").iterdir() if p.is_dir()}
 bad = []
 for f in pack.rglob("*.md"):
+    if any(d.startswith(".") for d in f.relative_to(pack).parts[:-1]):
+        continue  # local notes (.outputs/, .docs/) are not part of the pack
     text = re.sub(r"```.*?```", "", f.read_text(), flags=re.S)  # ignore examples inside code fences
-    for name in set(re.findall(r"parts/([a-z-]+)/SKILL\.md", text)) | set(re.findall(r"dev-kit part `([a-z-]+)`", text)):
+    # parts/x/SKILL.md, "dev-kit part `x`", and the controllers' "part `x`" / "parts `a`, `b` and `c`"
+    named = {n for group in re.findall(r"\bparts? ((?:`[a-z-]+`(?:,\s*|\s+and\s+|\s+or\s+)?)+)", text)
+             for n in re.findall(r"`([a-z-]+)`", group)}
+    for name in set(re.findall(r"parts/([a-z-]+)/SKILL\.md", text)) | named:
         if name not in parts:
             bad.append(f"{f.relative_to(pack)}: part does not exist `{name}`")
     for link in re.findall(r"\]\((?![a-z][a-z0-9+.-]*:|/)([^)#\s]+)", text):  # every relative link, with or without ./

@@ -58,26 +58,14 @@ For every function or component:
 
 ## Output Format
 
-When analyzing test coverage:
+In `dk:pre-pr-check`, return findings only, one per line, in the controller's format:
+`file:line | blocker/major/minor | confidence 0–100 | when it happens | rule id or — | finding`
 
-```markdown
-## Test Coverage Analysis
+- Report: a test that exists but passes while the code is broken (say how it still passes); a test skipped, deleted or weakened; a test that a loaded rule or the spec requires for this change and that is missing (cite it, for example `testing/basics#T1` or the spec section).
+- Do not report "missing tests" in general: without a rule or spec to cite it is Do not flag (`standards/review/finding-quality.md`).
+- Severity comes from the loaded standards' `## Severity` (for example `testing/basics`: T1 missing on a bug fix → major, T4 → blocker).
 
-### Current Coverage
-- [X] tests covering [Y] functions/components
-- Coverage gaps identified: [list]
-
-### Recommended Tests
-1. **[Test name]** — [What it verifies, why it matters]
-2. **[Test name]** — [What it verifies, why it matters]
-
-### Findings (dev-kit scale)
-- blocker: [missing or broken tests for data loss, security, or a spec rule the change claims to implement]
-- major: [missing tests for core business logic, edge cases, error paths]
-- minor: [tests for utilities and formatting; style of existing tests]
-
-Give `file:line` for each finding.
-```
+Used on its own (test design, coverage analysis), list the tests you recommend: **[Test name]** — what it verifies, why it matters.
 
 ## Rules
 
