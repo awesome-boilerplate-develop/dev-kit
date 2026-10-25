@@ -51,11 +51,13 @@ class CheckReport(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout)
 
     def test_failing_check_needs_no_go(self):
-        for result in ("FAIL: compiler error, exit 1", "**FAIL** 1 new failing test", "NOT RUN: restore failed"):
+        for result in ("FAIL: compiler error, exit 1", "**FAIL** 1 new failing test", "NOT RUN: restore failed",
+                       "thất bại: 1 test mới fail", "Lỗi compile, exit 1", "không chạy được: thiếu SDK"):
             r = self.check(report(result=result))
             self.assertIn("required check failed or did not run but verdict is GO", r.stdout, result)
             self.assertEqual(self.check(report(verdict="NO-GO", result=result)).returncode, 0, result)
-        self.assertEqual(self.check(report(result="PASS: 40 tests, 2 known baseline failures")).returncode, 0)
+        for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi"):
+            self.assertEqual(self.check(report(result=result)).returncode, 0, result)
 
     def test_file_without_extension_is_located(self):
         r = self.check(report(suspect="| minor | 60 | Makefile:12 | check target skips lint | — |"))

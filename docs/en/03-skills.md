@@ -154,7 +154,7 @@ flowchart TD
 **Report-only mode:** if the request says "do not change code", it edits no file and skips step 4.
 
 **Steps:**
-1. **Run the check commands right now** and keep the output as Evidence. Checks, review and report cover HEAD, so uncommitted changes stop the run with a question to you. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
+1. **Run the check commands right now** and keep the output as Evidence. The review covers HEAD; uncommitted changes are left alone and named in the report, and it asks you before fixing anything while they are there. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
 2. **Pick the review level per rule C2:**
 
    | Level | When | What it does |

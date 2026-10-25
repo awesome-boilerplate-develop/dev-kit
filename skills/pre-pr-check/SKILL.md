@@ -28,7 +28,7 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 **Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
 
 ### 1. Checks and a lowered bar
-- Checks, review and report all cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD, so stop and ask the user to commit them or set them aside; never stash, commit or discard them yourself.
+- The review and report cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD. Never stash, commit or discard them; go on, and name them on the Tree line of Review setup (the checks ran with them).
 - Run the check command now; keep the output as Evidence. A check that fails outside the baseline, or cannot run, goes in Commands run as `FAIL: …` or `NOT RUN: …`. It is not a finding (R6 drops what CI catches): it makes the verdict NO-GO on its own.
 - Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.
 - If `.dev-kit/CONSTRAINTS.md` (or the project's own `CONSTRAINTS.md`) exists, also check the diff against its floor and numbered rules; a change that breaks one is a blocker.
@@ -55,7 +55,7 @@ Every reviewer (and you, in self-review) gets: the diff range, the spec (`.dev-k
 - Any open certain `blocker`, or a check that is `FAIL` / `NOT RUN` in step 1 → `Verdict: NO-GO`; otherwise `Verdict: GO`.
 
 ### 5. Fix certain blockers
-Certain blockers and failing checks: Read part `receiving-code-review`, fix with evidence (or push back with reasons), commit each fix (only the files you changed) so the next round checks and reviews HEAD, back to step 1 (max 2 rounds).
+Certain blockers and failing checks. If step 1 found uncommitted changes, ask the user before fixing (a fix commit could take theirs along); with no one to answer, fix nothing and leave the verdict as it is. Read part `receiving-code-review`, fix with evidence (or push back with reasons), commit each fix (only the files you changed) so the next round checks and reviews HEAD, back to step 1 (max 2 rounds).
 
 ### 6. Report and PR body
 - Report from the template, including the required **Review setup** section; its Diff line is `git merge-base main HEAD`...`git rev-parse HEAD`, taken when you write the report.

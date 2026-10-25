@@ -157,7 +157,7 @@ flowchart TD
 **Chế độ report-only:** nếu yêu cầu nói "do not change code", nó không sửa file nào và bỏ qua bước 4.
 
 **Các bước:**
-1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Checks, review và report cùng xét HEAD, nên thay đổi chưa commit làm lượt chạy dừng lại để hỏi bạn. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
+1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Review xét HEAD; thay đổi chưa commit được giữ nguyên và ghi tên trong report, và nó hỏi bạn trước khi sửa gì trong lúc còn các thay đổi đó. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.
 2. **Chọn mức review theo rule C2:**
 
    | Mức | Khi nào | Làm gì |

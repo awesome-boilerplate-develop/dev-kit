@@ -157,7 +157,7 @@ flowchart TD
 **Report-only 模式：** 如果请求里说“不要修改代码”，它不会编辑任何文件，并跳过第 4 步。
 
 **步骤：**
-1. **立即运行检查命令**，并把输出保留为 Evidence。checks、review 和 report 都针对 HEAD，因此有未提交的修改时会停下来询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
+1. **立即运行检查命令**，并把输出保留为 Evidence。review 针对 HEAD；未提交的修改保持不动并在 report 中列出，存在这些修改时，修复之前会先询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
 2. **按 rule C2 选择 review 级别：**
 
    | 级别 | 何时 | 做什么 |

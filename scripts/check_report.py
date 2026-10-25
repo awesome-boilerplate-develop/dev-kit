@@ -14,7 +14,8 @@ and is about a missing test or only points at a test file: Do not flag (R1) → 
 A rule id cited in the certain tier must exist in a standards file (rule T1, R7), and `file#ID` must name an item of that file; an id that is not found FAILs.
 The Certain findings, Suspect findings and Commands run sections must be present (an empty table is fine); every finding has a confidence 0–100.
 A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO. So does a Commands run
-row whose Result starts with FAIL or NOT RUN: a failing required check gates on its own, findings or not.
+row whose Result starts with FAIL or NOT RUN (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy): a failing required check
+gates on its own, findings or not.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
 import pathlib
@@ -187,7 +188,7 @@ if base:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
 blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and re.match(r"fixed\b", c[5], re.I))]
-failed = [c[0] for c in rows(section("Commands run")) if len(c) > 1 and re.match(r"[\W_]*(fail|not run)", c[1], re.I)]
+failed = [c[0] for c in rows(section("Commands run")) if len(c) > 1 and re.match(r"[\W_]*(fail|not run|thất bại|lỗi|không chạy|chưa chạy)", c[1], re.I)]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
 if not verdict:
     problems.append("missing 'Verdict: GO | NO-GO'")

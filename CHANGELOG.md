@@ -7,11 +7,11 @@ Fixes from an external quality review of 1.9.2; each `ticket.py` and `check_repo
 - **`dk:ticket` reads every page:** Azure DevOps comments follow the continuation token, Jira comments beyond those embedded in the issue are fetched, and Jira children and queries follow `nextPageToken`.
 - **`dk:ticket` Azure DevOps Markdown comments:** comments are requested with `$expand=renderedText`, so a Markdown comment comes as HTML (lists and images kept) instead of Markdown pushed through the HTML converter.
 - **`dk:ticket` attachment names:** `Spec.pdf` and `spec.pdf` get different local names; on macOS and Windows the second overwrote the first.
-- **`pre-pr-check`, a failing check gates on its own:** a check that fails outside the baseline or cannot run is written as `FAIL` / `NOT RUN` in Commands run and makes the verdict NO-GO, findings or not (rule R6 dropped what CI catches, so a build error could reach GO). `check_report.py` rejects GO with such a row.
-- **`pre-pr-check` reviews one snapshot:** it stops and asks when the tree has changes outside `.dev-kit/`, and commits each fix before the next round, so checks, review and report all cover HEAD.
+- **`pre-pr-check`, a failing check gates on its own:** a check that fails outside the baseline or cannot run is written as `FAIL` / `NOT RUN` in Commands run and makes the verdict NO-GO, findings or not (rule R6 dropped what CI catches, so a build error could reach GO). `check_report.py` rejects GO with such a row (also when the report says it in Vietnamese: thất bại / lỗi / không chạy / chưa chạy).
+- **`pre-pr-check` reviews one snapshot:** it commits each fix before the next round, so checks, review and report cover HEAD. Uncommitted changes outside `.dev-kit/` are left alone and named on a new Tree line of Review setup; the run goes on (report-only and headless runs still end with a verdict), but it asks before fixing, since a fix commit could take them along.
 - **`pre-pr-check` routes `ops` standards** to the Standards reviewer; with four reviewers no one got them.
 - **Large work is gated before it is merged:** `story-runner` (and `code-refactor`) stop SDD before finishing, run `dk:pre-pr-check` in the worktree on the feature branch, and merge back only on GO. Before, finishing merged into the base first, so the gate saw an empty diff.
-- **Not yet checked** in a headless agent run: the controller changes (large-work order, dirty-tree stop, failing-check NO-GO).
+- **Not yet checked** in a headless agent run: the controller changes (large-work order, Tree line and ask-before-fixing, failing-check NO-GO).
 
 ## 1.9.2 (2026-10-25)
 - **README, install and update per CLI:** each CLI's section has an Install block and an Update block (Claude Code also in a session); the separate Updating section is gone. The Claude Code update was run on 2026-10-25 (1.7.5 to 1.9.1).
