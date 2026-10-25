@@ -14,9 +14,10 @@ and is about a missing test or only points at a test file: Do not flag (R1) → 
 A rule id cited in the certain tier must exist in a standards file (rule T1, R7), and `file#ID` must name an item of that file; an id that is not found FAILs.
 The Certain findings, Suspect findings and Commands run sections must be present (an empty table is fine); every finding has a confidence 0–100.
 Section headings may carry extra text ("### Certain findings (1)"); a table's header row is the row above its |---| line.
-A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO. Commands run lists at least one
-check. A row fails when its Result starts with FAIL or NOT RUN (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy), or names
-a failure count or a non-zero exit anywhere ("12 passed, 3 failed", "exit 1") without saying it is the baseline / known failures.
+A certain blocker is open unless its Status cell says "fixed" (not "fixed later", "fixed (will do)"); an open blocker needs Verdict NO-GO. Commands run lists at least one
+check. A row fails when its Result starts with FAIL, NOT RUN or SKIP (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy /
+bỏ qua, with or without accents), or says anywhere that it did not run ("could not run", "not executed", "0 tests ran") or names a
+failure count or a non-zero exit ("12 passed, 3 failed", "exit 1"), unless it says that is the baseline / known failures.
 A failing row needs Verdict NO-GO: a failing required check gates on its own, findings or not.
 The Verdict line must name one verdict: the template's "GO | NO-GO" left as written FAILs.
 With --base, an empty diff (HEAD is the merge base) FAILs: nothing was reviewed, so there is no verdict to give.
@@ -88,7 +89,7 @@ else:
         if key not in setup:
             problems.append(f"Review setup lacks '{key}'")
     # Reports may be written in the user's language: keep non-English alternatives (Vietnamese) in these patterns.
-    if re.search(r"Depth:.*(cost|save|tiết kiệm)", setup, re.I):
+    if re.search(r"Depth:.*(cost|cheap|sav(e|ing)|budget|expensive|tiết kiệm|rẻ|tốn|chi phí)", setup, re.I):
         problems.append("review depth justified by cost (rule C2 forbids lowering for cost)")
     graph = re.search(r"Graph:(.*)", setup)
     if graph and (root / ".code-review-graph").is_dir():
@@ -98,7 +99,8 @@ else:
             problems.append("Graph line lacks the detect-changes summary although .code-review-graph/ exists (rule G1)")
     diff_line = re.search(r"Diff:\s*`?([0-9a-f]{7,40})\.\.\.([0-9a-f]{7,40})", setup)
     if base and "Diff:" in setup:
-        sha = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
+        def sha(*a):
+            return subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
         now = (sha("merge-base", base, "HEAD"), sha("rev-parse", "HEAD"))
         if now[0] == now[1]:
             problems.append(f"nothing between {base} and HEAD: an empty diff has no review and no verdict (already merged, or on {base} itself?)")
@@ -195,17 +197,25 @@ if base:
             if not ok:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
-blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and re.match(r"fixed\b", c[5], re.I))]
+def fixed(status):
+    m = re.match(r"fixed\b(.*)", status, re.I)
+    return bool(m) and not re.search(r"\b(will|later|todo|pending|next|not yet|sau|sẽ|chưa)\b", m.group(1), re.I)
+
+
+blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and fixed(c[5]))]
 commands = rows(section("Commands run"))
 if section("Commands run") is not None and not commands:
     problems.append("Commands run lists no check: run the check command and record its result")
 
 
 def failing(result):
-    if re.match(r"[\W_]*(fail|not run|thất bại|lỗi|không chạy|chưa chạy)", result, re.I):
+    if re.match(r"[\W_]*(fail|not run|skip|thất bại|lỗi|không chạy|chưa chạy|bỏ qua|that bai|loi\b|khong chay|chua chay|bo qua)",
+                result, re.I):
         return True
     return not re.search(r"baseline|known", result, re.I) and bool(re.search(
-        r"\b[1-9]\d*\s+(failed|failing|failures?|errors?)\b|\bexit(\s+code)?\s*[:=]?\s*[1-9]", result, re.I))
+        r"\b[1-9]\d*\s+(failed|failing|failures?|errors?)\b|\bexit(\s+code)?\s*[:=]?\s*[1-9]"
+        r"|\b(did|could|can)\s*(not|n't)\s+(be\s+)?run|\bnot executed|\b(0|no)\s+tests?\s+(ran|run|were run|executed)"
+        r"|không chạy được|khong chay duoc", result, re.I))
 
 
 failed = [c[0] for c in commands if len(c) > 1 and failing(c[1])]

@@ -52,11 +52,14 @@ class CheckReport(unittest.TestCase):
 
     def test_failing_check_needs_no_go(self):
         for result in ("FAIL: compiler error, exit 1", "**FAIL** 1 new failing test", "NOT RUN: restore failed",
-                       "thất bại: 1 test mới fail", "Lỗi compile, exit 1", "không chạy được: thiếu SDK"):
+                       "thất bại: 1 test mới fail", "Lỗi compile, exit 1", "không chạy được: thiếu SDK",
+                       "skipped, suite did not run", "could not run: missing SDK", "0 tests ran", "suite not executed",
+                       "that bai: 1 test", "khong chay duoc", "bỏ qua: thiếu môi trường"):
             r = self.check(report(result=result))
             self.assertIn("required check failed or did not run but verdict is GO", r.stdout, result)
             self.assertEqual(self.check(report(verdict="NO-GO", result=result)).returncode, 0, result)
-        for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi", "none: no skips added", "12 passed, 0 failed"):
+        for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi", "none: no skips added", "12 passed, 0 failed",
+                       "PASS: 40 passed, 2 skipped", "PASS, 2 skipped (marked skip in baseline)"):
             self.assertEqual(self.check(report(result=result)).returncode, 0, result)
 
     def test_gate_holds_against_layout_tricks(self):
@@ -79,9 +82,18 @@ class CheckReport(unittest.TestCase):
             self.assertNotIn("template's choices", self.check(report(verdict=line)).stdout, line)
 
     def test_depth_lowered_for_cost_fails(self):
-        for reason in ("one reviewer to save cost", "self — tiết kiệm token"):
+        for reason in ("one reviewer to save cost", "self — tiết kiệm token", "one: cheaper than four", "self, within budget",
+                       "one, rẻ hơn"):
             r = self.check(report().replace("one — reason: small diff: 1 file, 3 lines", reason))
             self.assertIn("justified by cost", r.stdout, reason)
+
+    def test_fixed_later_keeps_the_blocker_open(self):
+        for status in ("fixed (will do)", "fixed later", "fixed — chưa commit"):
+            r = self.check(report(f"| blocker | 90 | src/pay.ts:12 | total is negative | — | {status} |"))
+            self.assertIn("open certain blocker but verdict is GO", r.stdout, status)
+        for status in ("fixed", "fixed (a1b2c3d)"):
+            r = self.check(report(f"| blocker | 90 | src/pay.ts:12 | total is negative | — | {status} |"))
+            self.assertEqual(r.returncode, 0, status + r.stdout)
 
     def test_missing_tests_without_rule_is_not_certain(self):
         r = self.check(report("| major | 90 | src/pay.ts:12 | refund path is untested | — | open |"))
@@ -158,8 +170,9 @@ class CheckReport(unittest.TestCase):
 
     def test_base_checks_cited_line_against_diff(self):
         with tempfile.TemporaryDirectory() as d:
-            git = lambda *a: subprocess.run(["git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@t", *a],
-                                            check=True, capture_output=True, text=True).stdout.strip()
+            def git(*a):
+                return subprocess.run(["git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@t", *a],
+                                      check=True, capture_output=True, text=True).stdout.strip()
             git("init", "-q", "-b", "main")
             src = pathlib.Path(d, "pay.ts")
             src.write_text("".join(f"line {i}\n" for i in range(1, 41)))

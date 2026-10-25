@@ -10,7 +10,7 @@
 | ブロック | 意味 |
 |---|---|
 | **Parts** | ステップで言及されたときだけ part を読む。part は skill ではない |
-| **Rules** | `rules/RULES.md` で on になっている rule を適用する: F1、F2、C1、C2、G1、S1、O1（[04](../en/04-rules.md)、英語） |
+| **Rules** | `rules/RULES.md` で on になっている rule を適用する: F1、F2、C1、C2、G1、T1、S1、O1、pre-pr-check では R1（[04](../en/04-rules.md)、英語） |
 | **Graph** | リポジトリに codegraph/CRG のインデックスがあれば rule G1 に従って使い、なければ省略する |
 | **Commands** | `.dev-kit/config.yml` があればそこからチェックコマンドとベースブランチを取る。なければ `make check` またはリポジトリのテストコマンドと `main` を使う |
 | **Outputs** | すべて `.dev-kit/` に書く（rule O1）。`templates/report.md` に沿ったレポートで終える。重大度は blocker/major/minor の尺度を使う（rule S1） |
@@ -32,7 +32,7 @@
 
 **ステップと質問（順番どおり）:**
 1. **グラフツール:** `scripts/install-graph-tools.sh --check` で確認する。*質問は、足りないものがあるときだけ:* インストールするか。断られた場合は「G1 off」で続行する。`codegraph install` と `code-review-graph install` は決して実行しない（MCP、hook、指示ファイルを登録するため）。
-2. **個人設定:** 以前のリポジトリでチームの standards フォルダが保存されていれば、`~/.dev-kit/config.yml` から読み込む。
+2. **個人設定:** 現時点ではなし。dev-kit はリポジトリごとに設定する。
 3. **調査のみ、質問なし:** コマンド、ベースブランチ、スタック、linter がすでに強制しているもの、すでに `.dev-kit/` の下で追跡されているファイル、プロジェクト自身の `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
 4. *質問:* **コマンドとベースブランチ**（確認または修正）。ベースブランチは `origin/HEAD` だけでなく、最近の PR がマージされているブランチと照らし合わせる。両者が違う場合は、コミット日とコミット数の差を添えて選択肢として尋ねる。そのあと `*` を含む `.gitignore` を置いた `.dev-kit/` を作成し、`config.yml` を書く。
 5. *質問:* **グラフのインデックス**（既定は yes。想定サイズはインデックス対象 1 ファイルあたり約 0.16 MB と 0.6 MB。約 850 ファイルで 136 MB と 529 MB を実測）。インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、リポジトリの exclude ファイル（`git rev-parse --git-path info/exclude`。すべての worktree で共有）に追加する。`.dev-kit/` は決して追加しない。 そのあと *質問:* **standards をクイック設定にするか詳細設定にするか**: クイック（Recommended）はエージェントが各 Recommended 行を自分で採用し、書き込む内容すべてを 1 回読み返して 1 回だけ尋ねる。読み返しはチェックリスト形式で、Recommended の項目にはチェックが入り（☑）、それ以外は空（☐）。`+ID`/`-ID`（ID が他のファイルと重なる場合は `file#ID`）で変えるか、kit ファイルごとの複数選択フォームで変える（チェックした項目は状態が切り替わる）。詳細はグループごとに尋ね、自分の規約のループと `CONSTRAINTS.md` の質問も含む。baseline が red のときはどちらでも尋ねる。仕様: [`skills/init/references/quick-setup.md`](../../skills/init/references/quick-setup.md)。実行記録（英語）: [1.6.0](../en/06-evidence.md#quick-setup-and-not-offered-items-on-omp-dev-kit-160)、[1.7.0](../en/06-evidence.md#pre-ticked-checklist-and-tick-forms-on-omp-dev-kit-170)。
@@ -110,7 +110,7 @@ flowchart LR
 **使う場面:** 機能/ストーリーのチケット。
 
 **ステップ:**
-1. **明確化する。** チケットが曖昧なら、`grilling` part を読み、一度に 1 つずつあなたに質問する。新しい業務用語があれば、`domain-modeling` part も読む。誰も答えられない場合（headless の実行）にだけ、妥当な選択肢を自分で選び、前提（assumption）として記録する。
+1. **明確化する。** チケットが曖昧なら、`grilling` part を読み、ラウンドごとに質問する: 今聞ける質問をすべて番号付きで、それぞれ推奨回答を添えて。新しい業務用語があれば、`domain-modeling` part も読む。誰も答えられない場合（headless の実行）にだけ、妥当な選択肢を自分で選び、前提（assumption）として記録する。
 2. **spec を書く** `.dev-kit/specs/<feature>.md`、`templates/spec.md` に沿って: 目的、rule、インターフェース、受け入れ基準、スコープ外、そして **Decisions** セクション（質問、回答、決めた人または「assumption」）。
 3. **rule C1 に従う:**
    - **小さな作業:** セッション内でそのまま行う。テストを先に書き、振る舞いごとに 1 コミット。
@@ -219,7 +219,7 @@ flowchart LR
 
 **ステップ:**
 1. **ボード設定:** 完全なリンクならすぐ取り込みます。その後 `.dev-kit/config.yml` に `ticket:` セクションがなければ、リンクから作って書き、そのことを伝えます。
-2. **認証情報:** `scripts/ticket.py check`。Jira は自分のターミナルで `ticket.py login jira` により保存した API トークン、Azure DevOps は `az login`(または PAT)を使います。
+2. **認証情報:** `scripts/ticket.py check`。Jira は自分のターミナルで `ticket.py login jira` により保存した API トークン、Azure DevOps は `az login`(または PAT)を使います。 ボード外を指す画像はトークンなしで取得します。内部アドレス（localhost、LAN）はブロックしません。
 3. リンクやキーで**取り込む**か、依頼内容から書いた JQL / WIQL で**検索**します。各チケットはボードの表示どおりに保たれます: 実際のフォーム順のセクション(組織ごとにフォームをカスタマイズするため Azure DevOps のレイアウトを読みます)、元の位置の画像、リンク(関連アイテム、PR、コミット)、添付、ボードの順のコメント。ストーリー配下の Task や Sub-task はストーリーのファイルに書かれ、ストーリー本文のあとに専用のセクションとストーリーの子アイテム一覧が付きます。
 4. 必要なら**翻訳**(`ticket.<lang>.md`。原文が正本で、チケットが変わると翻訳は古いと表示されます)。
 5. **次のスキル:** Bug → `dk:bug-fixer`、ストーリー → `dk:story-runner`(内容が薄いときは `dk:brainstorm`)、技術的負債 → `dk:code-refactor`、それ以外は質問します。`ticket.types` で上書きできます。チケットが 1 件なら、そのファイルをカードとしてすぐ実行するか尋ねます。

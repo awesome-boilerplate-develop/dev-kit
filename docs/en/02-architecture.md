@@ -19,8 +19,8 @@ dev-kit/
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
-├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
-├── scripts/                # check_parts.py, check_report.py, check_standards.py, bump_version.py, install-graph-tools.sh
+├── templates/              # spec.md, report.md, config.yml, baseline.md, standard.md, dogfood-log.md
+├── scripts/                # check_*.py, bump_version.py, ticket.py, test_*.py, install-graph-tools.sh
 ├── UPSTREAM.md  LICENSES/  CHANGELOG.md  README.md  docs/
 ```
 
@@ -40,7 +40,7 @@ flowchart LR
 ### Controller
 
 - A real skill, with `name` and `description` in the frontmatter. Claude Code loads only the description when a session opens.
-- Very thin: about 20 lines per file, made of 4 shared blocks (Parts, Rules, Commands, Report) and 4–5 steps of its own.
+- Thin: 40–65 lines per file, made of shared blocks (Harness, Parts, Rules, Commands, Graph, Standards, Output) and 4–6 steps of its own.
 - Works directly in the main session by default. It reads a part or spawns a subagent only when a step or a rule asks for it.
 
 ### Part

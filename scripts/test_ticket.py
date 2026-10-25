@@ -419,7 +419,8 @@ class JiraFetch(unittest.TestCase):
 
 class Plumbing(unittest.TestCase):
     def test_next_skill(self):
-        it = lambda t, **kw: ticket.Item(type=t, **kw)
+        def it(t, **kw):
+            return ticket.Item(type=t, **kw)
         self.assertEqual(ticket.next_skill(it("Bug"), None), "bug-fixer")
         self.assertEqual(ticket.next_skill(it("Bug"), {"Bug": "story-runner"}), "story-runner")
         self.assertEqual(ticket.next_skill(it("Task", labels=["Tech-Debt"]), None), "code-refactor")

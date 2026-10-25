@@ -15,7 +15,7 @@
 | **Baseline** | 没有安装任何 skill 集合的同一个模型；lab 中用于比较的参照点 |
 | **SDD**（subagent-driven development） | Superpowers 的工作方式：把 plan 拆成任务，为每个任务启动一个 subagent，再为每个任务启动一个 subagent 来 review；用一份 ledger 使运行可以恢复 |
 | **Worktree** | 为某个分支准备的独立 git 工作目录，使大型工作不会触碰主目录 |
-| **Grilling** | Matt Pocock 澄清需求的方式：沿着设计决策树，一次问一个问题 |
+| **Grilling** | Matt Pocock 澄清需求的方式：沿着设计决策树按轮次提问（当前能问的所有问题，编号并附推荐答案） |
 | **Characterization test** | 在重构之前固定当前行为的测试，包括看起来像 bug 的行为 |
 | **Pre-PR / final gate** | 开 PR 之前的检查：运行检查命令、查找降低标准的迹象、review，并给出 GO/NO-GO verdict |
 | **Lowered standard** | 为了“快速通过”而走的捷径：跳过测试、添加 `noqa`/`ts-ignore`、删除 assert、降低阈值 |

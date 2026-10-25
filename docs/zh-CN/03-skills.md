@@ -10,7 +10,7 @@
 | 块 | 含义 |
 |---|---|
 | **Parts** | 只有当某个步骤提到某个 part 时才去读它；part 不是 skill |
-| **Rules** | 应用 `rules/RULES.md` 中开启的 rule：F1、F2、C1、C2、G1、S1、O1（[04](../en/04-rules.md)，英文） |
+| **Rules** | 应用 `rules/RULES.md` 中开启的 rule：F1、F2、C1、C2、G1、T1、S1、O1，pre-pr-check 中还有 R1（[04](../en/04-rules.md)，英文） |
 | **Graph** | 如果仓库有 codegraph/CRG 索引，按 rule G1 使用；没有则跳过 |
 | **Commands** | 如果存在 `.dev-kit/config.yml`，从中取检查命令和基础分支；否则使用 `make check` 或仓库的测试命令，以及 `main` |
 | **Outputs** | 一切都写入 `.dev-kit/`（rule O1）；最后按 `templates/report.md` 出一份报告；严重程度使用 blocker/major/minor 分级（rule S1） |
@@ -32,7 +32,7 @@
 
 **步骤与问题，按顺序：**
 1. **Graph 工具：** 用 `scripts/install-graph-tools.sh --check` 检查。*仅在缺失时提问：* 是否安装？如果你拒绝，则继续，并写 “G1 off”。它绝不运行 `codegraph install` 或 `code-review-graph install`（这两个命令会注册 MCP、hook 和指令文件）。
-2. **个人设置：** 如果之前某个仓库在 `~/.dev-kit/config.yml` 中保存了团队 standards 文件夹，就读取它。
+2. **个人设置：** 目前没有；dev-kit 按仓库逐个设置。
 3. **探查，不提问：** 命令、基础分支、技术栈、linter 已经强制执行的内容、`.dev-kit/` 下已被跟踪的文件、项目自己的 `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
 4. *提问：* **命令和基础分支**（确认或更正）。基础分支会与近期 PR 合并进去的分支对照，而不只看 `origin/HEAD`；两者不同时会作为选项提问，并附上提交日期和相差的提交数。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
 5. *提问：* **graph 索引**（默认是；预期占用约为每个被索引文件 0.16 MB 和 0.6 MB，实测约 850 个文件为 136 MB 和 529 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入仓库的 exclude 文件（`git rev-parse --git-path info/exclude`，所有 worktree 共用）；`.dev-kit/` 从不加入该文件。 然后是*提问：* **快速还是详细设置**（针对 standards）：快速（Recommended）由 agent 自己采用每一行 Recommended，只问一次，并把要写入的全部内容读回一次，形式为清单：Recommended 的条目已勾选（☑），其余未勾选（☐）；你可以用 `+ID`/`-ID` 修改（ID 与其他文件重复时用 `file#ID`），或在每个 kit 文件一个的多选表单中修改，勾选某一条即切换它的状态；详细则逐组提问，包括你自己约定的循环和 `CONSTRAINTS.md` 问题。baseline 为红时两种模式都会问。规范：[`skills/init/references/quick-setup.md`](../../skills/init/references/quick-setup.md)；运行记录（英文）：[1.6.0](../en/06-evidence.md#quick-setup-and-not-offered-items-on-omp-dev-kit-160)、[1.7.0](../en/06-evidence.md#pre-ticked-checklist-and-tick-forms-on-omp-dev-kit-170)。
@@ -110,7 +110,7 @@ flowchart LR
 **使用场景：** 功能/story 工单。
 
 **步骤：**
-1. **澄清。** 如果工单含糊不清，读取 `grilling` part，一次问你一个问题。如果有新的业务术语，也读取 `domain-modeling` part。只有在没有人能回答时（headless 运行），它才自己选一个合理的方案，并标记为 assumption。
+1. **澄清。** 如果工单含糊不清，读取 `grilling` part，按轮次提问：当前能问的所有问题，编号，每个都附推荐答案。如果有新的业务术语，也读取 `domain-modeling` part。只有在没有人能回答时（headless 运行），它才自己选一个合理的方案，并标记为 assumption。
 2. **写 spec** `.dev-kit/specs/<feature>.md`，按 `templates/spec.md`：目标、rule、接口、验收标准、范围之外，以及一个 **Decisions** 部分（问题、答案、谁决定，或 “assumption”）。
 3. **遵循 rule C1：**
    - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit。
@@ -219,7 +219,7 @@ flowchart LR
 
 **步骤：**
 1. **看板设置：** 完整链接直接拉取；之后如果 `.dev-kit/config.yml` 还没有 `ticket:` 部分，就按链接写入并告诉你。
-2. **凭据：** `scripts/ticket.py check`；Jira 使用你在自己终端里用 `ticket.py login jira` 保存的 API token，Azure DevOps 使用 `az login`（或 PAT）。
+2. **凭据：** `scripts/ticket.py check`；Jira 使用你在自己终端里用 `ticket.py login jira` 保存的 API token，Azure DevOps 使用 `az login`（或 PAT）。 链接指向看板之外的图片不带 token 下载；不拦截内部地址（localhost、局域网）。
 3. 按链接或 key **拉取**，或用根据你的话写出的 JQL / WIQL **查询**。每个 ticket 保留看板显示的内容：按真实表单顺序排列的各部分（会读取 Azure DevOps 的表单布局，因为各组织会自定义表单）、原位置的图片、链接（相关条目、PR、commit）、附件，以及按看板顺序的评论。story 下的 Task 或 Sub-task 会写进 story 的文件：在 story 内容之后有自己的一节，并附上 story 的子项。
 4. 按需**翻译**（`ticket.<lang>.md`，原文仍是准据；ticket 变化后译文会被标记为过期）。
 5. **下一个 skill：** Bug → `dk:bug-fixer`，story → `dk:story-runner`（太简略时先 `dk:brainstorm`），技术债 → `dk:code-refactor`，其他情况会询问；`ticket.types` 可覆盖。单个 ticket 时，它会提议以该文件作为卡片直接运行。

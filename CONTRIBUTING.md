@@ -7,6 +7,10 @@ python3 scripts/check_parts.py .       # references between controllers and part
 python3 scripts/bump_version.py --check # every manifest carries the same version
 python3 scripts/check_i18n.py           # translations against their English source
 python3 scripts/test_check_report.py    # report checker cases
+python3 scripts/test_check_parts.py     # tests of check_parts, check_standards, check_i18n
+python3 scripts/test_check_standards.py
+python3 scripts/test_check_i18n.py
+python3 scripts/test_ticket.py          # dk:ticket script, no network
 ```
 
 CI runs the same commands on every pull request.

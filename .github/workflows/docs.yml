@@ -19,6 +19,11 @@ jobs:
         run: python3 scripts/check_parts.py .
       - name: Report checker tests
         run: python3 scripts/test_check_report.py
+      - name: Checker tests (parts, standards, translations)
+        run: |
+          python3 scripts/test_check_parts.py
+          python3 scripts/test_check_standards.py
+          python3 scripts/test_check_i18n.py
       - name: Kit standards files
         run: python3 scripts/check_standards.py standards --no-files
       - name: Manifest versions in sync

@@ -27,7 +27,7 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 
 ### 1. Clarify
 - If `.dev-kit/specs/<feature>.md` already has `Status: agreed` (written by `dk:brainstorm`), use it and go to step 3.
-- If the card is ambiguous, Read part `grilling` and resolve the questions with the user, one at a time.
+- If the card is ambiguous, Read part `grilling` and resolve the questions with the user in its rounds: the whole frontier per message, each question numbered with a recommended answer.
 - If the story introduces new domain terms, also Read part `domain-modeling`.
 - When no one can answer (headless run), choose the most reasonable option and mark it as an assumption.
 
