@@ -157,7 +157,7 @@ flowchart TD
 **Report-only 模式：** 如果请求里说“不要修改代码”，它不会编辑任何文件，并跳过第 4 步。
 
 **步骤：**
-1. **立即运行检查命令**，并把输出保留为 Evidence。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
+1. **立即运行检查命令**，并把输出保留为 Evidence。checks、review 和 report 都针对 HEAD，因此有未提交的修改时会停下来询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
 2. **按 rule C2 选择 review 级别：**
 
    | 级别 | 何时 | 做什么 |
@@ -167,8 +167,8 @@ flowchart TD
    | 4 个 reviewer | 你要求，或 diff 涉及 auth/权限、secret、个人数据、migration、config/env | 并行：2 个 `code-review` reviewer（各负责一个轴）、`dk:security-auditor`、`dk:test-engineer` |
 
    每个 reviewer 都会收到 diff 范围和 spec/issue 文本，并返回 `file:line | blocker/major/minor | reason`。
-3. **把结果合并**成一张按 blocker/major/minor 分级的表。只要还有任何 blocker 未解决，就是 `Verdict: NO-GO`；否则是 `GO`。
-4. **如果有 blocker：** 读取 `receiving-code-review` part，用证据修复（或附理由反驳），然后回到第 1 步。最多 2 轮。
+3. **把结果合并**成一张按 blocker/major/minor 分级的表。只要还有任何 blocker 未解决，或有 check 失败，就是 `Verdict: NO-GO`；否则是 `GO`。
+4. **如果有 blocker：** 读取 `receiving-code-review` part，用证据修复（或附理由反驳），每个修复单独提交，然后回到第 1 步。最多 2 轮。
 5. **附带 findings 表出报告。** 除非是 report-only 模式，否则按 `pr` part 写入 `.dev-kit/reports/pr-body.md`（Summary / Evidence / Merge Danger），其中 Evidence 是第 1 步的输出。
 
 **示例（示意）：** 一个“部分退款”分支涉及权限和个人数据，所以运行 4 个 reviewer。结果是 NO-GO，blocker 如下：
