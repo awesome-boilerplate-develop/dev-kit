@@ -12,6 +12,7 @@ Fixes from two external reviews of 1.9.3; each script fix has a test that fails 
 - **`dk:ticket` finds acceptance criteria by field id** (`Microsoft.VSTS.Common.AcceptanceCriteria`, Jira `ticket.ac_field`), so a story whose field is named "Done When" or in another language goes to `story-runner`, not `brainstorm`; the label check stays as the fallback.
 - **`dk:ticket` gets no Azure token when the tenant cannot be confirmed:** with `ticket.tenant` set, a failing or empty `az account show` stops with `az login --tenant <tenant>`; before, it went on with whatever account az had. Checked with mocks only.
 - **`dk:ticket` writes credentials owner-only from the start:** the file is created with mode 600 instead of being written and then narrowed.
+- **`check_i18n.py` names files with `/` on Windows too** (it printed `docs\vi\guide.md`), found by the first Windows run of the checker tests.
 - **`check_parts.py`** prints its usage when called without a path, reads files as UTF-8, and also checks that the Harness and Parts paragraphs are the same in every skill that has them.
 
 ## 1.9.3 (2026-10-25)

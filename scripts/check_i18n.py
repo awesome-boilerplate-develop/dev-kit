@@ -43,32 +43,32 @@ def check_links(path, text):
             continue
         target = target.split("#", 1)[0]
         if target and not (root / path.parent / target).exists():
-            errors.append(f"{path}: broken link {target}")
+            errors.append(f"{path.as_posix()}: broken link {target}")
 
 
 for lang, path, source in pairs():
     if not (root / source).exists():
-        errors.append(f"{path}: source {source} does not exist")
+        errors.append(f"{path.as_posix()}: source {source.as_posix()} does not exist")
         continue
     if not (root / path).exists():
-        errors.append(f"{path}: missing ({lang})")
+        errors.append(f"{path.as_posix()}: missing ({lang})")
         continue
     text = (root / path).read_text(encoding="utf-8")
     header = HEADER.match(text.splitlines()[0] if text else "")
     if not header:
-        errors.append(f"{path}: first line must be the i18n header comment")
+        errors.append(f"{path.as_posix()}: first line must be the i18n header comment")
     else:
         declared, commit, _review = header.groups()
         if declared != source.as_posix():
-            errors.append(f"{path}: header source={declared}, expected {source.as_posix()}")
+            errors.append(f"{path.as_posix()}: header source={declared}, expected {source.as_posix()}")
         if git("cat-file", "-e", f"{commit}^{{commit}}").returncode != 0:
-            errors.append(f"{path}: source_commit {commit} is not a commit")
+            errors.append(f"{path.as_posix()}: source_commit {commit} is not a commit")
         elif git("diff", "--quiet", commit, "--", source.as_posix()).returncode != 0:
-            (errors if strict else warnings).append(f"{path}: STALE, {source} changed since {commit}")
+            (errors if strict else warnings).append(f"{path.as_posix()}: STALE, {source.as_posix()} changed since {commit}")
     src_blocks = [m.group(0) for m in FENCE.finditer((root / source).read_text(encoding="utf-8"))]
     own_blocks = [m.group(0) for m in FENCE.finditer(text)]
     if own_blocks != src_blocks:
-        errors.append(f"{path}: code blocks differ from {source} ({len(own_blocks)} vs {len(src_blocks)} blocks)")
+        errors.append(f"{path.as_posix()}: code blocks differ from {source.as_posix()} ({len(own_blocks)} vs {len(src_blocks)} blocks)")
     check_links(path, text)
 
 for w in warnings:
