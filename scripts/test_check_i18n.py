@@ -45,7 +45,7 @@ class CheckI18n(unittest.TestCase):
         (self.root / "docs" / "vi" / "guide.md").write_text(text, encoding="utf-8")
 
     def run_check(self, *args):
-        r = subprocess.run([sys.executable, str(self.root / "scripts" / "check_i18n.py"), *args], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, str(self.root / "scripts" / "check_i18n.py"), *args], capture_output=True, text=True, encoding="utf-8")
         return r.returncode, r.stdout
 
     def test_faithful_translation_passes(self):

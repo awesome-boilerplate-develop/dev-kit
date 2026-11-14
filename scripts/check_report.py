@@ -7,6 +7,7 @@ With --base (run inside a repo): the Review setup Diff line must name the merge 
 (`<merge-base sha>...<HEAD sha>`, short SHAs allowed), and they must match the repo now; commits after it that change only
 .dev-kit/ (the kit's own output, such as the report) are allowed. Every finding must point to a file in the diff, and at least one
 cited line must be inside or next to (±5 lines) the changed code; otherwise it is pre-existing code, which R1 says not to flag → drop it.
+A bare file name that matches several changed files FAILs: give its path from the repo root.
 Run from inside a repo: if the repo has .code-review-graph/, the Graph line must have a detect-changes summary (or
 "detect-changes failed: <error>"); it must not say "no .code-review-graph/ index" (rule G1).
 A "certain" finding that cites no rule (an id that really exists in the kit/team/project standards, or a specific place in a spec; R1–R7 do not count)
@@ -30,6 +31,8 @@ import pathlib
 import re
 import subprocess
 import sys
+
+sys.stdout.reconfigure(encoding="utf-8")  # messages quote the report and standards (≥, —, Vietnamese); Windows pipes are cp1252
 
 args = sys.argv[1:]
 base = None
@@ -124,7 +127,23 @@ test_gap = re.compile(r"\b(untested|no tests?|missing tests?|not tested|test cov
 test_file = re.compile(r"[._](spec|test)s?\.\w+$|(^|/)(tests?|__tests__|spec)/|(^|/)test_[^/]+\.py$")
 broken_test = re.compile(r"\bpass(es|ed)?\s+(vacuously|even|regardless|always|when|without)|\bstill pass|\bvacuous|always (passes|green)"
                          r"|never fails|never asserts?|(does not|doesn't|do not) assert|asserts? nothing|accepts any", re.I)
-LOC = r"([\w./@-]+\.[A-Za-z]{1,5}|[\w./@-]*[A-Za-z][\w./@-]*(?=:\d))(?::(\d+))?"  # path with an extension, or any path:line (Makefile:12)
+# A path with an extension, or any path:line (Makefile:12); route folders such as app/[id]/, (group)/, +page, $id are paths too.
+LOC = r"([\w./@$+~()\[\]-]+\.[A-Za-z]{1,5}|[\w./@$+~()\[\]-]*[A-Za-z][\w./@$+~()\[\]-]*(?=:\d))(?::(\d+))?"
+
+
+def locs(cell):
+    """(path, line) pairs in a location cell; a bracket that only wraps the location, as in (src/a.ts:3), is not part of it."""
+    out = []
+    for f, ln in re.findall(LOC, cell):
+        for o, c in ("()", "[]"):
+            if f.startswith(o) and f.count(o) > f.count(c):
+                f = f[1:]
+            if f.endswith(c) and f.count(c) > f.count(o):
+                f = f[:-1]
+        out.append((f, ln))
+    return out
+
+
 known_ids = standard_ids()
 
 for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
@@ -135,7 +154,7 @@ for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
             problems.append(f"{tier} finding severity '{c[0]}' is not blocker / major / minor (rule S1): {c}")
         if tier == "certain" and len(c) == cols and not (re.match(r"(fixed|open|pushed back)\b", c[5], re.I)):
             problems.append(f"certain finding Status is not fixed / open / pushed back: {c}")
-        if not any(ln for _, ln in re.findall(LOC, c[2] if len(c) > 2 else "")):
+        if not any(ln for _, ln in locs(c[2] if len(c) > 2 else "")):
             problems.append(f"{tier} finding without a file:line location (rule R1): {c}")
         v = conf(c)
         if v is None:
@@ -159,7 +178,7 @@ for c in certain:
             problems.append(f"rule '{x}#{item}': {x} has no item {item} (rules T1, R7): {c[2]}")
     valid = [x for x in cited if x in known_ids and x != "review/finding-quality"]
     no_rule = not valid and not re.search(r"specs?/|\bspec\b.*(§|#|\d)", rule, re.I)
-    files = [f for f, _ in re.findall(LOC, c[2] if len(c) > 2 else "")]
+    files = [f for f, _ in locs(c[2] if len(c) > 2 else "")]
     if no_rule and test_gap.search(" ".join(c)):
         problems.append(f"'missing tests' reported as certain without a rule (Do not flag): {c[2]}")
     elif no_rule and files and all(test_file.search(f) for f in files) and not broken_test.search(" ".join(c[3:4])):
@@ -175,12 +194,16 @@ for c in suspect:
 if base:
     diff = subprocess.run(["git", "diff", "-U0", f"{base}...HEAD"], capture_output=True, text=True).stdout
     changed = {}  # file -> list of (start, end) on the new side
-    current = None
+    current = old = None
     for line in diff.splitlines():
+        if line.startswith("--- "):
+            old = line[6:] if line.startswith("--- a/") else None
         if line.startswith("+++ "):
             current = line[6:] if line.startswith("+++ b/") else None
             if current:
                 changed.setdefault(current, [])
+            elif old:  # a deleted file: every line it had was changed
+                changed[old] = [(1, sys.maxsize)]
         m = re.match(r"^@@ -\S+ \+(\d+)(?:,(\d+))? @@", line)
         if m and current:
             start, count = int(m.group(1)), int(m.group(2) or 1)
@@ -188,16 +211,23 @@ if base:
     for tier, rows_ in (("certain", certain), ("suspect", suspect)):
         for c in rows_:
             loc = c[2] if len(c) > 2 else ""
-            refs = [(f, ln) for f, ln in re.findall(LOC, loc) if ln]
+            refs = [(f, ln) for f, ln in locs(loc) if ln]
             if not refs:
                 continue  # already reported as without a location
-            ok = False
+            ok, ambiguous = False, []
             for f, ln in refs:
-                files = [k for k in changed if k == f or k.endswith("/" + f) or f.endswith(k)]
+                f = f.removeprefix("./")
+                files = [f] if f in changed else [k for k in changed if k.endswith("/" + f) or f.endswith("/" + k)]  # whole segments
+                if len(files) > 1:
+                    ambiguous.append(f)
+                    continue
                 for k in files:
                     if any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
                         ok = True
-            if not ok:
+            if ambiguous and not ok:
+                problems.append(f"{tier} finding names a file that matches several changed files, give its path from the repo root: "
+                                f"{', '.join(ambiguous)}")
+            elif not ok:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
 def fixed(status):
@@ -216,7 +246,7 @@ def failing(result):
                 result, re.I):
         return True
     if re.search(r"\b(did|could|can)\s*(not|n't)\s+(be\s+)?run|\bnot executed|\b(0|no)\s+tests?\s+(ran|run|were run|executed)"
-                 r"|không chạy được|khong chay duoc|\b[1-9]\d*\s+new\b", result, re.I):
+                 r"|không chạy được|khong chay duoc|\b[1-9]\d*\s+new\s+(fail|error|regression)", result, re.I):
         return True
     # Known failures excuse only as many failures as they number: "3 failed (2 known)" still has one new failure.
     known = sum(int(n) for n in re.findall(r"\b(\d+)\s+(?:known|baseline)\b", result, re.I))

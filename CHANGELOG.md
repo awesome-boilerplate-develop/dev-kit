@@ -1,5 +1,19 @@
 # dev-kit changelog
 
+## 1.9.4 (unreleased)
+Fixes from two external reviews of 1.9.3; each script fix has a test that fails on 1.9.3.
+- **Controllers never commit on the base branch:** `story-runner`, `bug-fixer` and `code-refactor` create a feature branch before the first commit when HEAD is on the base branch or detached (new **Branch.** paragraph, kept identical by `check_parts.py`). A commit on `main` left `main...HEAD` empty, so `pre-pr-check` stopped with no review and no verdict.
+- **`check_report.py` keeps valid findings:** paths with route folders (`app/[id]/page.tsx`, `(group)/`, `+page`, `$id`) are read whole, a bracket that only wraps the location is dropped, and a file deleted by the branch counts as changed on every line; before, these findings were told to be dropped as "outside the changed lines". A path must now match whole path segments (`extra.py` no longer matches a changed `a.py`), and a bare file name that matches several changed files fails with "give its path from the repo root".
+- **`check_report.py` reads "N new" as a failure only when a failure follows:** `PASS: 342 passed, 12 new tests green` passed as a failing check; `1 new failure`, `1 new failing test` still fail.
+- **`check_report.py` and `check_standards.py` print UTF-8**, and their tests read it as UTF-8: on Windows the messages (`≥`, `—`, Vietnamese) went through cp1252. The checker tests now run on Ubuntu, macOS and Windows; CI also runs `ruff check scripts`.
+- **`pre-pr-check` report-only mode** changes nothing outside `.dev-kit/`: the report is still written and a stale `pr-body.md` still removed on NO-GO (the step said "never edit files" while step 6 deleted one). With four reviewers, the `review` topic (team and project review checks) goes to every reviewer; before, no reviewer got it.
+- **`dk:ticket` keeps going past a dead external image:** an image hotlinked from outside the board that is gone or is not an image keeps its link, with a note on the fetch line; an image on the board itself still stops the fetch (a sign-in page or a network error).
+- **`dk:ticket` drops a task taken out of the story** (no parent any more) on refresh, as it already did for a task moved to another story.
+- **`dk:ticket` finds acceptance criteria by field id** (`Microsoft.VSTS.Common.AcceptanceCriteria`, Jira `ticket.ac_field`), so a story whose field is named "Done When" or in another language goes to `story-runner`, not `brainstorm`; the label check stays as the fallback.
+- **`dk:ticket` gets no Azure token when the tenant cannot be confirmed:** with `ticket.tenant` set, a failing or empty `az account show` stops with `az login --tenant <tenant>`; before, it went on with whatever account az had. Checked with mocks only.
+- **`dk:ticket` writes credentials owner-only from the start:** the file is created with mode 600 instead of being written and then narrowed.
+- **`check_parts.py`** prints its usage when called without a path, reads files as UTF-8, and also checks that the Harness and Parts paragraphs are the same in every skill that has them.
+
 ## 1.9.3 (2026-10-25)
 Fixes from an external quality review of 1.9.2; each `ticket.py` and `check_report.py` fix has a test that fails on 1.9.2.
 - **`dk:ticket` sends the board token only to the board:** an image or attachment URL in the ticket content that points to another host (or not over https) is downloaded without the token; before, a ticket author could collect the Jira credential or Azure DevOps PAT with an image link to their own server.

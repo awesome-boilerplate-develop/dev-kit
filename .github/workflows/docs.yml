@@ -15,15 +15,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Lint scripts
+        run: |
+          python3 -m pip install ruff==0.15.4
+          ruff check scripts
       - name: References between controllers and parts
         run: python3 scripts/check_parts.py .
-      - name: Report checker tests
-        run: python3 scripts/test_check_report.py
-      - name: Checker tests (parts, standards, translations)
-        run: |
-          python3 scripts/test_check_parts.py
-          python3 scripts/test_check_standards.py
-          python3 scripts/test_check_i18n.py
       - name: Kit standards files
         run: python3 scripts/check_standards.py standards --no-files
       - name: Manifest versions in sync
@@ -43,3 +40,9 @@ jobs:
           python-version: "3.12"
       - name: dk:ticket script tests (no network)
         run: python scripts/test_ticket.py
+      - name: Checker tests (report, parts, standards, translations)
+        run: |
+          python scripts/test_check_report.py
+          python scripts/test_check_parts.py
+          python scripts/test_check_standards.py
+          python scripts/test_check_i18n.py

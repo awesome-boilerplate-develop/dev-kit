@@ -14,6 +14,8 @@ import re
 import subprocess
 import sys
 
+sys.stdout.reconfigure(encoding="utf-8")  # messages quote the report and standards (≥, —, Vietnamese); Windows pipes are cp1252
+
 SECTIONS = ["Design", "Implement", "Review", "Do not flag", "Severity"]
 LETTER = {"architecture": "A", "coding": "C", "testing": "T", "security": "S", "ui": "U", "api": "P", "data": "D",
           "ops": "O", "process": "R", "review": "R"}

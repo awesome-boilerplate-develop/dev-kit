@@ -29,7 +29,7 @@ class CheckStandards(unittest.TestCase):
                 p.parent.mkdir(parents=True, exist_ok=True)
                 p.write_text(text, encoding="utf-8")
             r = subprocess.run([sys.executable, str(SCRIPT), str(pathlib.Path(d, "standards")), *args],
-                               capture_output=True, text=True, cwd=cwd or d)
+                               capture_output=True, text=True, encoding="utf-8", cwd=cwd or d)
             return r.returncode, r.stdout
 
     def test_valid_file_with_range_and_review_only_check_passes(self):

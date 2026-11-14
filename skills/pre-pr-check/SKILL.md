@@ -25,7 +25,7 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 
 ## Steps
 
-**Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
+**Mode.** If the request says not to change code, run *report-only*: never edit files outside `.dev-kit/` and skip step 5; the report is still written, and a stale `pr-body.md` is still deleted on NO-GO.
 
 ### 1. Checks and a lowered bar
 - `git diff --shortstat main...HEAD` is empty (on `main` itself, or the work is already merged) → stop: nothing to review, so no review, no report and no verdict; say so in the final reply.
@@ -46,7 +46,7 @@ Run `git diff --shortstat main...HEAD` and list the touched files; pick the dept
 - *Four reviewers* (one turn, in parallel): two general-purpose subagents with part `code-review` in the roles "Standards axis only" and "Spec axis only", plus `dk:security-auditor` and `dk:test-engineer`.
 
 Every reviewer (and you, in self-review) gets: the diff range, the spec (`.dev-kit/specs/…` or the issue text), the step-2 graph summary, `${CLAUDE_PLUGIN_ROOT}/standards/review/finding-quality.md` (rule R1), and the loaded standards (rule T1) whose `topic` belongs to its role, as paths, with the instruction to apply their `## Review`, `## Do not flag` and `## Severity` sections and cite rule ids:
-- Standards reviewer: coding, architecture, process, ops · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing.
+- Standards reviewer: coding, architecture, process, ops · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing · every reviewer: review (team and project review checks).
 - One reviewer or self-review: all loaded topics. Reviewers return findings as `file:line | severity | confidence 0–100 | when it happens | rule id or — | finding`.
 
 ### 4. Merge and gate

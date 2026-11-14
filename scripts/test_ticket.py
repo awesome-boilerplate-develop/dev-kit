@@ -119,6 +119,15 @@ class Credentials(unittest.TestCase):
         if os.name == "posix":
             self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
 
+    @unittest.skipUnless(os.name == "posix", "file modes")
+    def test_token_is_owner_only_while_written(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.with_suffix(".tmp").write_text("old")
+        self.path.with_suffix(".tmp").chmod(0o644)  # a leftover copy from a run that died
+        with mock.patch.object(ticket.os, "chmod", lambda *a: None):  # created 600, not opened up and then narrowed
+            ticket.save_credential("azure:org", {"type": "pat", "key": "p"})
+        self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
+
     def test_lookup_order(self):
         ticket.save_credential("jira:a.atlassian.net", {"type": "api_key", "email": "file", "key": "k"})
         ticket.save_credential("jira:work", {"type": "api_key", "email": "profile", "key": "k"})
@@ -143,6 +152,13 @@ class Credentials(unittest.TestCase):
         with mock.patch.object(ticket.subprocess, "run", return_value=done):
             with self.assertRaisesRegex(ticket.Fail, "az login --tenant t-mine"):
                 ticket.az_token("t-mine")
+
+    def test_unconfirmed_tenant_gets_no_token(self):
+        for shown in (mock.Mock(returncode=1, stdout="", stderr="Please run 'az login'"), mock.Mock(returncode=0, stdout="\n")):
+            with mock.patch.object(ticket.subprocess, "run", return_value=shown) as run:
+                with self.assertRaisesRegex(ticket.Fail, "could not confirm .* az login --tenant t-mine"):
+                    ticket.az_token("t-mine")
+            self.assertEqual(run.call_count, 1)  # get-access-token is never asked
 
 
 class Fake:
@@ -410,6 +426,21 @@ class JiraFetch(unittest.TestCase):
         self.assertIn("dropped, moved to another parent: PROJ-3 (now under PROJ-9)", note)
         self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
 
+    def test_task_taken_out_of_the_story_is_dropped(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        task = self.fake.routes[4][1](re.search(r"(PROJ-3)", "PROJ-3"))
+        task["fields"]["parent"] = None
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, moved to another parent: PROJ-3 (now without a parent)", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_acceptance_field_found_by_id_not_label(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["names"]["customfield_100"] = "Done When"
+        issue["renderedFields"]["description"] = "<p>Short.</p>"
+        *_, nxt, _ = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual(nxt, "story-runner")
+
     def test_local_file_image_is_never_opened(self):
         issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
         issue["renderedFields"]["description"] = '<p><img src="file:///etc/hosts"><img src="ftp://h/x.png"></p>'
@@ -417,6 +448,24 @@ class JiraFetch(unittest.TestCase):
         self.assertEqual(n_img, 1)  # only the image in a comment
         self.assertIn("file:///etc/hosts", path.read_text(encoding="utf-8"))
         self.assertFalse(any(u.startswith(("file:", "ftp:")) for u, _ in self.fake.calls))
+
+    def test_dead_external_image_keeps_its_link(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["renderedFields"]["description"] = ('<p><img src="https://gone.example/a.png">'
+                                                  '<img src="https://moved.example/b.png"></p>')
+        self.fake.routes.insert(0, (r"gone\.example", lambda m: (_ for _ in ()).throw(ticket.Fail("not found (HTTP 404): x"))))
+        self.fake.routes.insert(0, (r"moved\.example", b"<html>moved</html>"))
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("(https://gone.example/a.png)", text)
+        self.assertIn("(https://moved.example/b.png)", text)
+        self.assertIn("images not downloaded, kept as links: https://gone.example/a.png, https://moved.example/b.png", note)
+        self.assertEqual(sorted(f.name for f in (path.parent / "images").iterdir()), ["3.png"])  # the comment image
+
+    def test_dead_board_image_still_fails(self):
+        self.fake.routes.insert(0, (r"/attachment/content/10001", b"<html>sign in</html>"))
+        with self.assertRaisesRegex(ticket.Fail, "is not an image"):
+            ticket.fetch(self.board, "PROJ-1", self.out)
 
     def test_failed_refresh_keeps_the_old_copy(self):
         path, *_ = ticket.fetch(self.board, "PROJ-1", self.out)

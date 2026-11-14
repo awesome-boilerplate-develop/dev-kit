@@ -20,7 +20,7 @@ class CheckParts(unittest.TestCase):
             for rel, text in files.items():
                 pathlib.Path(d, rel).parent.mkdir(parents=True, exist_ok=True)
                 pathlib.Path(d, rel).write_text(text)
-            r = subprocess.run([sys.executable, str(SCRIPT), d], capture_output=True, text=True)
+            r = subprocess.run([sys.executable, str(SCRIPT), d], capture_output=True, text=True, encoding="utf-8")
             return r.returncode, r.stdout
 
     def test_clean_pack_passes(self):
@@ -41,6 +41,17 @@ class CheckParts(unittest.TestCase):
         _, out = self.run_check(fix_shared=SHARED.replace("**Graph (rule G1).** same", "**Graph (rule G1).** other"))
         self.assertIn("shared paragraph **Graph (rule G1).** differs", out)
         self.assertIn("bug-fixer", out)
+
+    def test_drifted_harness_paragraph_fails_in_any_skill(self):
+        extra = {"skills/init/SKILL.md": "**Harness.** same\n", "skills/ticket/SKILL.md": "**Harness.** other\n",
+                 "skills/brainstorm/SKILL.md": "**Harness.** same\n"}
+        _, out = self.run_check(extra=extra)
+        self.assertIn("shared paragraph **Harness.** differs from the others in: ticket", out)
+
+    def test_no_argument_prints_usage(self):
+        r = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("Usage:", r.stderr)
 
     def test_hidden_folders_are_skipped(self):
         code, out = self.run_check(extra={".outputs/notes.md": "Read part `x`."})

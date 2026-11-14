@@ -83,7 +83,7 @@ Without `CONSTRAINTS.md`, `dk:pre-pr-check` still flags new skips, suppressions,
 **Steps:**
 1. **Reproduce and find the root cause.** For a hard bug or a performance bug, read the `systematic-debugging` or `diagnosing-bugs` part and follow it.
 2. **Write a regression test** that fails for the right reason → fix at the root cause → test goes green.
-3. **Run the check commands.** Commit; the message states the root cause.
+3. **Run the check commands.** Commit on a feature branch (on the base branch it creates one first); the message states the root cause.
 4. **Run `dk:pre-pr-check`.**
 
 **Outputs:** a fix commit with its test, a report, the pre-pr-check result.
@@ -110,7 +110,7 @@ flowchart LR
 1. **Clarify.** If the ticket is ambiguous, read the `grilling` part and ask you in rounds: every question it can ask now, numbered, each with a recommended answer. If there are new business terms, also read the `domain-modeling` part. Only when nobody can answer (headless run) does it pick a reasonable option itself and mark it as an assumption.
 2. **Write the spec** `.dev-kit/specs/<feature>.md` per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, and a **Decisions** section (question, answer, who decided or "assumption").
 3. **Follow rule C1:**
-   - **Small work:** do it right in the session, tests first, one commit per behavior.
+   - **Small work:** do it right in the session, tests first, one commit per behavior, on a feature branch: on the base branch it creates one before the first commit, since an empty `<base>...HEAD` leaves pre-pr-check nothing to review.
    - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, stopping before SDD's own finishing step.
 4. **Run `dk:pre-pr-check`.** For large work it runs in the worktree, on the feature branch, before anything is merged; only on GO does `finishing-a-development-branch` offer its options (merge, PR, keep the branch) and you choose; with nobody to answer, the branch is kept.
 
@@ -140,7 +140,7 @@ flowchart TD
 **Steps:**
 1. **Fix the new interface.** If the boundaries are unclear, read the `codebase-design` part.
 2. **Write characterization tests first**, at the public interface, pinning current behavior for every input. Pin behavior that looks like a bug too: record it in the report as "suspect bug" and **do not fix** it during the refactor.
-3. **Follow rule C1:** for small work, move in small steps inside the session, check after each step, commit each step. For large work, use the SDD parts as story-runner does.
+3. **Follow rule C1:** for small work, move in small steps inside the session, check after each step, commit each step (on a feature branch, created first when on the base branch). For large work, use the SDD parts as story-runner does.
 4. **Run `dk:pre-pr-check`.** The review checks "no behavior change" and the interface you fixed.
 
 **Why pin even behavior that looks like a bug:** in the lab, a refactor ticket is graded by comparing behavior before and after on 300 random inputs. If you "fix a bug while you are there" during the refactor, behavior changes, and the reviewer cannot tell which part is the refactor and which is the bug fix.
@@ -166,7 +166,7 @@ flowchart TD
    Each reviewer receives the diff range and the spec/issue text, and returns `file:line | blocker/major/minor | reason`.
 3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, or a check failed, `Verdict: NO-GO`; otherwise `GO`.
 4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), commit each fix, and go back to step 1. At most 2 rounds.
-5. **Report with the findings table.** On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
+5. **Report with the findings table.** Report-only mode changes nothing outside `.dev-kit/`: no fixes, but the report is written and a stale PR body is removed on NO-GO. On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
 
 **Example (illustration):** a "partial refund" branch touches permissions and personal data, so it runs 4 reviewers. The result is NO-GO with these blockers:
 - a non-staff role can still issue refunds;

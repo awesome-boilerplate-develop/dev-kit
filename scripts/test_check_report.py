@@ -40,7 +40,7 @@ class CheckReport(unittest.TestCase):
     def run_check(self, text, cwd, *args):
         path = pathlib.Path(cwd) / "report.md"
         path.write_text(text, encoding="utf-8")
-        return subprocess.run([sys.executable, str(SCRIPT), str(path), *args], cwd=cwd, capture_output=True, text=True)
+        return subprocess.run([sys.executable, str(SCRIPT), str(path), *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
 
     def check(self, text, *args):
         with tempfile.TemporaryDirectory() as d:
@@ -62,7 +62,8 @@ class CheckReport(unittest.TestCase):
             self.assertIn("did not run but verdict is GO", self.check(report(result=result)).stdout, result)
         for result in ("PASS: 40 tests, 2 known baseline failures", "PASS, 0 lỗi", "none: no skips added", "12 passed, 0 failed",
                        "PASS: 40 passed, 2 skipped", "PASS, 2 skipped (marked skip in baseline)",
-                       "PASS: 38 passed, 2 failed, 2 known (baseline)", "PASS: exit 1, 2 known baseline failures"):
+                       "PASS: 38 passed, 2 failed, 2 known (baseline)", "PASS: exit 1, 2 known baseline failures",
+                       "PASS: 342 passed, 12 new tests green"):
             self.assertEqual(self.check(report(result=result)).returncode, 0, result)
 
     def test_gate_holds_against_layout_tricks(self):
@@ -185,11 +186,32 @@ class CheckReport(unittest.TestCase):
         r = self.check(report("| major | 85 | src/pay.ts:12 | total is negative | — | done |"))
         self.assertIn("Status is not fixed / open / pushed back", r.stdout)
 
+    def test_route_folders_and_deleted_files_are_in_the_diff(self):
+        with tempfile.TemporaryDirectory() as d:
+            def git(*a):
+                return subprocess.run(["git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@t", *a],
+                                      check=True, capture_output=True, text=True, encoding="utf-8").stdout.strip()
+            git("init", "-q", "-b", "main")
+            route = pathlib.Path(d, "app", "[id]")
+            route.mkdir(parents=True)
+            (route / "page.tsx").write_text("x\n")
+            pathlib.Path(d, "old.ts").write_text("".join(f"line {i}\n" for i in range(1, 21)))
+            git("add", ".")
+            git("commit", "-qm", "base")
+            git("checkout", "-qb", "feature")
+            pathlib.Path(d, "old.ts").unlink()
+            (route / "page.tsx").write_text("y\n")
+            git("commit", "-qam", "drop old.ts, change the route")
+            diff = f"- Diff: {git('merge-base', 'main', 'HEAD')[:7]}...{git('rev-parse', 'HEAD')[:7]}"
+            for loc in ("app/[id]/page.tsx:1", "(app/[id]/page.tsx:1)", "old.ts:12"):
+                r = self.run_check(report(suspect=f"| minor | 60 | {loc} | x | — |", diff=diff), d, "--base", "main")
+                self.assertEqual(r.returncode, 0, f"{loc}: {r.stdout}")
+
     def test_base_checks_cited_line_against_diff(self):
         with tempfile.TemporaryDirectory() as d:
             def git(*a):
                 return subprocess.run(["git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@t", *a],
-                                      check=True, capture_output=True, text=True).stdout.strip()
+                                      check=True, capture_output=True, text=True, encoding="utf-8").stdout.strip()
             git("init", "-q", "-b", "main")
             src = pathlib.Path(d, "pay.ts")
             src.write_text("".join(f"line {i}\n" for i in range(1, 41)))
@@ -203,6 +225,19 @@ class CheckReport(unittest.TestCase):
             self.assertEqual(inside.returncode, 0, inside.stdout)
             outside = self.run_check(report(suspect="| minor | 60 | pay.ts:3 | x | — |", diff=diff), d, "--base", "main")
             self.assertIn("outside the changed lines", outside.stdout)
+            for sub in ("lib", "app"):
+                pathlib.Path(d, sub).mkdir()
+                pathlib.Path(d, sub, "util.ts").write_text("x\n")
+            git("add", ".")
+            git("commit", "-qm", "more")
+            diff2 = f"- Diff: {git('merge-base', 'main', 'HEAD')[:7]}...{git('rev-parse', 'HEAD')[:7]}"
+            suffix = self.run_check(report(suspect="| minor | 60 | xpay.ts:30 | x | — |", diff=diff2), d, "--base", "main")
+            self.assertIn("outside the changed lines", suffix.stdout)  # pay.ts is not a path segment of xpay.ts
+            bare = self.run_check(report(suspect="| minor | 60 | util.ts:1 | x | — |", diff=diff2), d, "--base", "main")
+            self.assertIn("matches several changed files", bare.stdout)
+            full = self.run_check(report(suspect="| minor | 60 | lib/util.ts:1 | x | — |", diff=diff2), d, "--base", "main")
+            self.assertEqual(full.returncode, 0, full.stdout)
+            git("reset", "-q", "--hard", "HEAD~1")
             no_diff = self.run_check(report(suspect="| minor | 60 | pay.ts:30 | x | — |"), d, "--base", "main")
             self.assertIn("lacks 'Diff:'", no_diff.stdout)
             pathlib.Path(d, ".dev-kit").mkdir()
