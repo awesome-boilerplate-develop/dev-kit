@@ -151,7 +151,7 @@ flowchart TD
 
 **Use when:** the branch is done and a PR is about to be opened. The other three controllers call it at the end on their own; you can also call it directly for a branch written by a person.
 
-**Report-only mode:** if the request says "do not change code", it edits no file and skips step 4.
+**Report-only mode:** if the request says "do not change code", it changes no file outside `.dev-kit/` and skips step 4; it still writes the report, and removes a stale PR body on NO-GO.
 
 **Steps:**
 1. **Run the check commands right now** and keep the output as Evidence. An empty diff (on the base branch itself, or already merged) stops the run: nothing to review, no verdict. The review covers HEAD; uncommitted changes are left alone and named in the report; the checks then ran on them, not on HEAD, so the verdict is NO-GO until you commit them, and it asks you before fixing anything while they are there. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
@@ -166,7 +166,7 @@ flowchart TD
    Each reviewer receives the diff range and the spec/issue text, and returns `file:line | blocker/major/minor | reason`.
 3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, or a check failed, `Verdict: NO-GO`; otherwise `GO`.
 4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), commit each fix, and go back to step 1. At most 2 rounds.
-5. **Report with the findings table.** Report-only mode changes nothing outside `.dev-kit/`: no fixes, but the report is written and a stale PR body is removed on NO-GO. On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
+5. **Report with the findings table.** On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
 
 **Example (illustration):** a "partial refund" branch touches permissions and personal data, so it runs 4 reviewers. The result is NO-GO with these blockers:
 - a non-staff role can still issue refunds;
