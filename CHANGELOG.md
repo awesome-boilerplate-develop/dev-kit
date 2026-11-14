@@ -1,6 +1,6 @@
 # dev-kit changelog
 
-## 1.9.4 (unreleased)
+## 1.9.4 (2026-11-14)
 Fixes from two external reviews of 1.9.3; each script fix has a test that fails on 1.9.3.
 - **Controllers never commit on the base branch:** `story-runner`, `bug-fixer` and `code-refactor` create a feature branch before the first commit when HEAD is on the base branch or detached (new **Branch.** paragraph, kept identical by `check_parts.py`). A commit on `main` left `main...HEAD` empty, so `pre-pr-check` stopped with no review and no verdict.
 - **`check_report.py` keeps valid findings:** paths with route folders (`app/[id]/page.tsx`, `(group)/`, `+page`, `$id`) are read whole, a bracket that only wraps the location is dropped, and a file deleted by the branch counts as changed on every line; before, these findings were told to be dropped as "outside the changed lines". A path must now match whole path segments (`extra.py` no longer matches a changed `a.py`), and a bare file name that matches several changed files fails with "give its path from the repo root".
