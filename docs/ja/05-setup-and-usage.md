@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.2 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.3 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | [简体中文](../zh-CN/05-setup-and-usage.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [05-setup-and-usage.md](../en/05-setup-and-usage.md)
@@ -137,7 +137,7 @@ Use skill dk:bug-fixer for this card:
 
 **確認する出力:**
 - `.dev-kit/reports/<name>.md`: 何を行ったか、なぜか、実行したコマンドとその結果。
-- `.dev-kit/reports/pr-body.md`: 下書きの PR 本文。
+- `.dev-kit/reports/pr-body.md`: 下書きの PR 本文（GO のときのみ）。
 - `.dev-kit/specs/`（story）: 特に **Decisions** セクションで、エージェントが何を決めたかを確認する。
 - 現在のブランチ上のコミット。dev-kit は push せず、PR も開きません。
 

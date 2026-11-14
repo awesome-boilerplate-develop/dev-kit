@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.2 review=machine -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.3 review=machine -->
 [English](../en/05-setup-and-usage.md) | [Tiếng Việt](../vi/05-setup-and-usage.md) | 简体中文 | [日本語](../ja/05-setup-and-usage.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[05-setup-and-usage.md](../en/05-setup-and-usage.md)。
@@ -137,7 +137,7 @@ Use skill dk:bug-fixer for this card:
 
 **要查看的输出：**
 - `.dev-kit/reports/<name>.md`：做了什么、为什么、运行了哪些命令以及结果；
-- `.dev-kit/reports/pr-body.md`：起草好的 PR 正文；
+- `.dev-kit/reports/pr-body.md`：起草好的 PR 正文（仅在 GO 时）；
 - `.dev-kit/specs/`（story）：尤其是 **Decisions** 部分，看看 agent 敲定了什么；
 - 当前分支上的 commit。dev-kit 不会 push，也不会开 PR。
 

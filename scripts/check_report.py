@@ -7,19 +7,32 @@ With --base (run inside a repo): the Review setup Diff line must name the merge 
 (`<merge-base sha>...<HEAD sha>`, short SHAs allowed), and they must match the repo now; commits after it that change only
 .dev-kit/ (the kit's own output, such as the report) are allowed. Every finding must point to a file in the diff, and at least one
 cited line must be inside or next to (±5 lines) the changed code; otherwise it is pre-existing code, which R1 says not to flag → drop it.
+A bare file name that matches several changed files FAILs: give its path from the repo root.
 Run from inside a repo: if the repo has .code-review-graph/, the Graph line must have a detect-changes summary (or
 "detect-changes failed: <error>"); it must not say "no .code-review-graph/ index" (rule G1).
 A "certain" finding that cites no rule (an id that really exists in the kit/team/project standards, or a specific place in a spec; R1–R7 do not count)
 and is about a missing test or only points at a test file: Do not flag (R1) → move to suspect; keep it only if it clearly says the existing test is wrong.
 A rule id cited in the certain tier must exist in a standards file (rule T1, R7), and `file#ID` must name an item of that file; an id that is not found FAILs.
 The Certain findings, Suspect findings and Commands run sections must be present (an empty table is fine); every finding has a confidence 0–100.
-A certain blocker is open unless its Status cell says "fixed"; an open blocker needs Verdict NO-GO.
+Section headings may carry extra text ("### Certain findings (1)"); a table's header row is the row above its |---| line.
+A certain blocker is open unless its Status cell says "fixed" (not "fixed later", "fixed (will do)"); an open blocker needs Verdict NO-GO. Commands run lists at least one
+check. A row fails when its Result starts with FAIL, NOT RUN or SKIP (or the Vietnamese thất bại / lỗi / không chạy / chưa chạy /
+bỏ qua, with or without accents), or says anywhere that it did not run ("could not run", "not executed", "0 tests ran"), names a
+new failure ("1 new failure"), or names more failures than it names known / baseline ones ("3 failed (2 known)"); a non-zero exit
+fails unless known failures explain it.
+Uncommitted changes outside .dev-kit/ (the Tree line says "uncommitted", or git status shows them now) mean the checks ran on
+something other than HEAD: GO FAILs, and NO-GO is allowed for that reason alone.
+A failing row needs Verdict NO-GO: a failing required check gates on its own, findings or not.
+The Verdict line must name one verdict: the template's "GO | NO-GO" left as written FAILs.
+With --base, an empty diff (HEAD is the merge base) FAILs: nothing was reviewed, so there is no verdict to give.
 Prints each violation; exits 1 if there are violations, 0 if the report passes."""
 import os
 import pathlib
 import re
 import subprocess
 import sys
+
+sys.stdout.reconfigure(encoding="utf-8")  # messages quote the report and standards (≥, —, Vietnamese); Windows pipes are cp1252
 
 args = sys.argv[1:]
 base = None
@@ -53,14 +66,16 @@ def standard_ids():
 
 
 def section(title):
-    m = re.search(rf"^###? {re.escape(title)}\s*\n(.*?)(?=^###? |\Z)", text, re.S | re.M)
+    m = re.search(rf"^###? {re.escape(title)}[^\n]*\n(.*?)(?=^###? |\Z)", text, re.S | re.M)
     return m.group(1) if m else None
 
 
 def rows(block):
     out = []
-    for line in (block or "").splitlines():
-        if line.startswith("|") and not re.match(r"^\|\s*-", line) and "Severity" not in line:
+    lines = (block or "").splitlines()
+    for i, line in enumerate(lines):
+        header = i + 1 < len(lines) and re.match(r"^\|\s*:?-", lines[i + 1])
+        if line.startswith("|") and not re.match(r"^\|\s*:?-", line) and not header:
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if any(cells) and cells[0] not in ("—", "-", "none", ""):
                 out.append(cells)
@@ -80,7 +95,7 @@ else:
         if key not in setup:
             problems.append(f"Review setup lacks '{key}'")
     # Reports may be written in the user's language: keep non-English alternatives (Vietnamese) in these patterns.
-    if re.search(r"Depth:.*(cost|save|tiết kiệm)", setup, re.I):
+    if re.search(r"Depth:.*(cost|cheap|sav(e|ing)|budget|expensive|tiết kiệm|rẻ|tốn|chi phí)", setup, re.I):
         problems.append("review depth justified by cost (rule C2 forbids lowering for cost)")
     graph = re.search(r"Graph:(.*)", setup)
     if graph and (root / ".code-review-graph").is_dir():
@@ -90,8 +105,11 @@ else:
             problems.append("Graph line lacks the detect-changes summary although .code-review-graph/ exists (rule G1)")
     diff_line = re.search(r"Diff:\s*`?([0-9a-f]{7,40})\.\.\.([0-9a-f]{7,40})", setup)
     if base and "Diff:" in setup:
-        sha = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
+        def sha(*a):
+            return subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
         now = (sha("merge-base", base, "HEAD"), sha("rev-parse", "HEAD"))
+        if now[0] == now[1]:
+            problems.append(f"nothing between {base} and HEAD: an empty diff has no review and no verdict (already merged, or on {base} itself?)")
         if not diff_line:
             problems.append("Review setup Diff line is not '<merge-base sha>...<HEAD sha>'")
         elif not (now[0].startswith(diff_line.group(1)) and (now[1].startswith(diff_line.group(2)) or (
@@ -109,7 +127,23 @@ test_gap = re.compile(r"\b(untested|no tests?|missing tests?|not tested|test cov
 test_file = re.compile(r"[._](spec|test)s?\.\w+$|(^|/)(tests?|__tests__|spec)/|(^|/)test_[^/]+\.py$")
 broken_test = re.compile(r"\bpass(es|ed)?\s+(vacuously|even|regardless|always|when|without)|\bstill pass|\bvacuous|always (passes|green)"
                          r"|never fails|never asserts?|(does not|doesn't|do not) assert|asserts? nothing|accepts any", re.I)
-LOC = r"([\w./@-]+\.[A-Za-z]{1,5}|[\w./@-]*[A-Za-z][\w./@-]*(?=:\d))(?::(\d+))?"  # path with an extension, or any path:line (Makefile:12)
+# A path with an extension, or any path:line (Makefile:12); route folders such as app/[id]/, (group)/, +page, $id are paths too.
+LOC = r"([\w./@$+~()\[\]-]+\.[A-Za-z]{1,5}|[\w./@$+~()\[\]-]*[A-Za-z][\w./@$+~()\[\]-]*(?=:\d))(?::(\d+))?"
+
+
+def locs(cell):
+    """(path, line) pairs in a location cell; a bracket that only wraps the location, as in (src/a.ts:3), is not part of it."""
+    out = []
+    for f, ln in re.findall(LOC, cell):
+        for o, c in ("()", "[]"):
+            if f.startswith(o) and f.count(o) > f.count(c):
+                f = f[1:]
+            if f.endswith(c) and f.count(c) > f.count(o):
+                f = f[:-1]
+        out.append((f, ln))
+    return out
+
+
 known_ids = standard_ids()
 
 for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
@@ -120,7 +154,7 @@ for tier, rows_, cols in (("certain", certain, 6), ("suspect", suspect, 5)):
             problems.append(f"{tier} finding severity '{c[0]}' is not blocker / major / minor (rule S1): {c}")
         if tier == "certain" and len(c) == cols and not (re.match(r"(fixed|open|pushed back)\b", c[5], re.I)):
             problems.append(f"certain finding Status is not fixed / open / pushed back: {c}")
-        if not any(ln for _, ln in re.findall(LOC, c[2] if len(c) > 2 else "")):
+        if not any(ln for _, ln in locs(c[2] if len(c) > 2 else "")):
             problems.append(f"{tier} finding without a file:line location (rule R1): {c}")
         v = conf(c)
         if v is None:
@@ -144,7 +178,7 @@ for c in certain:
             problems.append(f"rule '{x}#{item}': {x} has no item {item} (rules T1, R7): {c[2]}")
     valid = [x for x in cited if x in known_ids and x != "review/finding-quality"]
     no_rule = not valid and not re.search(r"specs?/|\bspec\b.*(§|#|\d)", rule, re.I)
-    files = [f for f, _ in re.findall(LOC, c[2] if len(c) > 2 else "")]
+    files = [f for f, _ in locs(c[2] if len(c) > 2 else "")]
     if no_rule and test_gap.search(" ".join(c)):
         problems.append(f"'missing tests' reported as certain without a rule (Do not flag): {c[2]}")
     elif no_rule and files and all(test_file.search(f) for f in files) and not broken_test.search(" ".join(c[3:4])):
@@ -160,12 +194,16 @@ for c in suspect:
 if base:
     diff = subprocess.run(["git", "diff", "-U0", f"{base}...HEAD"], capture_output=True, text=True).stdout
     changed = {}  # file -> list of (start, end) on the new side
-    current = None
+    current = old = None
     for line in diff.splitlines():
+        if line.startswith("--- "):
+            old = line[6:] if line.startswith("--- a/") else None
         if line.startswith("+++ "):
             current = line[6:] if line.startswith("+++ b/") else None
             if current:
                 changed.setdefault(current, [])
+            elif old:  # a deleted file: every line it had was changed
+                changed[old] = [(1, sys.maxsize)]
         m = re.match(r"^@@ -\S+ \+(\d+)(?:,(\d+))? @@", line)
         if m and current:
             start, count = int(m.group(1)), int(m.group(2) or 1)
@@ -173,26 +211,70 @@ if base:
     for tier, rows_ in (("certain", certain), ("suspect", suspect)):
         for c in rows_:
             loc = c[2] if len(c) > 2 else ""
-            refs = [(f, ln) for f, ln in re.findall(LOC, loc) if ln]
+            refs = [(f, ln) for f, ln in locs(loc) if ln]
             if not refs:
                 continue  # already reported as without a location
-            ok = False
+            ok, ambiguous = False, []
             for f, ln in refs:
-                files = [k for k in changed if k == f or k.endswith("/" + f) or f.endswith(k)]
+                f = f.removeprefix("./")
+                files = [f] if f in changed else [k for k in changed if k.endswith("/" + f) or f.endswith("/" + k)]  # whole segments
+                if len(files) > 1:
+                    ambiguous.append(f)
+                    continue
                 for k in files:
                     if any(a - 5 <= int(ln) <= b + 5 for a, b in changed[k]):
                         ok = True
-            if not ok:
+            if ambiguous and not ok:
+                problems.append(f"{tier} finding names a file that matches several changed files, give its path from the repo root: "
+                                f"{', '.join(ambiguous)}")
+            elif not ok:
                 problems.append(f"{tier} finding points outside the changed lines: pre-existing code is Do not flag (rule R1), drop it: {loc}")
 
-blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and re.match(r"fixed\b", c[5], re.I))]
+def fixed(status):
+    m = re.match(r"fixed\b(.*)", status, re.I)
+    return bool(m) and not re.search(r"\b(will|later|todo|pending|next|not yet|sau|sẽ|chưa)\b", m.group(1), re.I)
+
+
+blockers = [c for c in certain if c[0].strip("*` ").lower() == "blocker" and not (len(c) > 5 and fixed(c[5]))]
+commands = rows(section("Commands run"))
+if section("Commands run") is not None and not commands:
+    problems.append("Commands run lists no check: run the check command and record its result")
+
+
+def failing(result):
+    if re.match(r"[\W_]*(fail|not run|skip|thất bại|lỗi|không chạy|chưa chạy|bỏ qua|that bai|loi\b|khong chay|chua chay|bo qua)",
+                result, re.I):
+        return True
+    if re.search(r"\b(did|could|can)\s*(not|n't)\s+(be\s+)?run|\bnot executed|\b(0|no)\s+tests?\s+(ran|run|were run|executed)"
+                 r"|không chạy được|khong chay duoc|\b[1-9]\d*\s+new\s+(fail|error|regression)", result, re.I):
+        return True
+    # Known failures excuse only as many failures as they number: "3 failed (2 known)" still has one new failure.
+    known = sum(int(n) for n in re.findall(r"\b(\d+)\s+(?:known|baseline)\b", result, re.I))
+    total = max((int(n) for n in re.findall(r"\b(\d+)\s+(?:failed|failing|failures?|errors?)\b", result, re.I)), default=0)
+    return total > known or (not known and bool(re.search(r"\bexit(\s+code)?\s*[:=]?\s*[1-9]", result, re.I)))
+
+
+failed = [c[0] for c in commands if len(c) > 1 and failing(c[1])]
+report_rel = os.path.relpath(os.path.realpath(args[0]), os.path.realpath(root)).replace(os.sep, "/")
+status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=root).stdout.splitlines()
+dirty = [ln[3:] for ln in status if not ln[3:].startswith(".dev-kit/") and ln[3:] != report_rel]
+if re.search(r"Tree:.*uncommitted", setup or "", re.I) and not dirty:
+    dirty = ["(named on the Tree line)"]
 verdict = re.search(r"Verdict:\s*\**\s*(NO-GO|GO)", text)
+verdict_line = re.search(r"Verdict:[^\n]*", text)
 if not verdict:
     problems.append("missing 'Verdict: GO | NO-GO'")
+elif "|" in verdict_line.group() or ("NO-GO" in verdict_line.group() and re.search(r"(?<!NO-)\bGO\b", verdict_line.group())):
+    problems.append(f"the Verdict line still has the template's choices, pick one: {verdict_line.group()}")
 elif blockers and verdict.group(1) != "NO-GO":
     problems.append("open certain blocker but verdict is GO")
-elif not blockers and verdict.group(1) == "NO-GO":
-    problems.append("verdict NO-GO without an open certain blocker")
+elif failed and verdict.group(1) != "NO-GO":
+    problems.append(f"a required check failed or did not run but verdict is GO: {', '.join(failed)}")
+elif dirty and verdict.group(1) != "NO-GO":
+    problems.append(f"uncommitted changes outside .dev-kit/ ({', '.join(dirty[:5])}): the checks did not run on HEAD, so the verdict "
+                    "is NO-GO until they are committed and the checks run again")
+elif not blockers and not failed and not dirty and verdict.group(1) == "NO-GO":
+    problems.append("verdict NO-GO without an open certain blocker, a failing check or uncommitted changes")
 
 for p in problems:
     print("FAIL:", p)

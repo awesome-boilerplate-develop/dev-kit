@@ -21,7 +21,7 @@ description: Shape an idea into an agreed spec before any code. Use when the use
 Look at what the idea touches: the files, docs and recent commits it would change. If it spans several independent subsystems, say so and agree with the user which one comes first; brainstorm one at a time.
 
 ### 2. Clarify
-Read part `grilling` and settle purpose, constraints and success criteria with the user. If the idea introduces new domain terms, also Read part `domain-modeling`.
+Read part `grilling` and settle purpose, constraints and success criteria with the user in its rounds: the whole frontier per message, each question numbered with a recommended answer. If the idea introduces new domain terms, also Read part `domain-modeling`.
 
 ### 3. Approaches
 Propose 2–3 approaches with their trade-offs, the recommended one first with its reason, and wait for the user's choice. Drop what the goal does not need.

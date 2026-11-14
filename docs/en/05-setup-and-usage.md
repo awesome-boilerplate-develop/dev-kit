@@ -134,7 +134,7 @@ Use skill dk:bug-fixer for this card:
 
 **Output to look at:**
 - `.dev-kit/reports/<name>.md`: what was done, why, the commands run and their results;
-- `.dev-kit/reports/pr-body.md`: the drafted PR body;
+- `.dev-kit/reports/pr-body.md`: the drafted PR body (on GO only);
 - `.dev-kit/specs/` (story): especially the **Decisions** section, to see what the agent settled;
 - commits on the current branch. dev-kit does not push and does not open a PR.
 

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.9.2 review=human -->
+<!-- i18n: source=docs/en/02-architecture.md source_commit=v1.9.3 review=human -->
 [English](../en/02-architecture.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/02-architecture.md).
@@ -22,8 +22,8 @@ dev-kit/
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
-├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
-├── scripts/                # check_parts.py, check_report.py, check_standards.py, bump_version.py, install-graph-tools.sh
+├── templates/              # spec.md, report.md, config.yml, baseline.md, standard.md, dogfood-log.md
+├── scripts/                # check_*.py, bump_version.py, ticket.py, test_*.py, install-graph-tools.sh
 ├── UPSTREAM.md  LICENSES/  CHANGELOG.md  README.md  docs/
 ```
 
@@ -43,7 +43,7 @@ flowchart LR
 ### Controller
 
 - Là skill thật, có `name` và `description` trong frontmatter. Claude Code chỉ nạp phần description lúc mở phiên.
-- Rất mỏng: mỗi file khoảng 20 dòng, gồm 4 khối chung (Parts, Rules, Commands, Report) và 4–5 bước riêng.
+- Mỏng: mỗi file 40–65 dòng, gồm các khối chung (Harness, Parts, Rules, Commands, Graph, Standards, Output) và 4–6 bước riêng.
 - Mặc định làm thẳng trong phiên chính. Chỉ đọc part hoặc spawn subagent khi một bước hay một rule yêu cầu.
 
 ### Part
@@ -96,7 +96,7 @@ Các agent persona `dk:security-auditor` và `dk:test-engineer` (agent-skills) c
 | `.dev-kit/plans/` | story-runner/code-refactor (việc lớn) | Plan theo `writing-plans` |
 | `.dev-kit/reports/<name>.md` | mọi controller | Báo cáo theo `templates/report.md`: đổi gì, vì sao, test, lệnh đã chạy, bảng review, câu hỏi mở |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (việc lớn) | Ledger, brief từng task, gói review |
-| `.dev-kit/reports/pr-body.md` | pre-pr-check | Nội dung PR: Summary / Evidence / Merge Danger |
+| `.dev-kit/reports/pr-body.md` | pre-pr-check, khi GO | Nội dung PR: Summary / Evidence / Merge Danger |
 | `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | part `domain-modeling` | Thuật ngữ và quyết định mới; `GLOSSARY.md` và `docs/adr/` của chính project được đọc, và mọi thay đổi với chúng được đề xuất cho bạn |
 | `.dev-kit/CONSTRAINTS.md` | part `constraint-driven-development` (tùy chọn) | Chuẩn chất lượng của bạn; `pre-pr-check` đối chiếu diff với nó. Nếu có `CONSTRAINTS.md` của project ở gốc repo thì đọc file đó thay vào |
 

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.9.2 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=cfbbf72 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | [简体中文](../zh-CN/03-skills.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [03-skills.md](../en/03-skills.md)
@@ -10,7 +10,7 @@
 | ブロック | 意味 |
 |---|---|
 | **Parts** | ステップで言及されたときだけ part を読む。part は skill ではない |
-| **Rules** | `rules/RULES.md` で on になっている rule を適用する: F1、F2、C1、C2、G1、S1、O1（[04](../en/04-rules.md)、英語） |
+| **Rules** | `rules/RULES.md` で on になっている rule を適用する: F1、F2、C1、C2、G1、T1、S1、O1、pre-pr-check では R1（[04](../en/04-rules.md)、英語） |
 | **Graph** | リポジトリに codegraph/CRG のインデックスがあれば rule G1 に従って使い、なければ省略する |
 | **Commands** | `.dev-kit/config.yml` があればそこからチェックコマンドとベースブランチを取る。なければ `make check` またはリポジトリのテストコマンドと `main` を使う |
 | **Outputs** | すべて `.dev-kit/` に書く（rule O1）。`templates/report.md` に沿ったレポートで終える。重大度は blocker/major/minor の尺度を使う（rule S1） |
@@ -32,7 +32,7 @@
 
 **ステップと質問（順番どおり）:**
 1. **グラフツール:** `scripts/install-graph-tools.sh --check` で確認する。*質問は、足りないものがあるときだけ:* インストールするか。断られた場合は「G1 off」で続行する。`codegraph install` と `code-review-graph install` は決して実行しない（MCP、hook、指示ファイルを登録するため）。
-2. **個人設定:** 以前のリポジトリでチームの standards フォルダが保存されていれば、`~/.dev-kit/config.yml` から読み込む。
+2. **個人設定:** 現時点ではなし。dev-kit はリポジトリごとに設定する。
 3. **調査のみ、質問なし:** コマンド、ベースブランチ、スタック、linter がすでに強制しているもの、すでに `.dev-kit/` の下で追跡されているファイル、プロジェクト自身の `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
 4. *質問:* **コマンドとベースブランチ**（確認または修正）。ベースブランチは `origin/HEAD` だけでなく、最近の PR がマージされているブランチと照らし合わせる。両者が違う場合は、コミット日とコミット数の差を添えて選択肢として尋ねる。そのあと `*` を含む `.gitignore` を置いた `.dev-kit/` を作成し、`config.yml` を書く。
 5. *質問:* **グラフのインデックス**（既定は yes。想定サイズはインデックス対象 1 ファイルあたり約 0.16 MB と 0.6 MB。約 850 ファイルで 136 MB と 529 MB を実測）。インデックスのフォルダが `git status` にまだ表示される場合（codegraph は自身の `.gitignore` を表示されたままにする）は、リポジトリの exclude ファイル（`git rev-parse --git-path info/exclude`。すべての worktree で共有）に追加する。`.dev-kit/` は決して追加しない。 そのあと *質問:* **standards をクイック設定にするか詳細設定にするか**: クイック（Recommended）はエージェントが各 Recommended 行を自分で採用し、書き込む内容すべてを 1 回読み返して 1 回だけ尋ねる。読み返しはチェックリスト形式で、Recommended の項目にはチェックが入り（☑）、それ以外は空（☐）。`+ID`/`-ID`（ID が他のファイルと重なる場合は `file#ID`）で変えるか、kit ファイルごとの複数選択フォームで変える（チェックした項目は状態が切り替わる）。詳細はグループごとに尋ね、自分の規約のループと `CONSTRAINTS.md` の質問も含む。baseline が red のときはどちらでも尋ねる。仕様: [`skills/init/references/quick-setup.md`](../../skills/init/references/quick-setup.md)。実行記録（英語）: [1.6.0](../en/06-evidence.md#quick-setup-and-not-offered-items-on-omp-dev-kit-160)、[1.7.0](../en/06-evidence.md#pre-ticked-checklist-and-tick-forms-on-omp-dev-kit-170)。
@@ -86,7 +86,7 @@
 **ステップ:**
 1. **再現し、根本原因を見つける。** 難しいバグやパフォーマンスのバグでは、`systematic-debugging` または `diagnosing-bugs` part を読んで従う。
 2. **回帰テストを書く。** 正しい理由で失敗すること → 根本原因を修正する → テストが green になる。
-3. **チェックコマンドを実行する。** コミットする。メッセージには根本原因を書く。
+3. **チェックコマンドを実行する。** feature ブランチにコミットする（ベースブランチ上なら先にブランチを作る）。メッセージには根本原因を書く。
 4. **`dk:pre-pr-check` を実行する。**
 
 **出力:** 修正のコミットとそのテスト、レポート、pre-pr-check の結果。
@@ -110,11 +110,11 @@ flowchart LR
 **使う場面:** 機能/ストーリーのチケット。
 
 **ステップ:**
-1. **明確化する。** チケットが曖昧なら、`grilling` part を読み、一度に 1 つずつあなたに質問する。新しい業務用語があれば、`domain-modeling` part も読む。誰も答えられない場合（headless の実行）にだけ、妥当な選択肢を自分で選び、前提（assumption）として記録する。
+1. **明確化する。** チケットが曖昧なら、`grilling` part を読み、ラウンドごとに質問する: 今聞ける質問をすべて番号付きで、それぞれ推奨回答を添えて。新しい業務用語があれば、`domain-modeling` part も読む。誰も答えられない場合（headless の実行）にだけ、妥当な選択肢を自分で選び、前提（assumption）として記録する。
 2. **spec を書く** `.dev-kit/specs/<feature>.md`、`templates/spec.md` に沿って: 目的、rule、インターフェース、受け入れ基準、スコープ外、そして **Decisions** セクション（質問、回答、決めた人または「assumption」）。
 3. **rule C1 に従う:**
-   - **小さな作業:** セッション内でそのまま行う。テストを先に書き、振る舞いごとに 1 コミット。
-   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch`（作業中のブランチにマージして戻す。push/PR はしない）。
+   - **小さな作業:** セッション内でそのまま行う。テストを先に書き、振る舞いごとに 1 コミット。コミットは feature ブランチに行う。ベースブランチ上なら最初のコミットの前にブランチを作る。`<base>...HEAD` が空だと pre-pr-check がレビューするものがないため。
+   - **大きな作業**（タスクが 3 つより多い、または複数のモジュールにまたがる）: part を順に使う: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`。SDD 自身の finishing の手前で止める。ステップ 4 の `dk:pre-pr-check` は worktree 内の feature ブランチでマージ前に実行し、GO のときだけ `finishing-a-development-branch` が選択肢（マージ、PR、ブランチを残す）を示し、あなたが選ぶ。答える人がいなければブランチを残す。
 4. **`dk:pre-pr-check` を実行する。**
 
 ```mermaid
@@ -123,9 +123,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **例（説明用）:** チケット「顧客がチェックアウトで割引コードを入力する」。
@@ -142,7 +143,7 @@ flowchart TD
 **ステップ:**
 1. **新しいインターフェースを固める。** 境界が不明確なら、`codebase-design` part を読む。
 2. **まず characterization test を書く。** 公開インターフェースで、あらゆる入力について現在の振る舞いを固定する。バグに見える振る舞いも固定する: レポートに「suspect bug」として記録し、リファクタリング中は**修正しない**。
-3. **rule C1 に従う:** 小さな作業では、セッション内で小さなステップで進め、各ステップの後にチェックし、各ステップをコミットする。大きな作業では、story-runner と同じように SDD の part を使う。
+3. **rule C1 に従う:** 小さな作業では、セッション内で小さなステップで進め、各ステップの後にチェックし、各ステップをコミットする（feature ブランチに。ベースブランチ上なら先に作る）。大きな作業では、story-runner と同じように SDD の part を使う。
 4. **`dk:pre-pr-check` を実行する。** レビューでは、「振る舞いの変更がないこと」と、固めたインターフェースを確認する。
 
 **バグに見える振る舞いまで固定する理由:** lab では、リファクタリングのチケットを、300 件のランダムな入力でリファクタリング前後の振る舞いを比べて採点します。リファクタリング中に「ついでにバグを直す」と振る舞いが変わり、レビュアーはどこがリファクタリングでどこがバグ修正なのか判別できなくなります。
@@ -153,10 +154,10 @@ flowchart TD
 
 **使う場面:** ブランチが完成し、これから PR を開くとき。他の 3 つの controller は最後に自分でこれを呼び出します。人が書いたブランチに対して直接呼び出すこともできます。
 
-**Report-only モード:** リクエストに「コードを変更しない」とあれば、ファイルを編集せず、ステップ 4 を省略する。
+**Report-only モード:** リクエストに「コードを変更しない」とあれば、`.dev-kit/` の外のファイルは変更せず、ステップ 4 を省略する。レポートは書き、NO-GO なら古い PR body を削除する。
 
 **ステップ:**
-1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
+1. **チェックコマンドを今すぐ実行し**、出力を Evidence として残す。diff が空（base ブランチそのもの、またはマージ済み）なら停止する: review する対象がなく、verdict もない。review は HEAD を対象にする。未コミットの変更には手を触れず report に名前を記す。その場合 checks は HEAD ではなくそれらの変更の上で走るので、コミットするまで verdict は NO-GO になる。変更が残っている間は修正の前にあなたに確認する。baseline 外で失敗した check、または実行できなかった check は、それだけで verdict を NO-GO にする。`git diff <base branch>...HEAD` を読み、基準引き下げの兆候を探す: 新しいテストがスキップされている、`noqa`/`ts-ignore` が追加されている、assert が削除されている、しきい値が下げられている。
 2. **rule C2 に従ってレビューのレベルを選ぶ:**
 
    | レベル | 場面 | 内容 |
@@ -166,9 +167,9 @@ flowchart TD
    | 4 reviewers | あなたが求めたとき、または diff が auth/権限、シークレット、個人データ、マイグレーション、config/env に触れるとき | 並列で: `code-review` のレビュアー 2 人（それぞれ 1 軸）、`dk:security-auditor`、`dk:test-engineer` |
 
    各レビュアーは diff の範囲と spec/issue の文面を受け取り、`file:line | blocker/major/minor | reason` を返す。
-3. **結果を統合して** blocker/major/minor の尺度で 1 つの表にする。blocker が 1 つでも未解決なら `Verdict: NO-GO`、そうでなければ `GO`。
-4. **blocker がある場合:** `receiving-code-review` part を読み、根拠を示して修正する（または理由を添えて反論する）。そしてステップ 1 に戻る。最大 2 ラウンド。
-5. **finding の表を付けてレポートする。** report-only モードでなければ、`pr` part に沿って `.dev-kit/reports/pr-body.md` を書く（Summary / Evidence / Merge Danger）。Evidence はステップ 1 の出力にする。
+3. **結果を統合して** blocker/major/minor の尺度で 1 つの表にする。blocker が 1 つでも未解決、または check が失敗していれば `Verdict: NO-GO`、そうでなければ `GO`。
+4. **blocker がある場合:** `receiving-code-review` part を読み、根拠を示して修正する（または理由を添えて反論する）。修正ごとにコミットし、ステップ 1 に戻る。最大 2 ラウンド。
+5. **finding の表を付けてレポートする。** GO で report-only モードでなければ、`pr` part に沿って `.dev-kit/reports/pr-body.md` を書く（Summary / Evidence / Merge Danger）。Evidence はステップ 1 の出力にする。
 
 **例（説明用）:** 「部分返金」のブランチが権限と個人データに触れるため、4 reviewers で実行する。結果は NO-GO で、blocker は次のとおり:
 - スタッフ以外のロールでも返金できてしまう。
@@ -218,7 +219,7 @@ flowchart LR
 
 **ステップ:**
 1. **ボード設定:** 完全なリンクならすぐ取り込みます。その後 `.dev-kit/config.yml` に `ticket:` セクションがなければ、リンクから作って書き、そのことを伝えます。
-2. **認証情報:** `scripts/ticket.py check`。Jira は自分のターミナルで `ticket.py login jira` により保存した API トークン、Azure DevOps は `az login`(または PAT)を使います。
+2. **認証情報:** `scripts/ticket.py check`。Jira は自分のターミナルで `ticket.py login jira` により保存した API トークン、Azure DevOps は `az login`(または PAT)を使います。 ボード外を指す画像はトークンなしで取得します。内部アドレス（localhost、LAN）はブロックしません。
 3. リンクやキーで**取り込む**か、依頼内容から書いた JQL / WIQL で**検索**します。各チケットはボードの表示どおりに保たれます: 実際のフォーム順のセクション(組織ごとにフォームをカスタマイズするため Azure DevOps のレイアウトを読みます)、元の位置の画像、リンク(関連アイテム、PR、コミット)、添付、ボードの順のコメント。ストーリー配下の Task や Sub-task はストーリーのファイルに書かれ、ストーリー本文のあとに専用のセクションとストーリーの子アイテム一覧が付きます。
 4. 必要なら**翻訳**(`ticket.<lang>.md`。原文が正本で、チケットが変わると翻訳は古いと表示されます)。
 5. **次のスキル:** Bug → `dk:bug-fixer`、ストーリー → `dk:story-runner`(内容が薄いときは `dk:brainstorm`)、技術的負債 → `dk:code-refactor`、それ以外は質問します。`ticket.types` で上書きできます。チケットが 1 件なら、そのファイルをカードとしてすぐ実行するか尋ねます。

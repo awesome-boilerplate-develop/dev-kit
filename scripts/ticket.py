@@ -27,6 +27,7 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -242,22 +243,28 @@ def cell(text):
 
 
 def safe_name(name):
-    return re.sub(r'[\\/:*?"<>|\x00-\x1f]', "_", name).strip(". ") or "file"
+    name = re.sub(r'[\\/:*?"<>|\x00-\x1f]', "_", name).strip(". ") or "file"
+    return "_" + name if re.match(r"(?i)(con|prn|aux|nul|com\d|lpt\d)(\.|$)", name) else name  # Windows device names
 
 
 # ---------- HTTP ----------
 
 class SameHostAuth(urllib.request.HTTPRedirectHandler):
-    """Follows redirects but never sends the Authorization header to another host (Jira attachments redirect)."""
+    """Follows redirects but never sends the Authorization header to another host or over http (Jira attachments redirect)."""
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         new = super().redirect_request(req, fp, code, msg, headers, newurl)
-        if new is not None and urllib.parse.urlparse(newurl).netloc != urllib.parse.urlparse(req.full_url).netloc:
+        to = urllib.parse.urlparse(newurl)
+        if new is not None and (to.netloc != urllib.parse.urlparse(req.full_url).netloc or to.scheme != "https"):
             new.headers.pop("Authorization", None)
         return new
 
 
-_opener = urllib.request.build_opener(SameHostAuth)
+# http(s) and data: only; build_opener would add file: and ftp:, which a link in a ticket must not reach.
+_opener = urllib.request.OpenerDirector()
+for _h in (urllib.request.UnknownHandler, urllib.request.HTTPHandler, urllib.request.HTTPSHandler, urllib.request.DataHandler,
+           urllib.request.HTTPDefaultErrorHandler, urllib.request.HTTPErrorProcessor, SameHostAuth):
+    _opener.add_handler(_h())
 
 
 def request(url, auth, body=None, raw=False):
@@ -297,9 +304,10 @@ def request(url, auth, body=None, raw=False):
 # ---------- settings and credentials ----------
 
 def read_config(path=None):
-    """The flat `ticket:` section of .dev-kit/config.yml; `types: { Bug: bug-fixer }` becomes a dict."""
+    """The flat `ticket:` section of .dev-kit/config.yml; `types: { Bug: bug-fixer }`, or the same as an indented block
+    under `types:`, becomes a dict."""
     path = path or pathlib.Path(".dev-kit/config.yml")
-    cfg, inside = {}, False
+    cfg, inside, block, block_indent = {}, False, {}, None
     if not path.exists():
         return cfg
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -309,10 +317,20 @@ def read_config(path=None):
         if inside:
             if line.strip() and not line[0].isspace():
                 break
+            indent = len(line) - len(line.lstrip())
+            if block_indent is not None and indent > block_indent and line.split("#")[0].strip():
+                k, _, v = line.split("#")[0].strip().partition(":")
+                block[k.strip().strip("'\"")] = v.strip().strip("'\"")
+                continue
+            block_indent = None
             m = re.match(r"^\s+([A-Za-z_]+):\s*(.*?)\s*(#.*)?$", line)
-            if m and m.group(2):
+            if m and m.group(1) == "types" and not m.group(2):
+                block_indent = indent
+            elif m and m.group(2):
                 cfg[m.group(1)] = m.group(2).strip("'\"")
-    if cfg.get("types", "").startswith("{"):
+    if block:
+        cfg["types"] = block
+    elif cfg.get("types", "").startswith("{"):
         cfg["types"] = {k.strip().strip("'\""): v.strip().strip("'\"")
                         for k, v in (p.split(":", 1) for p in cfg["types"].strip("{}").split(",") if ":" in p)}
     else:
@@ -341,11 +359,9 @@ def save_credential(name, entry):
     data = load_credentials()
     data[name] = entry
     tmp = p.with_suffix(".tmp")
-    tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    try:
-        os.chmod(tmp, 0o600)
-    except OSError:
-        pass
+    tmp.unlink(missing_ok=True)  # a leftover copy would keep its old mode
+    with os.fdopen(os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, indent=2))  # created 600, so the token is never readable by others
     os.replace(tmp, p)
     return p
 
@@ -370,7 +386,9 @@ def az_token(tenant=None):
         if tenant:
             r = subprocess.run(["az", "account", "show", "--query", "tenantId", "-o", "tsv"],
                                capture_output=True, text=True, timeout=TIMEOUT)
-            if r.returncode == 0 and r.stdout.strip() and r.stdout.strip().lower() != tenant.lower():
+            if r.returncode or not r.stdout.strip():
+                raise Fail(f"could not confirm that az is signed in to tenant {tenant}: run az login --tenant {tenant}")
+            if r.stdout.strip().lower() != tenant.lower():
                 raise Fail(f"az is signed in to tenant {r.stdout.strip()}, this repo uses {tenant}: "
                            f"run az login --tenant {tenant}")
         r = subprocess.run(["az", "account", "get-access-token", "--resource", ADO_RESOURCE,
@@ -474,6 +492,7 @@ class Item:
         self.key = self.display = self.url = self.type = self.title = self.state = ""
         self.meta, self.sections, self.links, self.attachments, self.comments = [], [], [], [], []
         self.labels, self.comment_order, self.parent, self.task_like = [], "newest first", None, False
+        self.has_ac = False  # the board's acceptance-criteria field (by field id) is filled in
         self.__dict__.update(kw)
 
     @property
@@ -483,6 +502,7 @@ class Item:
 
 class Board:
     name = ""
+    hosts = ()  # the board's own hosts: the only ones its token is sent to
 
     def __init__(self, auth):
         self.auth = auth
@@ -499,6 +519,13 @@ class Board:
             except Unauthorized as e2:
                 raise Fail(f"{e2}: {self.auth.hint}") from None
 
+    def download(self, url):
+        """Bytes of an image or attachment. A URL in the ticket content may point anywhere: no token outside the board."""
+        u = urllib.parse.urlparse(url)
+        if u.scheme == "https" and u.netloc.lower() in self.hosts:
+            return self.get(url, raw=True)
+        return request(url, None, raw=True)
+
 
 class Ado(Board):
     name = "Azure DevOps"
@@ -506,12 +533,13 @@ class Ado(Board):
     def __init__(self, org, project, auth):
         super().__init__(auth)
         self.org, self.project = org, project
+        self.hosts = ("dev.azure.com", f"{org.lower()}.visualstudio.com")
         self.root = f"https://dev.azure.com/{urllib.parse.quote(org)}"
         self.base = f"{self.root}/{urllib.parse.quote(project)}/_apis/wit"
         self.forms = {}
 
     def link(self, wid):
-        return f"https://dev.azure.com/{self.org}/{self.project}/_workitems/edit/{wid}"
+        return f"https://dev.azure.com/{urllib.parse.quote(self.org)}/{urllib.parse.quote(self.project)}/_workitems/edit/{wid}"
 
     def briefs(self, ids):
         """Type, title, state and assignee of many work items, 200 per request."""
@@ -565,7 +593,15 @@ class Ado(Board):
                   "url": r["url"], "ids": {r["url"].rsplit("/", 1)[-1].lower(),
                                            r["attributes"].get("name", "").rsplit(".", 1)[0].lower()}}
                  for r in rels if r["rel"] == "AttachedFile"]
-        comments = self.get(f"{self.base}/workItems/{key}/comments?order=desc&api-version=7.1-preview.4")
+        # renderedText: a Markdown comment comes as HTML too. Comments come in pages, linked by a continuation token.
+        comments, token = [], ""
+        while True:
+            page = self.get(f"{self.base}/workItems/{key}/comments?order=desc&$expand=renderedText&api-version=7.1-preview.4"
+                            + (f"&continuationToken={urllib.parse.quote(token)}" if token else ""))
+            comments += page.get("comments", [])
+            token = page.get("continuationToken")
+            if not token:
+                break
         p = info.get(parent, {}) if parent else {}
         return Item(
             key=str(w["id"]), display=f"#{w['id']}", url=self.link(w["id"]), type=wtype,
@@ -578,9 +614,10 @@ class Ado(Board):
                               f"{person(f.get('System.CreatedBy'))}")],
             labels=[t.strip() for t in (f.get("System.Tags") or "").split(";") if t.strip()],
             sections=[(label, f.get(k)) for k, label in form if f.get(k)],
+            has_ac=bool(re.sub(r"<[^>]+>|&nbsp;", "", f.get("Microsoft.VSTS.Common.AcceptanceCriteria") or "").strip()),
             links=links, attachments=files,
             comments=[((c.get("createdBy") or {}).get("displayName", "?"), c.get("createdDate", "")[:16].replace("T", " "),
-                       c.get("renderedText") or c.get("text") or "") for c in comments.get("comments", [])],
+                       c.get("renderedText") or c.get("text") or "") for c in comments],
             comment_order="newest first",
             parent=parent and {"key": parent, "display": f"#{parent}", "type": p.get("System.WorkItemType", ""),
                                "title": p.get("System.Title", ""), "url": self.link(parent)},
@@ -599,7 +636,7 @@ class Ado(Board):
         m = re.match(r"vstfs:///Git/(PullRequestId|Commit)/[^%]+%2F([^%]+)%2F(.+)$", url, re.I)
         if not m:
             return url
-        repo = f"https://dev.azure.com/{self.org}/{self.project}/_git/{m.group(2)}"
+        repo = f"https://dev.azure.com/{urllib.parse.quote(self.org)}/{urllib.parse.quote(self.project)}/_git/{m.group(2)}"
         return f"{repo}/pullrequest/{m.group(3)}" if m.group(1).lower() == "pullrequestid" else f"{repo}/commit/{m.group(3)}"
 
     def image_ids(self, src):
@@ -624,6 +661,7 @@ class Jira(Board):
     def __init__(self, site, auth, ac_field=None):
         super().__init__(auth)
         self.site, self.ac_field = site, ac_field
+        self.hosts = (site.lower(),)
         self.root = f"https://{site}"
 
     def item(self, key):
@@ -649,10 +687,17 @@ class Jira(Board):
                           "", "", ""))
         files = [{"name": a.get("filename", "file"), "size": a.get("size") or 0, "url": a.get("content"),
                   "ids": {str(a.get("id"))}} for a in f.get("attachment") or []]
-        rendered = {c.get("id"): c for c in ((rf.get("comment") or {}).get("comments") or [])}
+        rendered = {c.get("id"): c.get("body") for c in ((rf.get("comment") or {}).get("comments") or [])}
+        raw = list((f.get("comment") or {}).get("comments") or [])
+        while len(raw) < ((f.get("comment") or {}).get("total") or 0):  # the issue carries only the first page
+            page = self.get(f"{self.root}/rest/api/3/issue/{urllib.parse.quote(key)}/comment?startAt={len(raw)}"
+                            "&maxResults=100&orderBy=created&expand=renderedBody").get("comments") or []
+            if not page:
+                break
+            raw += page
+            rendered.update({c.get("id"): c.get("renderedBody") for c in page})
         comments = [((c.get("author") or {}).get("displayName", "?"), str(c.get("created", ""))[:16].replace("T", " "),
-                     (rendered.get(c.get("id")) or {}).get("body") or "")
-                    for c in (f.get("comment") or {}).get("comments") or []]
+                     rendered.get(c.get("id")) or "") for c in raw]
         sprint = f.get(next((k for k, n in names.items() if n == "Sprint"), ""), None)
         sprint = ", ".join(s.get("name", "") for s in sprint) if isinstance(sprint, list) else None
         p = f.get("parent")
@@ -667,20 +712,32 @@ class Jira(Board):
                   ("Fix versions", ", ".join(v.get("name", "") for v in f.get("fixVersions") or [])),
                   ("Created", str(f.get("created", ""))[:16].replace("T", " "))],
             labels=f.get("labels") or [], sections=sections, links=links, attachments=files, comments=comments,
+            has_ac=bool(self.ac_field and re.sub(r"<[^>]+>|&nbsp;", "", rf.get(self.ac_field) or "").strip()),
             comment_order="oldest first",
             parent=p and {"key": p["key"], "display": p["key"], "url": f"{self.root}/browse/{p['key']}",
                           "type": ((p.get("fields") or {}).get("issuetype") or {}).get("name", ""),
                           "title": (p.get("fields") or {}).get("summary", "")},
             task_like=bool(itype.get("subtask")), raw=i)
 
+    def search(self, jql, fields, limit=None):
+        """Issues of a JQL search, page by page (each page hands the next one's token), at most `limit`."""
+        issues, token = [], None
+        while limit is None or len(issues) < limit:
+            data = self.get(f"{self.root}/rest/api/3/search/jql?jql={urllib.parse.quote(jql)}"
+                            f"&maxResults={100 if limit is None else limit - len(issues)}&fields={fields}"
+                            + (f"&nextPageToken={urllib.parse.quote(token)}" if token else ""))
+            issues += data.get("issues", [])
+            token = data.get("nextPageToken")
+            if not token or not data.get("issues"):
+                break
+        return issues
+
     def children(self, item):
-        jql = urllib.parse.quote(f"parent = {item.key} ORDER BY created ASC")
-        data = self.get(f"{self.root}/rest/api/3/search/jql?jql={jql}&maxResults=100"
-                        "&fields=summary,status,issuetype,assignee")
+        issues = self.search(f"parent = {item.key} ORDER BY created ASC", "summary,status,issuetype,assignee")
         return [(c["key"], f"[{c['key']}]({self.root}/browse/{c['key']})",
                  (c["fields"].get("issuetype") or {}).get("name", ""), c["fields"].get("summary", ""),
                  (c["fields"].get("status") or {}).get("name", ""), (c["fields"].get("assignee") or {}).get("displayName", ""))
-                for c in data.get("issues", [])]
+                for c in issues]
 
     def image_ids(self, src):
         return set(re.findall(r"/(?:attachment|thumbnail)/(?:content/)?(\d+)", src))
@@ -691,8 +748,7 @@ class Jira(Board):
         return f"{self.root}/rest/api/3/attachment/content/{m.group(1)}" if m else src
 
     def query(self, q, limit):
-        data = self.get(f"{self.root}/rest/api/3/search/jql?jql={urllib.parse.quote(q)}&maxResults={limit}&fields=key")
-        return [i["key"] for i in data.get("issues", [])][:limit]
+        return [i["key"] for i in self.search(q, "key", limit)][:limit]
 
     def whoami(self):
         return self.get(f"{self.root}/rest/api/3/myself").get("displayName", "?")
@@ -708,11 +764,14 @@ class Doc:
     """One ticket.md being built: shares the image counter across every item and comment written into it."""
 
     def __init__(self, board):
-        self.board, self.images, self.attachments = board, [], []
+        self.board, self.images, self.attachments, self.missed = board, [], [], []
         self.md = Markdown(self.on_image)
 
     def on_image(self, src):
-        self.images.append(self.board.absolute(src))
+        src = self.board.absolute(src)
+        if urllib.parse.urlparse(src).scheme not in ("http", "https", "data"):
+            return src  # file:, ftp: and the like are left as written, never opened
+        self.images.append(src)
         n = len(self.images)
         return f"images/{n}.__ext{n}__"
 
@@ -747,33 +806,46 @@ class Doc:
         return out
 
     def unique(self, name):
-        taken = {n for _, n in self.attachments}
+        taken = {n.lower() for _, n in self.attachments}  # Spec.pdf and spec.pdf are one file on macOS and Windows
         stem, dot, ext = name.rpartition(".")
         n, cand = 1, name
-        while cand in taken:
+        while cand.lower() in taken:
             n += 1
             cand = f"{stem}-{n}.{ext}" if dot else f"{name}-{n}"
         return cand
 
     def write(self, folder, text):
-        folder.mkdir(parents=True, exist_ok=True)
-        for sub in ("images", "attachments"):
-            d = folder / sub
-            if d.exists():
-                for old in d.iterdir():
-                    old.unlink()
-                d.rmdir()
+        # Download and check everything before the old copy is removed: a failed refresh leaves it whole.
+        # An image hotlinked from outside the board that is gone keeps its link instead of stopping the fetch;
+        # one on the board itself still fails, since that means a sign-in or network problem.
+        images = []
         for n, src in enumerate(self.images, 1):
-            data = self.board.get(src, raw=True)
+            external = urllib.parse.urlparse(src).netloc.lower() not in self.board.hosts
+            try:
+                data = self.board.download(src)
+            except Fail:
+                if not external:
+                    raise
+                data = b""
             ext = next((e for magic, e in IMAGE_TYPES if data.startswith(magic)), None)
+            if not ext and external:
+                self.missed.append(src.split("?")[0])
+                text = text.replace(f"images/{n}.__ext{n}__", src)
+                continue
             if not ext:
                 raise Fail(f"image {n} of {folder.name} is not an image (a sign-in page?): {src.split('?')[0]}")
+            images.append((n, data, ext))
+            text = text.replace(f"__ext{n}__", ext)
+        files = [(name, self.board.download(url)) for url, name in self.attachments]
+        folder.mkdir(parents=True, exist_ok=True)
+        for sub in ("images", "attachments"):
+            shutil.rmtree(folder / sub, ignore_errors=True)
+        for n, data, ext in images:
             (folder / "images").mkdir(exist_ok=True)
             (folder / "images" / f"{n}.{ext}").write_bytes(data)
-            text = text.replace(f"__ext{n}__", ext)
-        for url, name in self.attachments:
+        for name, data in files:
             (folder / "attachments").mkdir(exist_ok=True)
-            (folder / "attachments" / name).write_bytes(self.board.get(url, raw=True))
+            (folder / "attachments" / name).write_bytes(data)
         text = re.sub(r"(\n---\n)(\n---\n)+", r"\1", text)
         text = re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
         (folder / "ticket.md").write_text(text, encoding="utf-8")
@@ -803,7 +875,7 @@ def next_skill(item, types):
     if "debt" in words or "refactor" in words:
         return "code-refactor"
     if item.requirement:
-        has_ac = any("acceptance" in label.lower() for label, _ in item.sections)
+        has_ac = item.has_ac or any("acceptance" in label.lower() for label, _ in item.sections)
         text = re.sub(r"<[^>]+>", "", " ".join(f or "" for _, f in item.sections))
         return "story-runner" if has_ac or len(text.strip()) >= 300 else "brainstorm"
     return "?"
@@ -822,9 +894,22 @@ def fetch(board, key, out_root, with_parent=True, types=None):
     old = out_root / safe_name(parent.key) / "ticket.md" if parent else None
     keys = re.findall(r"^<!-- dk:ticket task=(\S+) -->$", old.read_text(encoding="utf-8"), re.M) if old and old.exists() else []
     keys = list(dict.fromkeys(keys + [t.key for t in new]))
-    if keys:
+    if parent:  # a story, also on its own: its children from the board are listed
         folder = out_root / safe_name(parent.key)
-        tasks = [next((t for t in new if t.key == k), None) or board.item(k) for k in keys]
+        tasks, gone, moved = [], [], []
+        for k in keys:
+            try:
+                t = next((t for t in new if t.key == k), None) or board.item(k)
+            except Fail as e:  # a task deleted on the board is dropped, not a reason to stop refreshing the story
+                if "HTTP 404" not in str(e):
+                    raise
+                gone.append(k)
+                continue
+            if not t.parent or t.parent["key"] != parent.key:  # moved or detached: it is no longer this story's scope
+                moved.append(f"{t.display} (now under {t.parent['display']})" if t.parent else f"{t.display} (now without a parent)")
+                continue
+            tasks.append(t)
+        keys = [t.key for t in tasks]
         parts = [header(board, parent, requested=tasks)] + doc.body(parent, 2)
         for t in tasks:
             meta = [("State", t.state), ("Assigned to", dict(t.meta).get("Assigned to") or dict(t.meta).get("Assignee")),
@@ -842,11 +927,18 @@ def fetch(board, key, out_root, with_parent=True, types=None):
             parts.append("\n".join(lines))
         path = doc.write(folder, "\n\n".join(parts))
         note = (f"{item.type} {item.display} is written into the file of {parent.type} {parent.display} "
-                f"(scope: {item.display})") if new else f"kept the attached tasks: {', '.join(t.display for t in tasks)}"
+                f"(scope: {item.display})") if new else (f"kept the attached tasks: {', '.join(t.display for t in tasks)}"
+                                                        if tasks else "")
+        for what, keys_out in (("not found on the board", gone), ("moved to another parent", moved)):
+            if keys_out:
+                note += f"{'; ' if note else ''}dropped, {what}: {', '.join(keys_out)}"
+        if doc.missed:
+            note += f"{'; ' if note else ''}images not downloaded, kept as links: {', '.join(doc.missed)}"
         n_com = len(parent.comments) + sum(len(t.comments) for t in tasks)
         return path, item, parent.type, len(doc.images), n_com, next_skill(parent, types), note
     path = doc.write(out_root / safe_name(item.key), "\n\n".join([header(board, item)] + doc.body(item, 2)))
-    return path, item, item.type, len(doc.images), len(item.comments), next_skill(item, types), ""
+    note = f"images not downloaded, kept as links: {', '.join(doc.missed)}" if doc.missed else ""
+    return path, item, item.type, len(doc.images), len(item.comments), next_skill(item, types), note
 
 
 def prepare_out(out):
@@ -1004,6 +1096,13 @@ def main(argv):
         code = commands[argv[0]](list(argv[1:]), read_config(), os.environ)
     except Fail as e:
         print(f"error: {e}", file=sys.stderr)
+        return 1
+    except UnicodeDecodeError as e:
+        print(f"error: a file is not UTF-8 ({e.reason} at byte {e.start}): save .dev-kit/config.yml or the old ticket.md "
+              "as UTF-8", file=sys.stderr)
+        return 1
+    except KeyError as e:
+        print(f"error: the board answered in an unexpected shape (no {e}): report it with the ticket link", file=sys.stderr)
         return 1
     except (SystemExit, ValueError):
         code = 2

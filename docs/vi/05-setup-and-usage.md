@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.2 review=human -->
+<!-- i18n: source=docs/en/05-setup-and-usage.md source_commit=v1.9.3 review=human -->
 [English](../en/05-setup-and-usage.md) | Tiếng Việt | [简体中文](../zh-CN/05-setup-and-usage.md) | [日本語](../ja/05-setup-and-usage.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/05-setup-and-usage.md](../en/05-setup-and-usage.md)) là bản chuẩn.
@@ -137,7 +137,7 @@ Use skill dk:bug-fixer for this card:
 
 **Output cần xem:**
 - `.dev-kit/reports/<name>.md`: đã làm gì, vì sao, các lệnh đã chạy và kết quả;
-- `.dev-kit/reports/pr-body.md`: nội dung PR đã soạn;
+- `.dev-kit/reports/pr-body.md`: nội dung PR đã soạn (chỉ khi GO);
 - `.dev-kit/specs/` (story): đặc biệt là mục **Decisions**, để xem agent đã chốt những gì;
 - các commit trên branch hiện tại. dev-kit không push và không mở PR.
 

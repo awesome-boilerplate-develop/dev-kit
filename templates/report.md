@@ -12,16 +12,17 @@
 ## Commands run
 | Command | Result |
 |---|---|
-| <check command> | <pass/fail, counts> |
+| <check command> | <PASS / FAIL: … / NOT RUN: …, counts; a failure listed in the baseline is PASS> |
 
 ## Review setup (required)
 - Diff: <merge-base sha>...<HEAD sha> (the range reviewed)
+- Tree: clean | uncommitted: <files> (the checks ran with them, not on HEAD: verdict NO-GO)
 - Depth: <self | one | four> — reason: <the C2 trigger or "small diff: N files, M lines">
 - Graph: <detect-changes summary: risk, test gaps, untested functions> | "detect-changes failed: <error>" | "no .code-review-graph/ index"
 - Standards applied: <ids, e.g. review/finding-quality> | none
 
 ## Review
-Verdict: GO | NO-GO (from open **certain** blockers only)
+Verdict: GO | NO-GO (from open **certain** blockers, checks that FAIL or did NOT RUN, and uncommitted changes)
 
 ### Certain findings
 | Severity | Conf. | file:line | Finding (what, when it happens, impact, fix) | Rule | Status |

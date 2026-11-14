@@ -19,8 +19,8 @@ dev-kit/
 ├── agents/                 # review subagent personas: security-auditor, test-engineer
 ├── harness/                # per-CLI tool notes (Codex, Copilot, agy, OpenCode, omp)
 ├── rules/RULES.md          # the rule set: status + evidence
-├── templates/              # spec.md, report.md, config.yml, dogfood-log.md
-├── scripts/                # check_parts.py, check_report.py, check_standards.py, bump_version.py, install-graph-tools.sh
+├── templates/              # spec.md, report.md, config.yml, baseline.md, standard.md, dogfood-log.md
+├── scripts/                # check_*.py, bump_version.py, ticket.py, test_*.py, install-graph-tools.sh
 ├── UPSTREAM.md  LICENSES/  CHANGELOG.md  README.md  docs/
 ```
 
@@ -40,7 +40,7 @@ flowchart LR
 ### Controller
 
 - A real skill, with `name` and `description` in the frontmatter. Claude Code loads only the description when a session opens.
-- Very thin: about 20 lines per file, made of 4 shared blocks (Parts, Rules, Commands, Report) and 4–5 steps of its own.
+- Thin: 40–65 lines per file, made of shared blocks (Harness, Parts, Rules, Commands, Graph, Standards, Output) and 4–6 steps of its own.
 - Works directly in the main session by default. It reads a part or spawns a subagent only when a step or a rule asks for it.
 
 ### Part
@@ -93,7 +93,7 @@ The persona agents `dk:security-auditor` and `dk:test-engineer` (agent-skills) a
 | `.dev-kit/plans/` | story-runner/code-refactor (large work) | Plan per `writing-plans` |
 | `.dev-kit/reports/<name>.md` | every controller | Report per `templates/report.md`: what changed, why, tests, commands run, review table, open questions |
 | `.dev-kit/sdd/<plan>/` | subagent-driven development (large work) | Ledger, per-task briefs, review packets |
-| `.dev-kit/reports/pr-body.md` | pre-pr-check | PR body: Summary / Evidence / Merge Danger |
+| `.dev-kit/reports/pr-body.md` | pre-pr-check, on GO | PR body: Summary / Evidence / Merge Danger |
 | `.dev-kit/GLOSSARY.md`, `.dev-kit/adr/` | the `domain-modeling` part | New terms and decisions; the project's own `GLOSSARY.md` and `docs/adr/` are read, and changes to them are proposed to you |
 | `.dev-kit/CONSTRAINTS.md` | the `constraint-driven-development` part (optional) | Your quality bar; `pre-pr-check` checks the diff against it. A project `CONSTRAINTS.md` at the root is read instead |
 

@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.9.2 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=cfbbf72 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -10,7 +10,7 @@
 | 块 | 含义 |
 |---|---|
 | **Parts** | 只有当某个步骤提到某个 part 时才去读它；part 不是 skill |
-| **Rules** | 应用 `rules/RULES.md` 中开启的 rule：F1、F2、C1、C2、G1、S1、O1（[04](../en/04-rules.md)，英文） |
+| **Rules** | 应用 `rules/RULES.md` 中开启的 rule：F1、F2、C1、C2、G1、T1、S1、O1，pre-pr-check 中还有 R1（[04](../en/04-rules.md)，英文） |
 | **Graph** | 如果仓库有 codegraph/CRG 索引，按 rule G1 使用；没有则跳过 |
 | **Commands** | 如果存在 `.dev-kit/config.yml`，从中取检查命令和基础分支；否则使用 `make check` 或仓库的测试命令，以及 `main` |
 | **Outputs** | 一切都写入 `.dev-kit/`（rule O1）；最后按 `templates/report.md` 出一份报告；严重程度使用 blocker/major/minor 分级（rule S1） |
@@ -32,7 +32,7 @@
 
 **步骤与问题，按顺序：**
 1. **Graph 工具：** 用 `scripts/install-graph-tools.sh --check` 检查。*仅在缺失时提问：* 是否安装？如果你拒绝，则继续，并写 “G1 off”。它绝不运行 `codegraph install` 或 `code-review-graph install`（这两个命令会注册 MCP、hook 和指令文件）。
-2. **个人设置：** 如果之前某个仓库在 `~/.dev-kit/config.yml` 中保存了团队 standards 文件夹，就读取它。
+2. **个人设置：** 目前没有；dev-kit 按仓库逐个设置。
 3. **探查，不提问：** 命令、基础分支、技术栈、linter 已经强制执行的内容、`.dev-kit/` 下已被跟踪的文件、项目自己的 `GLOSSARY.md`、`docs/adr/`、`CONSTRAINTS.md`。
 4. *提问：* **命令和基础分支**（确认或更正）。基础分支会与近期 PR 合并进去的分支对照，而不只看 `origin/HEAD`；两者不同时会作为选项提问，并附上提交日期和相差的提交数。然后它创建 `.dev-kit/`，放入内容为 `*` 的 `.gitignore`，并写入 `config.yml`。
 5. *提问：* **graph 索引**（默认是；预期占用约为每个被索引文件 0.16 MB 和 0.6 MB，实测约 850 个文件为 136 MB 和 529 MB）。仍出现在 `git status` 中的索引文件夹（codegraph 会保留它自己的、可见的 `.gitignore`）会加入仓库的 exclude 文件（`git rev-parse --git-path info/exclude`，所有 worktree 共用）；`.dev-kit/` 从不加入该文件。 然后是*提问：* **快速还是详细设置**（针对 standards）：快速（Recommended）由 agent 自己采用每一行 Recommended，只问一次，并把要写入的全部内容读回一次，形式为清单：Recommended 的条目已勾选（☑），其余未勾选（☐）；你可以用 `+ID`/`-ID` 修改（ID 与其他文件重复时用 `file#ID`），或在每个 kit 文件一个的多选表单中修改，勾选某一条即切换它的状态；详细则逐组提问，包括你自己约定的循环和 `CONSTRAINTS.md` 问题。baseline 为红时两种模式都会问。规范：[`skills/init/references/quick-setup.md`](../../skills/init/references/quick-setup.md)；运行记录（英文）：[1.6.0](../en/06-evidence.md#quick-setup-and-not-offered-items-on-omp-dev-kit-160)、[1.7.0](../en/06-evidence.md#pre-ticked-checklist-and-tick-forms-on-omp-dev-kit-170)。
@@ -86,7 +86,7 @@
 **步骤：**
 1. **复现并找到根因。** 对于难的 bug 或性能 bug，读取 `systematic-debugging` 或 `diagnosing-bugs` part 并照做。
 2. **写一个回归测试**，使其因正确的原因而失败 → 在根因处修复 → 测试变绿。
-3. **运行检查命令。** 提交；commit message 要写明根因。
+3. **运行检查命令。** 在 feature 分支上提交（若在基础分支上，先创建一个）；commit message 要写明根因。
 4. **运行 `dk:pre-pr-check`。**
 
 **输出：** 一个带测试的修复 commit、一份报告、pre-pr-check 的结果。
@@ -110,11 +110,11 @@ flowchart LR
 **使用场景：** 功能/story 工单。
 
 **步骤：**
-1. **澄清。** 如果工单含糊不清，读取 `grilling` part，一次问你一个问题。如果有新的业务术语，也读取 `domain-modeling` part。只有在没有人能回答时（headless 运行），它才自己选一个合理的方案，并标记为 assumption。
+1. **澄清。** 如果工单含糊不清，读取 `grilling` part，按轮次提问：当前能问的所有问题，编号，每个都附推荐答案。如果有新的业务术语，也读取 `domain-modeling` part。只有在没有人能回答时（headless 运行），它才自己选一个合理的方案，并标记为 assumption。
 2. **写 spec** `.dev-kit/specs/<feature>.md`，按 `templates/spec.md`：目标、rule、接口、验收标准、范围之外，以及一个 **Decisions** 部分（问题、答案、谁决定，或 “assumption”）。
 3. **遵循 rule C1：**
-   - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit。
-   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch`（合并回你正在工作的分支；不 push/不开 PR）。
+   - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit，提交在 feature 分支上：若在基础分支上，第一次提交前先创建分支，因为 `<base>...HEAD` 为空时 pre-pr-check 没有可审查的内容。
+   - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development`，在 SDD 自己的 finishing 步骤之前停下。第 4 步的 `dk:pre-pr-check` 在 worktree 中的 feature 分支上、合并之前运行；只有 GO 时 `finishing-a-development-branch` 才给出选项（合并、PR、保留分支）由你选择；无人回答时保留分支。
 4. **运行 `dk:pre-pr-check`。**
 
 ```mermaid
@@ -123,9 +123,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **示例（示意）：** 工单“顾客在结账时输入折扣码”。
@@ -142,7 +143,7 @@ flowchart TD
 **步骤：**
 1. **确定新的接口。** 如果边界不清楚，读取 `codebase-design` part。
 2. **先写 characterization test**，在公共接口上，针对每种输入固定当前行为。看起来像 bug 的行为也要固定：在报告中记为 “suspect bug”，并且在重构期间**不要修复**它。
-3. **遵循 rule C1：** 小型工作在 session 内小步移动，每步之后检查，每步提交。大型工作则像 story-runner 那样使用 SDD 的 part。
+3. **遵循 rule C1：** 小型工作在 session 内小步移动，每步之后检查，每步提交（在 feature 分支上；若在基础分支上则先创建）。大型工作则像 story-runner 那样使用 SDD 的 part。
 4. **运行 `dk:pre-pr-check`。** review 会检查“没有行为变化”以及你确定的接口。
 
 **为什么连看起来像 bug 的行为也要固定：** 在 lab 中，一张重构工单是通过在 300 个随机输入上比较前后行为来评分的。如果你在重构期间“顺手修个 bug”，行为就变了，reviewer 无法分辨哪部分是重构，哪部分是 bug 修复。
@@ -153,10 +154,10 @@ flowchart TD
 
 **使用场景：** 分支完成，即将开 PR。其他三个 controller 会在结束时自动调用它；你也可以直接对一个由人写的分支调用它。
 
-**Report-only 模式：** 如果请求里说“不要修改代码”，它不会编辑任何文件，并跳过第 4 步。
+**Report-only 模式：** 如果请求里说“不要修改代码”，它不会修改 `.dev-kit/` 以外的任何文件，并跳过第 4 步；它仍会写报告，并在 NO-GO 时删除旧的 PR body。
 
 **步骤：**
-1. **立即运行检查命令**，并把输出保留为 Evidence。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
+1. **立即运行检查命令**，并把输出保留为 Evidence。diff 为空（就在 base 分支上，或已合并）则停止：没有可 review 的内容，也没有 verdict。review 针对 HEAD；未提交的修改保持不动并在 report 中列出；此时 checks 是在这些修改上而非 HEAD 上运行的，所以在你提交之前 verdict 为 NO-GO；存在这些修改时，修复之前会先询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
 2. **按 rule C2 选择 review 级别：**
 
    | 级别 | 何时 | 做什么 |
@@ -166,9 +167,9 @@ flowchart TD
    | 4 个 reviewer | 你要求，或 diff 涉及 auth/权限、secret、个人数据、migration、config/env | 并行：2 个 `code-review` reviewer（各负责一个轴）、`dk:security-auditor`、`dk:test-engineer` |
 
    每个 reviewer 都会收到 diff 范围和 spec/issue 文本，并返回 `file:line | blocker/major/minor | reason`。
-3. **把结果合并**成一张按 blocker/major/minor 分级的表。只要还有任何 blocker 未解决，就是 `Verdict: NO-GO`；否则是 `GO`。
-4. **如果有 blocker：** 读取 `receiving-code-review` part，用证据修复（或附理由反驳），然后回到第 1 步。最多 2 轮。
-5. **附带 findings 表出报告。** 除非是 report-only 模式，否则按 `pr` part 写入 `.dev-kit/reports/pr-body.md`（Summary / Evidence / Merge Danger），其中 Evidence 是第 1 步的输出。
+3. **把结果合并**成一张按 blocker/major/minor 分级的表。只要还有任何 blocker 未解决，或有 check 失败，就是 `Verdict: NO-GO`；否则是 `GO`。
+4. **如果有 blocker：** 读取 `receiving-code-review` part，用证据修复（或附理由反驳），每个修复单独提交，然后回到第 1 步。最多 2 轮。
+5. **附带 findings 表出报告。** 在 GO 且不是 report-only 模式时，按 `pr` part 写入 `.dev-kit/reports/pr-body.md`（Summary / Evidence / Merge Danger），其中 Evidence 是第 1 步的输出。
 
 **示例（示意）：** 一个“部分退款”分支涉及权限和个人数据，所以运行 4 个 reviewer。结果是 NO-GO，blocker 如下：
 - 非员工角色仍然可以发起退款；
@@ -218,7 +219,7 @@ flowchart LR
 
 **步骤：**
 1. **看板设置：** 完整链接直接拉取；之后如果 `.dev-kit/config.yml` 还没有 `ticket:` 部分，就按链接写入并告诉你。
-2. **凭据：** `scripts/ticket.py check`；Jira 使用你在自己终端里用 `ticket.py login jira` 保存的 API token，Azure DevOps 使用 `az login`（或 PAT）。
+2. **凭据：** `scripts/ticket.py check`；Jira 使用你在自己终端里用 `ticket.py login jira` 保存的 API token，Azure DevOps 使用 `az login`（或 PAT）。 链接指向看板之外的图片不带 token 下载；不拦截内部地址（localhost、局域网）。
 3. 按链接或 key **拉取**，或用根据你的话写出的 JQL / WIQL **查询**。每个 ticket 保留看板显示的内容：按真实表单顺序排列的各部分（会读取 Azure DevOps 的表单布局，因为各组织会自定义表单）、原位置的图片、链接（相关条目、PR、commit）、附件，以及按看板顺序的评论。story 下的 Task 或 Sub-task 会写进 story 的文件：在 story 内容之后有自己的一节，并附上 story 的子项。
 4. 按需**翻译**（`ticket.<lang>.md`，原文仍是准据；ticket 变化后译文会被标记为过期）。
 5. **下一个 skill：** Bug → `dk:bug-fixer`，story → `dk:story-runner`（太简略时先 `dk:brainstorm`），技术债 → `dk:code-refactor`，其他情况会询问；`ticket.types` 可覆盖。单个 ticket 时，它会提议以该文件作为卡片直接运行。

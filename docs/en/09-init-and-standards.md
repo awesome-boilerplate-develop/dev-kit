@@ -129,7 +129,7 @@ For `experimental`, `dk:init` suggests the file but does not pre-tick it. For `v
 | `story-runner`: spec, plan | architecture, api, data, security | Design |
 | Writing code (`story-runner`, `bug-fixer`, `code-refactor`) | coding, testing, ui, api, security | Implement |
 | `pre-pr-check`: every reviewer | `review/finding-quality` | (all) |
-| `pre-pr-check`: Standards reviewer | coding, architecture, process | Review, Do not flag, Severity |
+| `pre-pr-check`: Standards reviewer | coding, architecture, process, ops | Review, Do not flag, Severity |
 | `pre-pr-check`: Spec reviewer | api, ui, data | Review, Do not flag, Severity |
 | `pre-pr-check`: `security-auditor` | security | Review, Do not flag, Severity |
 | `pre-pr-check`: `test-engineer` | testing | Review, Do not flag, Severity |

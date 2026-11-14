@@ -30,7 +30,7 @@
 
 ## 8.4 Questions for you to decide
 
-1. **Main host:** Claude Code or omp? This decides how codegraph is wired in and how subagents are spawned.
+1. ~~**Main host:** Claude Code or omp?~~ Decided: Claude Code is the reference harness; the other CLIs load the same kit through their `harness/<cli>.md`.
 2. **Specs:** keep them as local files or push them to a tracker?
 3. ~~**`.dev-kit/`:** which parts to commit and which to ignore?~~ Decided in 1.1.0: dev-kit is personal and nothing in `.dev-kit/` is committed. A shared team mode is an idea for later (8.5).
 4. **Artifacts:** write them in Vietnamese, or in the language of the card?
@@ -42,7 +42,7 @@
 
 The current focus is one repo at a time: `dk:init` writes everything to that repo's `.dev-kit/standards/` (1.4.3). The next step, once single-repo use is solid, is to let one developer reuse rules across their own repos of the same product (for example several micro-frontends that share a control library and permission conventions).
 
-What already exists: the five controllers load every `*.md` under `standards.team` in `.dev-kit/config.yml` (rule T1), so a folder set by hand already works; `dk:init` just does not offer it.
+What already exists: the four controllers load every `*.md` under `standards.team` in `.dev-kit/config.yml` (rule T1), so a folder set by hand already works; `dk:init` just does not offer it.
 
 What it would add:
 - **Label:** call the layer "shared across your repos" on screen rather than "team".

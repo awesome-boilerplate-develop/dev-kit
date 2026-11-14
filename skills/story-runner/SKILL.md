@@ -19,6 +19,8 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 
 **Standards (rule T1).** Load the standards that apply: kit files listed in `.dev-kit/config.yml` → `standards.kit` (each `<id>` is `${CLAUDE_PLUGIN_ROOT}/standards/<id>.md`), every `*.md` under the team folder `standards.team` and under `.dev-kit/standards/`; skip ids in `standards.disable`, and skip files whose `applies_to` matches none of the files you will touch. On conflict: project > team > kit. While planning apply `## Design`; while writing code apply `## Implement`. List the standards you applied in the report. An id in `standards.kit` or `standards.disable` that matches no file (a renamed or removed kit file) is named under the standards in the report, not skipped silently. No config or no files → skip.
 
+**Branch.** Before the first commit, if HEAD is on `main` or detached, create a feature branch (`git switch -c <short-name>`) and commit there; never commit on `main`: `dk:pre-pr-check` reviews `main...HEAD`, which would then be empty, so the work would get no review and no verdict. Large work gets its branch from part `using-git-worktrees`.
+
 ## Output
 
 **Outputs** (rule O1). Everything this skill writes goes under `.dev-kit/`. Finish with `.dev-kit/reports/<short-name>.md` filled from `${CLAUDE_PLUGIN_ROOT}/templates/report.md`; keep it short, it is for a human reader. Severities use the dev-kit scale `blocker` / `major` / `minor` (rule S1). Run subagents in the foreground and wait for them in this turn; never schedule wakeups, loops or background waits (rule F2). End the final reply with: what was done, the verdict, and the report path.
@@ -27,7 +29,7 @@ description: Deliver a feature/story card. Use when a kanban story must be clari
 
 ### 1. Clarify
 - If `.dev-kit/specs/<feature>.md` already has `Status: agreed` (written by `dk:brainstorm`), use it and go to step 3.
-- If the card is ambiguous, Read part `grilling` and resolve the questions with the user, one at a time.
+- If the card is ambiguous, Read part `grilling` and resolve the questions with the user in its rounds: the whole frontier per message, each question numbered with a recommended answer.
 - If the story introduces new domain terms, also Read part `domain-modeling`.
 - When no one can answer (headless run), choose the most reasonable option and mark it as an assumption.
 
@@ -37,7 +39,8 @@ Write the spec to `.dev-kit/specs/<feature>.md` from `${CLAUDE_PLUGIN_ROOT}/temp
 ### 3. Implement
 Rule C1 (G1: playbook §2/§3 when the story changes existing code; §6 for large work):
 - small work → implement here, test first, commit per behaviour.
-- Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`, `finishing-a-development-branch` (merge back locally, no push/PR).
+- Large work → parts `writing-plans`, `using-git-worktrees`, `subagent-driven-development`; stop SDD before its `finishing-a-development-branch` step: the gate in step 4 comes first.
 
 ### 4. Pre-PR check
 Run skill `dk:pre-pr-check`, also for a small diff: do not review the diff yourself instead. Its step 3 already picks self-review for a small diff, and its step 6 runs `check_report.py`, which a review of your own skips.
+- Large work: run it in the worktree, on the feature branch, before anything is merged. Then copy its report (and `pr-body.md` on GO) to `.dev-kit/reports/` of the main checkout. On GO, part `finishing-a-development-branch`: present its options, the choice is the user's; with no one to answer, keep the branch (its option 3) and name it. On NO-GO, leave the branch unmerged and say so.

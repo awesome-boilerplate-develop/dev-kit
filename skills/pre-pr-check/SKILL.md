@@ -25,10 +25,12 @@ description: Final gate before a PR. Use when a branch is finished and must be v
 
 ## Steps
 
-**Mode.** If the request says not to change code, run *report-only*: never edit files, skip step 5.
+**Mode.** If the request says not to change code, run *report-only*: never edit files outside `.dev-kit/` and skip step 5; the report is still written, and a stale `pr-body.md` is still deleted on NO-GO.
 
 ### 1. Checks and a lowered bar
-- Run the check command now; keep the output as Evidence.
+- `git diff --shortstat main...HEAD` is empty (on `main` itself, or the work is already merged) → stop: nothing to review, so no review, no report and no verdict; say so in the final reply.
+- The review and report cover HEAD. Run `git status --porcelain` first: changes outside `.dev-kit/` are not in HEAD. Never stash, commit or discard them; go on, and name them on the Tree line of Review setup. The checks run with them, so they say nothing about HEAD: the verdict is NO-GO until the changes are committed (or set aside by the user) and the checks run again.
+- Run the check command now; keep the output as Evidence. A check that fails outside the baseline, or cannot run, goes in Commands run as `FAIL: …` or `NOT RUN: …`. It is not a finding (R6 drops what CI catches): it makes the verdict NO-GO on its own.
 - Look at `git diff main...HEAD` for a lowered bar: new skips, suppressions, deleted asserts, weakened thresholds.
 - If `.dev-kit/CONSTRAINTS.md` (or the project's own `CONSTRAINTS.md`) exists, also check the diff against its floor and numbered rules; a change that breaks one is a blocker.
 
@@ -44,20 +46,20 @@ Run `git diff --shortstat main...HEAD` and list the touched files; pick the dept
 - *Four reviewers* (one turn, in parallel): two general-purpose subagents with part `code-review` in the roles "Standards axis only" and "Spec axis only", plus `dk:security-auditor` and `dk:test-engineer`.
 
 Every reviewer (and you, in self-review) gets: the diff range, the spec (`.dev-kit/specs/…` or the issue text), the step-2 graph summary, `${CLAUDE_PLUGIN_ROOT}/standards/review/finding-quality.md` (rule R1), and the loaded standards (rule T1) whose `topic` belongs to its role, as paths, with the instruction to apply their `## Review`, `## Do not flag` and `## Severity` sections and cite rule ids:
-- Standards reviewer: coding, architecture, process · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing.
+- Standards reviewer: coding, architecture, process, ops · Spec reviewer: api, ui, data · `dk:security-auditor`: security · `dk:test-engineer`: testing · every reviewer: review (team and project review checks).
 - One reviewer or self-review: all loaded topics. Reviewers return findings as `file:line | severity | confidence 0–100 | when it happens | rule id or — | finding`.
 
 ### 4. Merge and gate
 - Deduplicate by location and defect.
 - Drop findings that fail any condition of `finding-quality` (R1–R7) or have confidence < 50.
 - Split the rest into **certain** (≥ 80) and **suspect** (50–79). Map other severity labels with rule S1.
-- Any open certain `blocker` → `Verdict: NO-GO`; otherwise `Verdict: GO`.
+- Any open certain `blocker`, a check that is `FAIL` / `NOT RUN` in step 1, or uncommitted changes on the Tree line → `Verdict: NO-GO`; otherwise `Verdict: GO`.
 
 ### 5. Fix certain blockers
-Certain blockers: Read part `receiving-code-review`, fix with evidence (or push back with reasons), back to step 1 (max 2 rounds).
+Certain blockers and failing checks. If step 1 found uncommitted changes, ask the user before fixing (a fix commit could take theirs along); with no one to answer, fix nothing and leave the verdict as it is. Read part `receiving-code-review`, fix with evidence (or push back with reasons), commit each fix (only the files you changed) so the next round checks and reviews HEAD, back to step 1 (max 2 rounds).
 
 ### 6. Report and PR body
 - Report from the template, including the required **Review setup** section; its Diff line is `git merge-base main HEAD`...`git rev-parse HEAD`, taken when you write the report.
 - Write it after the last commit of the work: a later commit outside `.dev-kit/` makes the report stale.
 - Then run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_report.py <report path> --base main` from the repo root; if it prints FAIL lines, fix the report (move, drop or re-tier findings; fix the verdict) and run it again until it prints OK (at most 3 tries; if still failing, say so in the final reply).
-- Unless report-only, a PR body in `.dev-kit/reports/pr-body.md`, following part `pr` (Summary / Evidence / Merge Danger; Evidence = the check output from step 1).
+- On GO and unless report-only, a PR body in `.dev-kit/reports/pr-body.md`; on NO-GO write none and delete an earlier one (there is no PR to open). The PR body follows part `pr` (Summary / Evidence / Merge Danger; Evidence = the check output from step 1).

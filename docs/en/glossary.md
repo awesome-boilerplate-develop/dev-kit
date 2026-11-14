@@ -10,7 +10,7 @@ English | [Tiếng Việt](../vi/glossary.md) | [简体中文](../zh-CN/glossary
 | **Baseline** | The same model with no skill set installed; the reference point for comparison in the lab |
 | **SDD** (subagent-driven development) | The Superpowers way of working: split a plan into tasks, spawn a subagent for each task and a subagent to review each task; a ledger lets the run resume |
 | **Worktree** | A separate git working directory for a branch, so large work does not touch the main directory |
-| **Grilling** | Matt Pocock's way of clarifying requirements: ask one question at a time, following the tree of design decisions |
+| **Grilling** | Matt Pocock's way of clarifying requirements: ask in rounds (every question you can ask now, numbered, with a recommended answer), following the tree of design decisions |
 | **Characterization test** | A test that pins current behavior before a refactor, including behavior that looks like a bug |
 | **Pre-PR / final gate** | The check before opening a PR: run checks, look for lowered-standard signs, review, and give a GO/NO-GO verdict |
 | **Lowered standard** | A "pass quickly" shortcut: skipping a test, adding `noqa`/`ts-ignore`, deleting an assert, lowering a threshold |

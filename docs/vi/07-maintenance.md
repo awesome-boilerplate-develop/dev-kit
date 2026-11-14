@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.9.2 review=human -->
+<!-- i18n: source=docs/en/07-maintenance.md source_commit=v1.9.3 review=human -->
 [English](../en/07-maintenance.md) | Tiếng Việt
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh là bản chính thức. Xem [bản tiếng Anh](../en/07-maintenance.md).
@@ -63,7 +63,7 @@ Cả ba nguồn đều là MIT. Các file LICENSE gốc nằm trong [`LICENSES/`
 
 Làm theo Superpowers v7.0.0: một bộ `skills/`, mỗi CLI một manifest, khác biệt nằm trong `harness/<cli>.md`. Không tách nội dung controller theo CLI.
 
-- **Thêm một CLI mới:** thêm manifest (nếu CLI có định dạng plugin), thêm một dòng vào `.version-bump.json`, viết `harness/<cli>.md`, và thêm tên CLI vào đoạn Harness của 5 controller.
+- **Thêm một CLI mới:** thêm manifest (nếu CLI có định dạng plugin), thêm một dòng vào `.version-bump.json`, viết `harness/<cli>.md`, và thêm tên CLI vào đoạn Harness của 7 skill (`skills/*/SKILL.md`).
 - **Kiểm sau khi đổi controller hoặc khi CLI ra bản lớn:** cài kit, rồi bảo agent nạp `pre-pr-check` và chỉ làm theo đoạn Harness, và trả về thư mục kit, dòng đầu của `rules/RULES.md`, file ghi chú đã đọc, và tên công cụ subagent. Đạt khi cả bốn đều đúng.
 - **Ba điều không được làm,** rút ra từ ADR 0002 của mattpocock/skills và một lần thử ngày 2026-10-14:
   - đưa `parts/` vào trong `skills/`: Codex dò skill đệ quy, nên part sẽ thành skill và tốn context lúc mở phiên;

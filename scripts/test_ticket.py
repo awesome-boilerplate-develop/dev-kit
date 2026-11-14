@@ -95,6 +95,10 @@ class Settings(unittest.TestCase):
                          "  tenant:\n  types: { Bug: bug-fixer, Tech Debt: code-refactor }\nbase_branch: main\n")
             self.assertEqual(ticket.read_config(p), {"provider": "jira", "site": "a.atlassian.net",
                                                      "types": {"Bug": "bug-fixer", "Tech Debt": "code-refactor"}})
+            p.write_text("ticket:\n  provider: jira\n  types:\n    Bug: bug-fixer   # fixes\n    Tech Debt: code-refactor\n"
+                         "  site: a.atlassian.net\nbase_branch: main\n")
+            self.assertEqual(ticket.read_config(p), {"provider": "jira", "site": "a.atlassian.net",
+                                                     "types": {"Bug": "bug-fixer", "Tech Debt": "code-refactor"}})
 
 
 class Credentials(unittest.TestCase):
@@ -114,6 +118,15 @@ class Credentials(unittest.TestCase):
         self.assertEqual(set(ticket.load_credentials()), {"jira:a.atlassian.net", "azure:org"})
         if os.name == "posix":
             self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
+
+    @unittest.skipUnless(os.name == "posix", "file modes")
+    def test_token_is_owner_only_while_written(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.with_suffix(".tmp").write_text("old")
+        self.path.with_suffix(".tmp").chmod(0o644)  # a leftover copy from a run that died
+        with mock.patch.object(ticket.os, "chmod", lambda *a: None):  # created 600, not opened up and then narrowed
+            ticket.save_credential("azure:org", {"type": "pat", "key": "p"})
+        self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
 
     def test_lookup_order(self):
         ticket.save_credential("jira:a.atlassian.net", {"type": "api_key", "email": "file", "key": "k"})
@@ -139,6 +152,13 @@ class Credentials(unittest.TestCase):
         with mock.patch.object(ticket.subprocess, "run", return_value=done):
             with self.assertRaisesRegex(ticket.Fail, "az login --tenant t-mine"):
                 ticket.az_token("t-mine")
+
+    def test_unconfirmed_tenant_gets_no_token(self):
+        for shown in (mock.Mock(returncode=1, stdout="", stderr="Please run 'az login'"), mock.Mock(returncode=0, stdout="\n")):
+            with mock.patch.object(ticket.subprocess, "run", return_value=shown) as run:
+                with self.assertRaisesRegex(ticket.Fail, "could not confirm .* az login --tenant t-mine"):
+                    ticket.az_token("t-mine")
+            self.assertEqual(run.call_count, 1)  # get-access-token is never asked
 
 
 class Fake:
@@ -286,6 +306,19 @@ class AdoFetch(unittest.TestCase):
         self.assertIn("| [#100](100/ticket.md) | Bug | Drug name issues | Active | dk:bug-fixer |", index)
         self.assertEqual(self.fake.calls[0][1], {"query": "SELECT 1"})
 
+    def test_comments_rendered_and_every_page(self):
+        pages = {"": {"comments": [{"createdDate": "2026-10-03T00:00:00Z", "renderedText": "<ol><li>first</li></ol>",
+                                    "text": "1. first"}], "continuationToken": "p2"},
+                 "p2": {"comments": [{"createdDate": "2026-09-01T00:00:00Z", "renderedText": "<p>page two</p>"}]}}
+        self.fake.routes.insert(0, (r"/workItems/100/comments\?(?:.*continuationToken=(\w+))?",
+                                    lambda m: pages[m.group(1) or ""]))
+        path, *_, n_com, _, _ = ticket.fetch(self.board, "100", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertEqual(n_com, 2)
+        self.assertIn("1. first", text)
+        self.assertIn("page two", text)
+        self.assertTrue(all("$expand=renderedText" in u for u, _ in self.fake.calls if "/comments" in u))
+
 
 def jira_routes():
     site = "https://acme.atlassian.net"
@@ -327,7 +360,8 @@ class JiraFetch(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
         self.out = pathlib.Path(self.dir.name)
-        self.patch = mock.patch.object(ticket, "request", Fake(jira_routes()))
+        self.fake = Fake(jira_routes())
+        self.patch = mock.patch.object(ticket, "request", self.fake)
         self.patch.start()
         self.board = ticket.Jira("acme.atlassian.net", ticket.Auth("Basic x"), "customfield_100")
 
@@ -342,7 +376,9 @@ class JiraFetch(unittest.TestCase):
         self.assertNotIn("[shot.png]", text)  # shown in a comment, which is converted before the attachments list
         self.assertLess(text.index("second"), text.index("images/2.png"))
         self.assertEqual(re.findall(r"^## (.+)$", text, re.M),
-                         ["Description", "Acceptance Criteria", "Links", "Attachments", "Comments (2, oldest first)"])
+                         ["Description", "Acceptance Criteria", "Links", "Attachments", "Comments (2, oldest first)",
+                          "Children (from the board)"])
+        self.assertIn("| [PROJ-3](https://acme.atlassian.net/browse/PROJ-3) | Sub-task | FE | To Do |", text)  # fetched alone
         self.assertIn("- **Sprint:** Sprint 5", text)
         self.assertIn("| blocks | [PROJ-2](https://acme.atlassian.net/browse/PROJ-2) | Story | Pay | To Do |", text)
         self.assertIn("[PR 1](https://git.example/pr/1)", text)
@@ -359,10 +395,91 @@ class JiraFetch(unittest.TestCase):
         self.assertIn("### Description\n\nDo the FE part", text)
         self.assertIn("| [PROJ-3](https://acme.atlassian.net/browse/PROJ-3) (in this file) | Sub-task | FE | To Do |", text)
 
+    def test_comments_beyond_the_first_page(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))  # the issue route's answer
+        issue["fields"]["comment"]["total"] = 3  # two of three comments come with the issue
+        self.fake.routes.insert(0, (r"/issue/PROJ-1/comment\?startAt=2", {"comments": [
+            {"id": "3", "author": {"displayName": "Di"}, "created": "2026-01-03T10:00:00.000+0000", "renderedBody": "<p>third</p>"}]}))
+        path, *_, n_com, _, _ = ticket.fetch(self.board, "PROJ-1", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertEqual(n_com, 3)
+        self.assertLess(text.index("second"), text.index("third"))
+
+    def test_query_follows_next_page_token(self):
+        pages = {"": {"issues": [{"key": "A-1"}], "nextPageToken": "t2"}, "t2": {"issues": [{"key": "A-2"}, {"key": "A-3"}]}}
+        self.fake.routes.insert(0, (r"/search/jql\?jql=project.*?(?:nextPageToken=(\w+))?$", lambda m: pages[m.group(1) or ""]))
+        self.assertEqual(self.board.query("project = A", 2), ["A-1", "A-2"])
+        self.assertEqual(self.board.query("project = A", 10), ["A-1", "A-2", "A-3"])
+
+    def test_deleted_task_is_dropped_from_the_story(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        self.fake.routes.insert(0, (r"/issue/PROJ-3\?", lambda m: (_ for _ in ()).throw(ticket.Fail("not found (HTTP 404): x"))))
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, not found on the board: PROJ-3", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_task_moved_to_another_story_is_dropped(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        task = self.fake.routes[4][1](re.search(r"(PROJ-3)", "PROJ-3"))
+        task["fields"]["parent"] = {"key": "PROJ-9", "fields": {"summary": "Other", "issuetype": {"name": "Story"}}}
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, moved to another parent: PROJ-3 (now under PROJ-9)", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_task_taken_out_of_the_story_is_dropped(self):
+        ticket.fetch(self.board, "PROJ-3", self.out)
+        task = self.fake.routes[4][1](re.search(r"(PROJ-3)", "PROJ-3"))
+        task["fields"]["parent"] = None
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertIn("dropped, moved to another parent: PROJ-3 (now without a parent)", note)
+        self.assertNotIn("dk:ticket task=PROJ-3", path.read_text(encoding="utf-8"))
+
+    def test_acceptance_field_found_by_id_not_label(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["names"]["customfield_100"] = "Done When"
+        issue["renderedFields"]["description"] = "<p>Short.</p>"
+        *_, nxt, _ = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual(nxt, "story-runner")
+
+    def test_local_file_image_is_never_opened(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["renderedFields"]["description"] = '<p><img src="file:///etc/hosts"><img src="ftp://h/x.png"></p>'
+        path, item, wtype, n_img, *_ = ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual(n_img, 1)  # only the image in a comment
+        self.assertIn("file:///etc/hosts", path.read_text(encoding="utf-8"))
+        self.assertFalse(any(u.startswith(("file:", "ftp:")) for u, _ in self.fake.calls))
+
+    def test_dead_external_image_keeps_its_link(self):
+        issue = self.fake.routes[4][1](re.search(r"(PROJ-1)", "PROJ-1"))
+        issue["renderedFields"]["description"] = ('<p><img src="https://gone.example/a.png">'
+                                                  '<img src="https://moved.example/b.png"></p>')
+        self.fake.routes.insert(0, (r"gone\.example", lambda m: (_ for _ in ()).throw(ticket.Fail("not found (HTTP 404): x"))))
+        self.fake.routes.insert(0, (r"moved\.example", b"<html>moved</html>"))
+        path, *_, note = ticket.fetch(self.board, "PROJ-1", self.out)
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("(https://gone.example/a.png)", text)
+        self.assertIn("(https://moved.example/b.png)", text)
+        self.assertIn("images not downloaded, kept as links: https://gone.example/a.png, https://moved.example/b.png", note)
+        self.assertEqual(sorted(f.name for f in (path.parent / "images").iterdir()), ["3.png"])  # the comment image
+
+    def test_dead_board_image_still_fails(self):
+        self.fake.routes.insert(0, (r"/attachment/content/10001", b"<html>sign in</html>"))
+        with self.assertRaisesRegex(ticket.Fail, "is not an image"):
+            ticket.fetch(self.board, "PROJ-1", self.out)
+
+    def test_failed_refresh_keeps_the_old_copy(self):
+        path, *_ = ticket.fetch(self.board, "PROJ-1", self.out)
+        before = {f: f.read_bytes() for f in path.parent.rglob("*") if f.is_file()}
+        self.fake.routes.insert(0, (r"/attachment/content/10002", lambda m: (_ for _ in ()).throw(ticket.Fail("timeout"))))
+        with self.assertRaisesRegex(ticket.Fail, "timeout"):
+            ticket.fetch(self.board, "PROJ-1", self.out)
+        self.assertEqual({f: f.read_bytes() for f in path.parent.rglob("*") if f.is_file()}, before)
+
 
 class Plumbing(unittest.TestCase):
     def test_next_skill(self):
-        it = lambda t, **kw: ticket.Item(type=t, **kw)
+        def it(t, **kw):
+            return ticket.Item(type=t, **kw)
         self.assertEqual(ticket.next_skill(it("Bug"), None), "bug-fixer")
         self.assertEqual(ticket.next_skill(it("Bug"), {"Bug": "story-runner"}), "story-runner")
         self.assertEqual(ticket.next_skill(it("Task", labels=["Tech-Debt"]), None), "code-refactor")
@@ -386,13 +503,58 @@ class Plumbing(unittest.TestCase):
             with self.assertRaisesRegex(ticket.Fail, "run login"):
                 ticket.Board(ticket.Auth("old", hint="run login")).get("u")
 
+    def test_token_only_to_the_board_hosts(self):
+        calls = []
+        with mock.patch.object(ticket, "request", lambda url, auth, body=None, raw=False: calls.append(auth) or PNG):
+            jira = ticket.Jira("acme.atlassian.net", ticket.Auth("Basic x"))
+            for url in ("https://acme.atlassian.net/rest/api/3/attachment/content/1", "https://evil.example/x.png",
+                        "http://acme.atlassian.net/x.png", "https://acme.atlassian.net.evil.example/x.png"):
+                jira.download(url)
+            ado = ticket.Ado("Org", "P", ticket.Auth("Bearer t"))
+            for url in (f"{ADO}/_apis/wit/attachments/{GUID1}", f"https://org.visualstudio.com/P/_apis/wit/attachments/{GUID1}",
+                        "https://images.example/shot.png"):
+                ado.download(url)
+        self.assertEqual(calls, ["Basic x", None, None, None, "Bearer t", "Bearer t", None])
+
+    def test_attachment_names_differ_by_more_than_case(self):
+        doc = ticket.Doc(ticket.Jira("a.atlassian.net", ticket.Auth("")))
+        doc.attachments.append(("u1", doc.unique("Spec.pdf")))
+        self.assertEqual(doc.unique("spec.pdf"), "spec-2.pdf")
+
     def test_redirect_to_another_host_drops_the_token(self):
         h = ticket.SameHostAuth()
         req = urllib.request.Request("https://acme.atlassian.net/a", headers={"Authorization": "Basic x"})
         same = h.redirect_request(req, None, 302, "", {}, "https://acme.atlassian.net/b")
         other = h.redirect_request(req, None, 302, "", {}, "https://media.example/b")
+        downgrade = h.redirect_request(req, None, 302, "", {}, "http://acme.atlassian.net/b")
         self.assertIn("Authorization", same.headers)
         self.assertNotIn("Authorization", other.headers)
+        self.assertNotIn("Authorization", downgrade.headers)
+
+    def test_opener_has_no_file_or_ftp(self):
+        for url in ("file:///etc/hosts", "ftp://example.invalid/x"):
+            with self.assertRaisesRegex(ticket.Fail, "unknown url type"):
+                ticket.request(url, None, raw=True)
+        self.assertEqual(ticket.request("data:,abc", None, raw=True), b"abc")
+
+    def test_windows_device_names_and_quoted_links(self):
+        self.assertEqual([ticket.safe_name(n) for n in ("aux.pdf", "CON", "com1.txt", "auxiliary.pdf")],
+                         ["_aux.pdf", "_CON", "_com1.txt", "auxiliary.pdf"])
+        self.assertEqual(ticket.Ado("org", "My Proj", ticket.Auth("")).link(7),
+                         "https://dev.azure.com/org/My%20Proj/_workitems/edit/7")
+
+    def test_error_line_for_a_non_utf8_config(self):
+        with tempfile.TemporaryDirectory() as d:
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                pathlib.Path(".dev-kit").mkdir()
+                pathlib.Path(".dev-kit/config.yml").write_bytes(b"ticket:\n  site: caf\xe9\n")
+                with mock.patch("sys.stderr") as err:
+                    self.assertEqual(ticket.main(["check"]), 1)
+                self.assertIn("not UTF-8", "".join(c.args[0] for c in err.write.call_args_list))
+            finally:
+                os.chdir(cwd)
 
     def test_sha_ignores_the_fetch_time(self):
         with tempfile.TemporaryDirectory() as d:

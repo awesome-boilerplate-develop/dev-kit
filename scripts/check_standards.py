@@ -14,6 +14,8 @@ import re
 import subprocess
 import sys
 
+sys.stdout.reconfigure(encoding="utf-8")  # messages quote the report and standards (≥, —, Vietnamese); Windows pipes are cp1252
+
 SECTIONS = ["Design", "Implement", "Review", "Do not flag", "Severity"]
 LETTER = {"architecture": "A", "coding": "C", "testing": "T", "security": "S", "ui": "U", "api": "P", "data": "D",
           "ops": "O", "process": "R", "review": "R"}
@@ -105,7 +107,7 @@ def check(path, problems):
     parts = re.split(r"^## (.+?)\s*$", body, flags=re.M)
     sections = {}
     for name, content in zip(parts[1::2], parts[2::2]):
-        sections.setdefault(name, []).extend(l for l in content.splitlines() if l.startswith("- "))
+        sections.setdefault(name, []).extend(ln for ln in content.splitlines() if ln.startswith("- "))
     defined, refs = [], []
     for name in ("Design", "Implement"):
         for line in sections.get(name, []):

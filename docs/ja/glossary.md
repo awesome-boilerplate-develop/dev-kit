@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/glossary.md source_commit=v1.9.2 review=machine -->
+<!-- i18n: source=docs/en/glossary.md source_commit=v1.9.3 review=machine -->
 [English](../en/glossary.md) | [Tiếng Việt](../vi/glossary.md) | [简体中文](../zh-CN/glossary.md) | 日本語
 
 > この翻訳は英語版より遅れる場合があります。正式な内容は英語版です: [glossary.md](../en/glossary.md)
@@ -15,7 +15,7 @@
 | **Baseline** | skill セットをインストールしていない同じモデル。lab での比較の基準点 |
 | **SDD** (subagent-driven development) | Superpowers の作業方法: 計画をタスクに分割し、タスクごとに subagent を起動し、各タスクをレビューする subagent も起動する。台帳により実行を再開できる |
 | **Worktree** | ブランチ用の別個の git 作業ディレクトリ。大きな作業がメインのディレクトリに影響しないようにする |
-| **Grilling** | Matt Pocock の要件の明確化の方法: 設計判断のツリーをたどりながら、一度に 1 つずつ質問する |
+| **Grilling** | Matt Pocock の要件の明確化の方法: 設計判断のツリーをたどりながら、ラウンドごとに質問する（今聞ける質問をすべて番号付き・推奨回答付きで） |
 | **Characterization test** | リファクタリングの前に現在の振る舞いを固定するテスト。バグに見える振る舞いも含む |
 | **Pre-PR / final gate** | PR を開く前のチェック: チェックを実行し、基準引き下げの兆候を探し、レビューして、GO/NO-GO の verdict を出す |
 | **Lowered standard（基準の引き下げ）** | 「手早く通す」ための近道: テストのスキップ、`noqa`/`ts-ignore` の追加、assert の削除、しきい値の引き下げ |

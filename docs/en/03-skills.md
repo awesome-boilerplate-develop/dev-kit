@@ -7,7 +7,7 @@ The four controllers share the same behavior blocks before their own steps:
 | Block | Meaning |
 |---|---|
 | **Parts** | Read a part only when a step mentions it; parts are not skills |
-| **Rules** | Apply the rules that are on in `rules/RULES.md`: F1, F2, C1, C2, G1, S1, O1 ([04](04-rules.md)) |
+| **Rules** | Apply the rules that are on in `rules/RULES.md`: F1, F2, C1, C2, G1, T1, S1, O1, and R1 in pre-pr-check ([04](04-rules.md)) |
 | **Graph** | If the repo has a codegraph/CRG index, use it per rule G1; if not, skip |
 | **Commands** | Take the check commands and base branch from `.dev-kit/config.yml` if it exists; otherwise use `make check` or the repo's test command, and `main` |
 | **Outputs** | Everything is written into `.dev-kit/` (rule O1); finish with a report per `templates/report.md`; severity uses the blocker/major/minor scale (rule S1) |
@@ -29,7 +29,7 @@ The examples below are **illustrations, not run** on your repo. Real examples ar
 
 **Steps and questions, in order:**
 1. **Graph tools:** checked with `scripts/install-graph-tools.sh --check`. *Question only if one is missing:* install it? If you decline, it continues with "G1 off". It never runs `codegraph install` or `code-review-graph install` (they register MCP, hooks and instruction files).
-2. **Personal settings:** reads `~/.dev-kit/config.yml` if an earlier repo saved a team standards folder there.
+2. **Personal settings:** none for now; dev-kit is set up one repo at a time.
 3. **Probe, no questions:** commands, base branch, stack, what the linters already enforce, files already tracked under `.dev-kit/`, the project's own `GLOSSARY.md`, `docs/adr/`, `CONSTRAINTS.md`.
 4. *Question:* **commands and base branch** (confirm or correct). The base branch is checked against where recent pull requests merge, not only `origin/HEAD`; when they differ it is asked as a choice with dates and commit counts. Then it creates `.dev-kit/` with a `.gitignore` containing `*` and writes `config.yml`.
 5. *Question:* **graph indexes** (default yes; the expected size, about 0.16 MB and 0.6 MB per indexed file, measured as 136 MB and 529 MB for ~850 files). Index folders that still show in `git status` (codegraph keeps its own `.gitignore` visible) go to the repo's exclude file (`git rev-parse --git-path info/exclude`, shared by all worktrees); `.dev-kit/` is never added there. Then *Question:* **quick or detailed setup** for the standards: quick (Recommended) takes every Recommended line itself and asks once, with one read-back of everything it will write, shown as a checklist with the Recommended items ticked (☑) and the others not (☐); you change it with `+ID`/`-ID` (`file#ID` when an ID repeats in another file) or with one multiple-choice form per kit file, where ticking an item switches its mark; detailed asks group by group, with the loops for your own conventions and the `CONSTRAINTS.md` question. A red baseline is asked in both. Spec: [`skills/init/references/quick-setup.md`](../../skills/init/references/quick-setup.md); runs: [1.6.0](06-evidence.md#quick-setup-and-not-offered-items-on-omp-dev-kit-160), [1.7.0](06-evidence.md#pre-ticked-checklist-and-tick-forms-on-omp-dev-kit-170).
@@ -83,7 +83,7 @@ Without `CONSTRAINTS.md`, `dk:pre-pr-check` still flags new skips, suppressions,
 **Steps:**
 1. **Reproduce and find the root cause.** For a hard bug or a performance bug, read the `systematic-debugging` or `diagnosing-bugs` part and follow it.
 2. **Write a regression test** that fails for the right reason → fix at the root cause → test goes green.
-3. **Run the check commands.** Commit; the message states the root cause.
+3. **Run the check commands.** Commit on a feature branch (on the base branch it creates one first); the message states the root cause.
 4. **Run `dk:pre-pr-check`.**
 
 **Outputs:** a fix commit with its test, a report, the pre-pr-check result.
@@ -107,12 +107,12 @@ flowchart LR
 **Use when:** a feature/story ticket.
 
 **Steps:**
-1. **Clarify.** If the ticket is ambiguous, read the `grilling` part and ask you one question at a time. If there are new business terms, also read the `domain-modeling` part. Only when nobody can answer (headless run) does it pick a reasonable option itself and mark it as an assumption.
+1. **Clarify.** If the ticket is ambiguous, read the `grilling` part and ask you in rounds: every question it can ask now, numbered, each with a recommended answer. If there are new business terms, also read the `domain-modeling` part. Only when nobody can answer (headless run) does it pick a reasonable option itself and mark it as an assumption.
 2. **Write the spec** `.dev-kit/specs/<feature>.md` per `templates/spec.md`: goal, rules, interface, acceptance criteria, out of scope, and a **Decisions** section (question, answer, who decided or "assumption").
 3. **Follow rule C1:**
-   - **Small work:** do it right in the session, tests first, one commit per behavior.
-   - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development` → `finishing-a-development-branch` (merge back into the branch you are working on; no push/PR).
-4. **Run `dk:pre-pr-check`.**
+   - **Small work:** do it right in the session, tests first, one commit per behavior, on a feature branch: on the base branch it creates one before the first commit, since an empty `<base>...HEAD` leaves pre-pr-check nothing to review.
+   - **Large work** (more than 3 tasks or several modules): use the parts in order: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, stopping before SDD's own finishing step.
+4. **Run `dk:pre-pr-check`.** For large work it runs in the worktree, on the feature branch, before anything is merged; only on GO does `finishing-a-development-branch` offer its options (merge, PR, keep the branch) and you choose; with nobody to answer, the branch is kept.
 
 ```mermaid
 flowchart TD
@@ -120,9 +120,10 @@ flowchart TD
     A -- "No" --> S["Spec + Decisions"]
     S --> Z{"Large work?"}
     Z -- "No" --> D["Work in the session, tests first"]
-    Z -- "Yes" --> P["writing-plans → worktree → SDD → finishing"]
+    Z -- "Yes" --> P["writing-plans → worktree → SDD"]
     D --> PP["dk:pre-pr-check"]
     P --> PP
+    PP -- "GO, large work" --> F["finishing (merge back)"]
 ```
 
 **Example (illustration):** ticket "A customer enters a discount code at checkout".
@@ -139,7 +140,7 @@ flowchart TD
 **Steps:**
 1. **Fix the new interface.** If the boundaries are unclear, read the `codebase-design` part.
 2. **Write characterization tests first**, at the public interface, pinning current behavior for every input. Pin behavior that looks like a bug too: record it in the report as "suspect bug" and **do not fix** it during the refactor.
-3. **Follow rule C1:** for small work, move in small steps inside the session, check after each step, commit each step. For large work, use the SDD parts as story-runner does.
+3. **Follow rule C1:** for small work, move in small steps inside the session, check after each step, commit each step (on a feature branch, created first when on the base branch). For large work, use the SDD parts as story-runner does.
 4. **Run `dk:pre-pr-check`.** The review checks "no behavior change" and the interface you fixed.
 
 **Why pin even behavior that looks like a bug:** in the lab, a refactor ticket is graded by comparing behavior before and after on 300 random inputs. If you "fix a bug while you are there" during the refactor, behavior changes, and the reviewer cannot tell which part is the refactor and which is the bug fix.
@@ -150,10 +151,10 @@ flowchart TD
 
 **Use when:** the branch is done and a PR is about to be opened. The other three controllers call it at the end on their own; you can also call it directly for a branch written by a person.
 
-**Report-only mode:** if the request says "do not change code", it edits no file and skips step 4.
+**Report-only mode:** if the request says "do not change code", it changes no file outside `.dev-kit/` and skips step 4; it still writes the report, and removes a stale PR body on NO-GO.
 
 **Steps:**
-1. **Run the check commands right now** and keep the output as Evidence. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
+1. **Run the check commands right now** and keep the output as Evidence. An empty diff (on the base branch itself, or already merged) stops the run: nothing to review, no verdict. The review covers HEAD; uncommitted changes are left alone and named in the report; the checks then ran on them, not on HEAD, so the verdict is NO-GO until you commit them, and it asks you before fixing anything while they are there. A check that fails outside the baseline, or cannot run, makes the verdict NO-GO on its own. Read `git diff <base branch>...HEAD` for signs of lowered standards: new tests skipped, `noqa`/`ts-ignore` added, asserts removed, thresholds lowered.
 2. **Pick the review level per rule C2:**
 
    | Level | When | What it does |
@@ -163,9 +164,9 @@ flowchart TD
    | 4 reviewers | You ask for it, or the diff touches auth/permissions, secrets, personal data, migrations, config/env | In parallel: 2 `code-review` reviewers (one axis each), `dk:security-auditor`, `dk:test-engineer` |
 
    Each reviewer receives the diff range and the spec/issue text, and returns `file:line | blocker/major/minor | reason`.
-3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, `Verdict: NO-GO`; otherwise `GO`.
-4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), and go back to step 1. At most 2 rounds.
-5. **Report with the findings table.** Unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
+3. **Merge the results** into one table on the blocker/major/minor scale. If any blocker is still open, or a check failed, `Verdict: NO-GO`; otherwise `GO`.
+4. **If there are blockers:** read the `receiving-code-review` part, fix with evidence (or push back with a reason), commit each fix, and go back to step 1. At most 2 rounds.
+5. **Report with the findings table.** On GO and unless in report-only mode, write `.dev-kit/reports/pr-body.md` per the `pr` part (Summary / Evidence / Merge Danger), with Evidence being the output of step 1.
 
 **Example (illustration):** a "partial refund" branch touches permissions and personal data, so it runs 4 reviewers. The result is NO-GO with these blockers:
 - a non-staff role can still issue refunds;
@@ -215,7 +216,7 @@ flowchart LR
 
 **Steps:**
 1. **Board settings:** a full link is fetched at once; afterwards, if `.dev-kit/config.yml` has no `ticket:` section, it writes one from the link and tells you.
-2. **Credentials:** `scripts/ticket.py check`; Jira uses an API token you store with `ticket.py login jira` in your own terminal, Azure DevOps uses `az login` (or a PAT).
+2. **Credentials:** `scripts/ticket.py check`; Jira uses an API token you store with `ticket.py login jira` in your own terminal, Azure DevOps uses `az login` (or a PAT). Images whose link points outside the board are downloaded without the token; internal addresses (localhost, LAN) are not blocked.
 3. **Fetch** by link or key, or **query** with JQL / WIQL written from your words. Each ticket keeps what the board shows: the sections in the order of the real form (the Azure DevOps layout is read, since organisations customise it), images where they appear, links (related items, PRs, commits), attachments and comments in the board's order. A Task or Sub-task under a story is written into the story's file, after the story's own content, with a section of its own and the story's children.
 4. **Translation** on request (`ticket.<lang>.md`, the original stays the source of truth; a changed ticket marks it stale).
 5. **Next skill:** Bug → `dk:bug-fixer`, story → `dk:story-runner` (or `dk:brainstorm` when it is too thin), tech debt → `dk:code-refactor`, otherwise it asks; `ticket.types` overrides. For one ticket it offers to run it with the file as the card.

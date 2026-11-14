@@ -1,6 +1,6 @@
 # dev-kit rules
 
-Each rule has a status and the lab evidence behind it (the dev-kit lab, private).
+Each rule has a status and the lab evidence behind it (the dev-kit lab, private). "File NN" in the Evidence column names a private lab note; the public summary of those results is in `docs/en/06-evidence.md`.
 Only **on** rules are applied by the controllers. Workflow rules are turned on only if they helped (or cut cost without hurting) on tasks they were **not** written from; rules marked (standard) or (framework) come from published review practice and audits, not from a lab result.
 
 | ID | Rule | Status | Evidence |
