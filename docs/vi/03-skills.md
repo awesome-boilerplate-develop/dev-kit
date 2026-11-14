@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.9.3 review=human -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=cfbbf72 review=human -->
 [English](../en/03-skills.md) | Tiếng Việt | [简体中文](../zh-CN/03-skills.md) | [日本語](../ja/03-skills.md)
 
 > Bản dịch này có thể chậm hơn bản tiếng Anh; bản tiếng Anh ([docs/en/03-skills.md](../en/03-skills.md)) là bản chuẩn.
@@ -86,7 +86,7 @@ Khi không có `CONSTRAINTS.md`, `dk:pre-pr-check` vẫn đánh dấu các skip,
 **Các bước:**
 1. **Tái hiện và tìm nguyên nhân gốc.** Với bug khó hoặc bug hiệu năng, đọc part `systematic-debugging` hoặc `diagnosing-bugs` và làm theo.
 2. **Viết regression test** fail đúng lý do → sửa tại nguyên nhân gốc → test chuyển xanh.
-3. **Chạy các lệnh kiểm tra.** Commit; message nêu nguyên nhân gốc.
+3. **Chạy các lệnh kiểm tra.** Commit trên feature branch (đang ở base branch thì tạo branch trước); message nêu nguyên nhân gốc.
 4. **Chạy `dk:pre-pr-check`.**
 
 **Đầu ra:** một commit sửa lỗi kèm test, một báo cáo, kết quả của pre-pr-check.
@@ -113,7 +113,7 @@ flowchart LR
 1. **Làm rõ.** Nếu ticket mơ hồ, đọc part `grilling` và hỏi bạn theo lượt: mọi câu hỏi có thể hỏi ngay, đánh số, mỗi câu kèm câu trả lời đề xuất. Nếu có thuật ngữ nghiệp vụ mới, đọc thêm part `domain-modeling`. Chỉ khi không ai trả lời được (chạy headless) thì nó mới tự chọn một phương án hợp lý và đánh dấu là giả định.
 2. **Viết spec** `.dev-kit/specs/<feature>.md` theo `templates/spec.md`: mục tiêu, quy tắc, interface, tiêu chí chấp nhận, ngoài phạm vi, và một mục **Decisions** (câu hỏi, câu trả lời, ai quyết định hoặc "assumption").
 3. **Theo rule C1:**
-   - **Việc nhỏ:** làm ngay trong session, test trước, mỗi hành vi một commit.
+   - **Việc nhỏ:** làm ngay trong session, test trước, mỗi hành vi một commit, trên feature branch: đang ở base branch thì tạo branch trước commit đầu tiên, vì `<base>...HEAD` rỗng thì pre-pr-check không có gì để review.
    - **Việc lớn** (hơn 3 task hoặc nhiều module): dùng các part theo thứ tự: `writing-plans` → `using-git-worktrees` → `subagent-driven-development`, dừng trước bước finishing của SDD. Bước 4 chạy `dk:pre-pr-check` trong worktree, trên feature branch, trước khi merge; chỉ khi GO thì `finishing-a-development-branch` mới đưa ra các lựa chọn (merge, PR, giữ branch) để bạn chọn; khi không có ai trả lời thì giữ nguyên branch.
 4. **Chạy `dk:pre-pr-check`.**
 
@@ -143,7 +143,7 @@ flowchart TD
 **Các bước:**
 1. **Chốt interface mới.** Nếu ranh giới chưa rõ, đọc part `codebase-design`.
 2. **Viết characterization test trước**, tại interface công khai, cố định hành vi hiện tại cho mọi đầu vào. Cố định cả hành vi trông như bug: ghi vào báo cáo là "suspect bug" và **không sửa** trong lúc refactor.
-3. **Theo rule C1:** với việc nhỏ, đi từng bước nhỏ trong session, kiểm tra sau mỗi bước, commit từng bước. Với việc lớn, dùng các part SDD như story-runner.
+3. **Theo rule C1:** với việc nhỏ, đi từng bước nhỏ trong session, kiểm tra sau mỗi bước, commit từng bước (trên feature branch, đang ở base branch thì tạo trước). Với việc lớn, dùng các part SDD như story-runner.
 4. **Chạy `dk:pre-pr-check`.** Review kiểm tra "không đổi hành vi" và interface bạn đã chốt.
 
 **Vì sao cố định cả hành vi trông như bug:** trong lab, một ticket refactor được chấm bằng cách so sánh hành vi trước và sau trên 300 đầu vào ngẫu nhiên. Nếu bạn "tiện tay sửa bug" trong lúc refactor, hành vi sẽ đổi, và reviewer không thể phân biệt đâu là refactor, đâu là sửa bug.
@@ -154,7 +154,7 @@ flowchart TD
 
 **Dùng khi:** branch đã xong và sắp mở PR. Ba controller kia tự gọi nó ở cuối; bạn cũng có thể gọi trực tiếp cho một branch do người viết.
 
-**Chế độ report-only:** nếu yêu cầu nói "do not change code", nó không sửa file nào và bỏ qua bước 4.
+**Chế độ report-only:** nếu yêu cầu nói "do not change code", nó không sửa file nào ngoài `.dev-kit/` và bỏ qua bước 4; nó vẫn ghi report, và xoá PR body cũ khi NO-GO.
 
 **Các bước:**
 1. **Chạy các lệnh kiểm tra ngay lúc này** và giữ output làm Evidence. Diff rỗng (đang ở chính base branch, hoặc đã merge rồi) thì dừng: không có gì để review, không có verdict. Review xét HEAD; thay đổi chưa commit được giữ nguyên và ghi tên trong report; khi đó checks chạy trên chúng chứ không phải HEAD, nên verdict là NO-GO cho tới khi bạn commit, và nó hỏi bạn trước khi sửa gì trong lúc còn các thay đổi đó. Một check fail ngoài baseline, hoặc không chạy được, tự nó làm verdict thành NO-GO. Đọc `git diff <base branch>...HEAD` để tìm dấu hiệu hạ tiêu chuẩn: test mới bị skip, thêm `noqa`/`ts-ignore`, xóa assert, hạ ngưỡng.

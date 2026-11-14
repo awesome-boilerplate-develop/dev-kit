@@ -1,4 +1,4 @@
-<!-- i18n: source=docs/en/03-skills.md source_commit=v1.9.3 review=machine -->
+<!-- i18n: source=docs/en/03-skills.md source_commit=cfbbf72 review=machine -->
 [English](../en/03-skills.md) | [Tiếng Việt](../vi/03-skills.md) | 简体中文 | [日本語](../ja/03-skills.md)
 
 > 本译文可能滞后于英文版；以英文版为准：[03-skills.md](../en/03-skills.md)。
@@ -86,7 +86,7 @@
 **步骤：**
 1. **复现并找到根因。** 对于难的 bug 或性能 bug，读取 `systematic-debugging` 或 `diagnosing-bugs` part 并照做。
 2. **写一个回归测试**，使其因正确的原因而失败 → 在根因处修复 → 测试变绿。
-3. **运行检查命令。** 提交；commit message 要写明根因。
+3. **运行检查命令。** 在 feature 分支上提交（若在基础分支上，先创建一个）；commit message 要写明根因。
 4. **运行 `dk:pre-pr-check`。**
 
 **输出：** 一个带测试的修复 commit、一份报告、pre-pr-check 的结果。
@@ -113,7 +113,7 @@ flowchart LR
 1. **澄清。** 如果工单含糊不清，读取 `grilling` part，按轮次提问：当前能问的所有问题，编号，每个都附推荐答案。如果有新的业务术语，也读取 `domain-modeling` part。只有在没有人能回答时（headless 运行），它才自己选一个合理的方案，并标记为 assumption。
 2. **写 spec** `.dev-kit/specs/<feature>.md`，按 `templates/spec.md`：目标、rule、接口、验收标准、范围之外，以及一个 **Decisions** 部分（问题、答案、谁决定，或 “assumption”）。
 3. **遵循 rule C1：**
-   - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit。
+   - **小型工作：** 直接在 session 中完成，测试先行，每个行为一个 commit，提交在 feature 分支上：若在基础分支上，第一次提交前先创建分支，因为 `<base>...HEAD` 为空时 pre-pr-check 没有可审查的内容。
    - **大型工作**（超过 3 个任务或涉及多个模块）：按顺序使用这些 part：`writing-plans` → `using-git-worktrees` → `subagent-driven-development`，在 SDD 自己的 finishing 步骤之前停下。第 4 步的 `dk:pre-pr-check` 在 worktree 中的 feature 分支上、合并之前运行；只有 GO 时 `finishing-a-development-branch` 才给出选项（合并、PR、保留分支）由你选择；无人回答时保留分支。
 4. **运行 `dk:pre-pr-check`。**
 
@@ -143,7 +143,7 @@ flowchart TD
 **步骤：**
 1. **确定新的接口。** 如果边界不清楚，读取 `codebase-design` part。
 2. **先写 characterization test**，在公共接口上，针对每种输入固定当前行为。看起来像 bug 的行为也要固定：在报告中记为 “suspect bug”，并且在重构期间**不要修复**它。
-3. **遵循 rule C1：** 小型工作在 session 内小步移动，每步之后检查，每步提交。大型工作则像 story-runner 那样使用 SDD 的 part。
+3. **遵循 rule C1：** 小型工作在 session 内小步移动，每步之后检查，每步提交（在 feature 分支上；若在基础分支上则先创建）。大型工作则像 story-runner 那样使用 SDD 的 part。
 4. **运行 `dk:pre-pr-check`。** review 会检查“没有行为变化”以及你确定的接口。
 
 **为什么连看起来像 bug 的行为也要固定：** 在 lab 中，一张重构工单是通过在 300 个随机输入上比较前后行为来评分的。如果你在重构期间“顺手修个 bug”，行为就变了，reviewer 无法分辨哪部分是重构，哪部分是 bug 修复。
@@ -154,7 +154,7 @@ flowchart TD
 
 **使用场景：** 分支完成，即将开 PR。其他三个 controller 会在结束时自动调用它；你也可以直接对一个由人写的分支调用它。
 
-**Report-only 模式：** 如果请求里说“不要修改代码”，它不会编辑任何文件，并跳过第 4 步。
+**Report-only 模式：** 如果请求里说“不要修改代码”，它不会修改 `.dev-kit/` 以外的任何文件，并跳过第 4 步；它仍会写报告，并在 NO-GO 时删除旧的 PR body。
 
 **步骤：**
 1. **立即运行检查命令**，并把输出保留为 Evidence。diff 为空（就在 base 分支上，或已合并）则停止：没有可 review 的内容，也没有 verdict。review 针对 HEAD；未提交的修改保持不动并在 report 中列出；此时 checks 是在这些修改上而非 HEAD 上运行的，所以在你提交之前 verdict 为 NO-GO；存在这些修改时，修复之前会先询问你。在 baseline 之外失败、或无法运行的 check，本身就会让 verdict 成为 NO-GO。阅读 `git diff <base branch>...HEAD`，查找降低标准的迹象：新增被跳过的测试、添加了 `noqa`/`ts-ignore`、删除了 assert、降低了阈值。
