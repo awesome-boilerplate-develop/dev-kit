@@ -7,12 +7,12 @@
 
 ## Tests
 - Added: <test names>
-- Red before the fix / green after: <yes/no + how checked>
+- Red before the fix / green after: <yes/no + how checked; the red run on the old code goes here, not under Commands run>
 
 ## Commands run
 | Command | Result |
 |---|---|
-| <check command> | <PASS / FAIL: … / NOT RUN: …, counts; a failure listed in the baseline is PASS> |
+| <check command, run on HEAD> | <PASS / FAIL: … / NOT RUN: …, counts; a failure listed in the baseline is PASS> |
 
 ## Review setup (required)
 - Diff: <merge-base sha>...<HEAD sha> (the range reviewed)
