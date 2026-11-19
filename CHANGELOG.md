@@ -1,6 +1,6 @@
 # dev-kit changelog
 
-## 1.9.5 (unreleased)
+## 1.9.5 (2026-11-19)
 Fixes from an agent run of 1.9.4 (Claude Code, headless, `dk:bug-fixer` and a report-only `dk:pre-pr-check` on a small test repo).
 - **The red run on the old code goes under Tests:** the report template says Commands run lists the checks on HEAD, and the red-before-fix run belongs to the Tests section. An agent listed it under Commands run, where `check_report.py` rightly reads a failed run as a failing check.
 - **`pre-pr-check` does not hide uncommitted files:** no edits to `.gitignore` or `.git/info/exclude`; files the check itself writes that the repo does not ignore (such as `__pycache__/`) are named, with a suggestion to ignore them in the repo. An agent added `__pycache__/` to `.git/info/exclude` to get a clean Tree line.
