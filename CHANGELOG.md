@@ -1,5 +1,10 @@
 # dev-kit changelog
 
+## 1.9.5 (unreleased)
+Fixes from an agent run of 1.9.4 (Claude Code, headless, `dk:bug-fixer` and a report-only `dk:pre-pr-check` on a small test repo).
+- **The red run on the old code goes under Tests:** the report template says Commands run lists the checks on HEAD, and the red-before-fix run belongs to the Tests section. An agent listed it under Commands run, where `check_report.py` rightly reads a failed run as a failing check.
+- **`pre-pr-check` does not hide uncommitted files:** no edits to `.gitignore` or `.git/info/exclude`; files the check itself writes that the repo does not ignore (such as `__pycache__/`) are named, with a suggestion to ignore them in the repo. An agent added `__pycache__/` to `.git/info/exclude` to get a clean Tree line.
+
 ## 1.9.4 (2026-11-14)
 Fixes from two external reviews of 1.9.3; each script fix has a test that fails on 1.9.3.
 - **Controllers never commit on the base branch:** `story-runner`, `bug-fixer` and `code-refactor` create a feature branch before the first commit when HEAD is on the base branch or detached (new **Branch.** paragraph, kept identical by `check_parts.py`). A commit on `main` left `main...HEAD` empty, so `pre-pr-check` stopped with no review and no verdict.
