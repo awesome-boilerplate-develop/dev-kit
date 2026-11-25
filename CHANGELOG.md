@@ -1,5 +1,12 @@
 # dev-kit changelog
 
+## 1.9.6 (unreleased)
+Parts from mattpocock/skills moved from v1.3.1 to v1.3.2 (`UPSTREAM.md`); `domain-modeling` and `pr` did not change upstream.
+- **`grilling`** words each question so "yes" accepts the recommended answer, and starts a fact-finding sub-agent with a fresh context window.
+- **`diagnosing-bugs`**: when the red was forced by mutating code or a fixture, `diff` against a pristine copy to prove the mutation landed before trusting it.
+- **`code-review`** (used on its own) searches the repo for every standards file and always lists `CODING_STANDARDS.md` / `CONTRIBUTING.md` when they exist; the two sub-agents start with a fresh context window and run together in the foreground.
+- **`codebase-design`** Design It Twice starts each sub-agent with a fresh context window.
+
 ## 1.9.5 (2026-11-19)
 Fixes from an agent run of 1.9.4 (Claude Code, headless, `dk:bug-fixer` and a report-only `dk:pre-pr-check` on a small test repo).
 - **The red run on the old code goes under Tests:** the report template says Commands run lists the checks on HEAD, and the red-before-fix run belongs to the Tests section. An agent listed it under Commands run, where `check_report.py` rightly reads a failed run as a failing check.

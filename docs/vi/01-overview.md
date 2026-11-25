@@ -43,7 +43,7 @@ Làm việc với agent hằng ngày, ba vấn đề cứ lặp lại:
 | Nguồn | Lấy gì | Dùng cho |
 |---|---|---|
 | Superpowers v6.4.2 | planning, worktree, subagent-driven development (SDD), TDD, systematic debugging, xác minh trước khi nói "xong", nhận review, kết thúc một branch | Thực thi việc lớn, debug |
-| mattpocock/skills v1.3.1 | grilling (hỏi làm rõ), domain-modeling, codebase-design, code-review hai trục, pr, diagnosing-bugs | Làm rõ yêu cầu, thiết kế module, review, nội dung PR, bug hiệu năng |
+| mattpocock/skills v1.3.2 | grilling (hỏi làm rõ), domain-modeling, codebase-design, code-review hai trục, pr, diagnosing-bugs | Làm rõ yêu cầu, thiết kế module, review, nội dung PR, bug hiệu năng |
 | agent-skills 0.6.12 | constraint-driven-development, các persona `security-auditor` và `test-engineer` | Chặn việc hạ tiêu chuẩn, review bảo mật và test |
 
 Chi tiết về nguồn, commit và những gì đã sửa: [`UPSTREAM.md`](../../UPSTREAM.md).
