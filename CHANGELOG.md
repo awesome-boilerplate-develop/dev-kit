@@ -1,6 +1,6 @@
 # dev-kit changelog
 
-## 1.9.6 (unreleased)
+## 1.9.6 (2026-11-26)
 Parts from mattpocock/skills moved from v1.3.1 to v1.3.2 (`UPSTREAM.md`); `domain-modeling` and `pr` did not change upstream.
 - **`grilling`** words each question so "yes" accepts the recommended answer, and starts a fact-finding sub-agent with a fresh context window.
 - **`diagnosing-bugs`**: when the red was forced by mutating code or a fixture, `diff` against a pristine copy to prove the mutation landed before trusting it.
