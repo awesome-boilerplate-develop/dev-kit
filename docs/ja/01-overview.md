@@ -43,7 +43,7 @@ dev-kit は **7 つの skill** を持つ Claude Code plugin です。
 | ソース | 取り入れたもの | 用途 |
 |---|---|---|
 | Superpowers v6.4.2 | planning、worktree、subagent-driven development (SDD)、TDD、systematic debugging、「完了」と言う前の検証、レビューの受け取り、ブランチの終了処理 | 大きな作業の実行、デバッグ |
-| mattpocock/skills v1.3.1 | grilling（確認のための質問）、domain-modeling、codebase-design、2 軸の code-review、pr、diagnosing-bugs | 要件の明確化、モジュール設計、レビュー、PR の文面、パフォーマンスのバグ |
+| mattpocock/skills v1.3.2 | grilling（確認のための質問）、domain-modeling、codebase-design、2 軸の code-review、pr、diagnosing-bugs | 要件の明確化、モジュール設計、レビュー、PR の文面、パフォーマンスのバグ |
 | agent-skills 0.6.12 | constraint-driven-development、ペルソナ `security-auditor` と `test-engineer` | 基準の引き下げを防ぐ、セキュリティとテストのレビュー |
 
 ソース、コミット、変更点の詳細: [`UPSTREAM.md`](../../UPSTREAM.md)。

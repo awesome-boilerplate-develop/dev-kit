@@ -40,7 +40,7 @@ Working with agents every day, three problems keep coming back:
 | Source | What was taken | Used for |
 |---|---|---|
 | Superpowers v6.4.2 | planning, worktree, subagent-driven development (SDD), TDD, systematic debugging, verifying before saying "done", receiving review, finishing a branch | Execution of large work, debugging |
-| mattpocock/skills v1.3.1 | grilling (clarifying questions), domain-modeling, codebase-design, two-axis code-review, pr, diagnosing-bugs | Clarifying requirements, module design, review, PR text, performance bugs |
+| mattpocock/skills v1.3.2 | grilling (clarifying questions), domain-modeling, codebase-design, two-axis code-review, pr, diagnosing-bugs | Clarifying requirements, module design, review, PR text, performance bugs |
 | agent-skills 0.6.12 | constraint-driven-development, personas `security-auditor` and `test-engineer` | Blocking lowered standards, security and test review |
 
 Details on sources, commits and what was changed: [`UPSTREAM.md`](../../UPSTREAM.md).
